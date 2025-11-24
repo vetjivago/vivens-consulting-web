@@ -147,6 +147,33 @@ const Home = () => {
         </div>
       </section>
 
+      <section className="py-20 bg-primary text-primary-foreground">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl font-bold mb-4">Vivens em Números</h2>
+            <p className="text-xl opacity-90">Dados que refletem nosso compromisso com a excelência</p>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-5xl mx-auto">
+            <div className="text-center">
+              <div className="text-5xl font-bold mb-2">1.500</div>
+              <div className="opacity-90">m² de instalações</div>
+            </div>
+            <div className="text-center">
+              <div className="text-5xl font-bold mb-2">80</div>
+              <div className="opacity-90">Racks ventilados SPF</div>
+            </div>
+            <div className="text-center">
+              <div className="text-5xl font-bold mb-2">100%</div>
+              <div className="opacity-90">Conformidade CONCEA</div>
+            </div>
+            <div className="text-center">
+              <div className="text-5xl font-bold mb-2">3Rs</div>
+              <div className="opacity-90">Práticas éticas</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section className="py-20 bg-muted/30">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">

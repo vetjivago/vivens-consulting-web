@@ -43,10 +43,14 @@ const Toxicologia = () => {
       <section className="py-20">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto mb-16">
-            <h2 className="text-4xl font-bold mb-6">Estudos Toxicológicos</h2>
+            <h2 className="text-4xl font-bold mb-6">Estudos Toxicológicos de Alta Qualidade</h2>
+            <p className="text-lg text-muted-foreground mb-4">
+              Realizamos estudos toxicológicos completos seguindo protocolos internacionais (OECD, ICH, FDA) 
+              e normas regulatórias brasileiras (ANVISA, CONCEA), com foco em precisão científica e bem-estar animal.
+            </p>
             <p className="text-lg text-muted-foreground mb-8">
-              Realizamos uma ampla gama de estudos toxicológicos pré-clínicos, seguindo as boas práticas de laboratório (GLP) 
-              e diretrizes internacionais (OECD, FDA, ANVISA).
+              Nossa infraestrutura certificada GLP e equipe especializada garantem resultados confiáveis 
+              para submissões regulatórias e desenvolvimento de produtos seguros.
             </p>
 
             <div className="space-y-6">

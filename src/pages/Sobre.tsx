@@ -72,6 +72,48 @@ const Sobre = () => {
       <section className="py-20">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto">
+            <h2 className="text-4xl font-bold mb-12 text-center">Nossa Trajetória</h2>
+            <div className="space-y-8 mb-20">
+              <div className="flex gap-6">
+                <div className="flex-shrink-0 w-32 text-right">
+                  <div className="text-2xl font-bold text-secondary">2024</div>
+                </div>
+                <div className="flex-grow border-l-4 border-secondary pl-6 pb-8">
+                  <h3 className="text-xl font-semibold mb-2">Fundação da Vivens</h3>
+                  <p className="text-muted-foreground">
+                    Criação da empresa com foco em pesquisa pré-clínica ética e de alta qualidade, 
+                    estabelecendo parcerias estratégicas com instituições de pesquisa.
+                  </p>
+                </div>
+              </div>
+              
+              <div className="flex gap-6">
+                <div className="flex-shrink-0 w-32 text-right">
+                  <div className="text-2xl font-bold text-secondary">2025</div>
+                </div>
+                <div className="flex-grow border-l-4 border-secondary pl-6 pb-8">
+                  <h3 className="text-xl font-semibold mb-2">Inauguração do Centro PD&I</h3>
+                  <p className="text-muted-foreground">
+                    Lançamento das instalações de 1.500 m² com biotério SPF, laboratórios analíticos 
+                    certificados GLP e tecnologias 3Rs integradas.
+                  </p>
+                </div>
+              </div>
+              
+              <div className="flex gap-6">
+                <div className="flex-shrink-0 w-32 text-right">
+                  <div className="text-2xl font-bold text-secondary">2026-27</div>
+                </div>
+                <div className="flex-grow border-l-4 border-secondary pl-6">
+                  <h3 className="text-xl font-semibold mb-2">Expansão e Certificações</h3>
+                  <p className="text-muted-foreground">
+                    Obtenção de certificações internacionais (ISO 17025, GLP), expansão do portfólio 
+                    de serviços e consolidação como referência nacional em pesquisa pré-clínica ética.
+                  </p>
+                </div>
+              </div>
+            </div>
+
             <h2 className="text-4xl font-bold mb-12 text-center">Nossos Valores</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               <div className="text-center">
