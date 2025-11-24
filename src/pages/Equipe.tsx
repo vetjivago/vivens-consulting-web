@@ -92,3 +92,5 @@ const Equipe = () => {
 };
 
 export default Equipe;
+
+// Triggering new deployment after repo visibility change
