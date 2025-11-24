@@ -21,16 +21,10 @@ const Sobre = () => {
             <h2 className="text-4xl font-bold mb-8 text-center">Nossa História</h2>
             <div className="prose prose-lg max-w-none">
               <p className="text-lg text-muted-foreground mb-6">
-                A Vivens Consultoria Científica nasceu da necessidade de elevar os padrões de pesquisa pré-clínica no Brasil, 
-                combinando excelência científica com compromisso ético inabalável no tratamento de animais de laboratório.
-              </p>
-              <p className="text-lg text-muted-foreground mb-6">
-                Sediada em Brasília com atuação nacional, somos uma Organização de Pesquisa por Contrato (CRO) full-service, 
-                especializada em estudos in vivo, consultoria regulatória CONCEA/ANVISA e tecnologias 3Rs (Substituição, Redução e Refinamento).
+                A Vivens nasce com o propósito de transformar a ciência de animais de laboratório por meio de uma abordagem ética, inovadora e tecnicamente qualificada. Atuamos na interseção entre o rigor científico e o compromisso com o bem-estar animal, oferecendo soluções completas para instituições que buscam excelência em pesquisa biomédica, conformidade regulatória e desempenho operacional.
               </p>
               <p className="text-lg text-muted-foreground">
-                Nosso compromisso vai além da ciência de qualidade: trabalhamos para que cada pesquisa realizada contribua 
-                para o avanço do conhecimento científico, respeitando integralmente o bem-estar dos animais envolvidos.
+                Nosso trabalho é sustentado por três pilares fundamentais: qualidade, ética e inovação. Acreditamos que é possível aliar o avanço científico ao respeito pela vida animal, promovendo práticas baseadas nos princípios dos 3Rs (Redução, Refinamento e Substituição) e em alinhamento às normativas nacionais e internacionais, como a Resolução CONCEA nº 51/2021 e as diretrizes da FELASA e OECD.
               </p>
             </div>
           </div>
@@ -47,7 +41,7 @@ const Sobre = () => {
                 </div>
                 <h3 className="text-2xl font-bold mb-4">Missão</h3>
                 <p className="text-muted-foreground">
-                  Fornecer serviços de alta qualidade e ética na gestão e ciência de animais de laboratório, 
+                  Fornecer serviços de alta qualidade e ética na gestão e ciência de animais de laboratório,
                   contribuindo para o avanço científico com responsabilidade e respeito ao bem-estar animal.
                 </p>
               </CardContent>
@@ -60,7 +54,7 @@ const Sobre = () => {
                 </div>
                 <h3 className="text-2xl font-bold mb-4">Visão</h3>
                 <p className="text-muted-foreground">
-                  Ser líder em soluções inovadoras para a ciência animal, reconhecida pela excelência técnica 
+                  Ser líder em soluções inovadoras para a ciência animal, reconhecida pela excelência técnica
                   e pelo compromisso com práticas éticas e sustentáveis em pesquisa pré-clínica.
                 </p>
               </CardContent>
@@ -81,12 +75,12 @@ const Sobre = () => {
                 <div className="flex-grow border-l-4 border-secondary pl-6 pb-8">
                   <h3 className="text-xl font-semibold mb-2">Fundação da Vivens</h3>
                   <p className="text-muted-foreground">
-                    Criação da empresa com foco em pesquisa pré-clínica ética e de alta qualidade, 
+                    Criação da empresa com foco em pesquisa pré-clínica ética e de alta qualidade,
                     estabelecendo parcerias estratégicas com instituições de pesquisa.
                   </p>
                 </div>
               </div>
-              
+
               <div className="flex gap-6">
                 <div className="flex-shrink-0 w-32 text-right">
                   <div className="text-2xl font-bold text-secondary">2025</div>
@@ -94,12 +88,12 @@ const Sobre = () => {
                 <div className="flex-grow border-l-4 border-secondary pl-6 pb-8">
                   <h3 className="text-xl font-semibold mb-2">Inauguração do Centro PD&I</h3>
                   <p className="text-muted-foreground">
-                    Lançamento das instalações de 1.500 m² com biotério SPF, laboratórios analíticos 
+                    Lançamento das instalações de 1.500 m² com biotério SPF, laboratórios analíticos
                     certificados GLP e tecnologias 3Rs integradas.
                   </p>
                 </div>
               </div>
-              
+
               <div className="flex gap-6">
                 <div className="flex-shrink-0 w-32 text-right">
                   <div className="text-2xl font-bold text-secondary">2026-27</div>
@@ -107,7 +101,7 @@ const Sobre = () => {
                 <div className="flex-grow border-l-4 border-secondary pl-6">
                   <h3 className="text-xl font-semibold mb-2">Expansão e Certificações</h3>
                   <p className="text-muted-foreground">
-                    Obtenção de certificações internacionais (ISO 17025, GLP), expansão do portfólio 
+                    Obtenção de certificações internacionais (ISO 17025, GLP), expansão do portfólio
                     de serviços e consolidação como referência nacional em pesquisa pré-clínica ética.
                   </p>
                 </div>
@@ -159,9 +153,9 @@ const Sobre = () => {
                 <CardContent className="p-6">
                   <h3 className="text-xl font-semibold mb-3">Mercado Global</h3>
                   <p className="text-muted-foreground">
-                    O mercado global de animais de laboratório foi avaliado em <strong>US$ 10,7 bilhões em 2023</strong>, 
-                    com projeção de crescimento anual de <strong>8,2% até 2030</strong>. Este crescimento é impulsionado 
-                    pelo aumento de investimentos em P&D, expansão da indústria farmacêutica e biotecnológica, 
+                    O mercado global de animais de laboratório foi avaliado em <strong>US$ 10,7 bilhões em 2023</strong>,
+                    com projeção de crescimento anual de <strong>8,2% até 2030</strong>. Este crescimento é impulsionado
+                    pelo aumento de investimentos em P&D, expansão da indústria farmacêutica e biotecnológica,
                     e crescimento da pesquisa acadêmica.
                   </p>
                 </CardContent>

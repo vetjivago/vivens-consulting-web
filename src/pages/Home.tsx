@@ -2,11 +2,11 @@ import Hero from "@/components/Hero";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Link } from "react-router-dom";
-import { 
-  FlaskConical, 
-  GraduationCap, 
-  Shield, 
-  Users, 
+import {
+  FlaskConical,
+  GraduationCap,
+  Shield,
+  Users,
   Award,
   Microscope,
   Heart,
@@ -46,24 +46,29 @@ const Home = () => {
 
   const differentials = [
     {
-      icon: Heart,
-      title: "Ética e Bem-estar",
-      description: "Compromisso com práticas éticas e bem-estar animal em todos os processos"
-    },
-    {
       icon: Microscope,
-      title: "Ciência de Excelência",
-      description: "Equipe altamente qualificada e infraestrutura de ponta"
+      title: "Expertise Técnica Multidisciplinar",
+      description: "Equipe composta por especialistas com sólida formação em ciências veterinárias, biotecnologia, gestão da qualidade, bioética e regulamentação sanitária, oferecendo uma visão integrada e estratégica."
     },
     {
-      icon: Award,
-      title: "Conformidade Total",
-      description: "Alinhamento com normas CONCEA, ANVISA e padrões internacionais"
+      icon: Users,
+      title: "Consultoria Especializada e Personalizada",
+      description: "Projetos de adequação de instalações, desenho de fluxos operacionais, estruturação de biotérios, validação de protocolos e implementação de programas de bem-estar animal com soluções sob medida."
     },
     {
-      icon: Building2,
-      title: "Infraestrutura Moderna",
-      description: "Instalações SPF de última geração com tecnologias avançadas"
+      icon: Shield,
+      title: "Compromisso com a Conformidade",
+      description: "Orientação técnica para atendimento às exigências do CONCEA, CEUA, ANVISA e demais órgãos reguladores, apoiando instituições no alcance de acreditações nacionais e internacionais."
+    },
+    {
+      icon: Heart,
+      title: "Integração Cuidado Animal e Pesquisa",
+      description: "Suporte técnico desde a gestão de biotérios até a elaboração de protocolos experimentais, promovendo ambientes controlados, eficientes e alinhados à ciência translacional."
+    },
+    {
+      icon: GraduationCap,
+      title: "Inovação em Educação Científica",
+      description: "Plataforma de capacitação com treinamentos técnicos, cursos e programas de formação continuada para profissionais e estudantes da ciência de animais de laboratório."
     }
   ];
 
@@ -112,7 +117,7 @@ const Home = () => {
               <p className="text-lg text-muted-foreground mb-8">
                 Combinamos excelência científica com compromisso ético, oferecendo serviços que atendem aos mais altos padrões de qualidade e bem-estar animal.
               </p>
-              
+
               <div className="space-y-6">
                 {differentials.map((diff, index) => (
                   <div key={index} className="flex gap-4">

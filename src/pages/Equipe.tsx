@@ -9,7 +9,6 @@ const Equipe = () => {
       image: "/luisa-braga.jpg", // Placeholder path
       bio: "Médica veterinária, trabalhando com ciência de animais de laboratório e ética desde sua graduação. Mestre em Ciências Veterinárias, com ênfase em Embriologia e Doutora em Genética e Biologia Molecular, pela UFRGS. Pós-doutorado em Terapia Celular, pelo Instituto de Cardiologia/RS e INCOR/USP. Ex-presidente da Sociedade Brasileira de Ciência em Animais de Laboratório (SBCAL). Ex-coordenadora do Conselho Nacional de Controle da Experimentação Animal (CONCEA), onde também atuou como coordenadora da Câmara Permanente de Produção e na coordenação geral e organização do Guia Brasileiro de Produção, Manutenção ou Utilização de Animais de Laboratório. Vice-presidente da Academia Brasileira de Ciências de Animais de Laboratório (ABCAL). Especialista em Gestão, Liderança e Coaching pela PUCRS. Tem experiência em gerenciamento de biotérios de roedores, tanto de produção quanto de experimentação animal. Hoje atua como consultora cientifica e sócia proprietária nas empresas LGMACEDO CONSULTORIA e DESENVOLVIMENTO CIENTÍFICO e VIVENS CONSULTORIA.",
       contact: {
-        phone: "(51) 99915-4684",
         email: "lgmacedo@gmail.com",
         linkedin: "https://www.linkedin.com/in/luisa-maria-gomes-de-macedo-braga-8b2b1150",
         instagram: "luisamgmb",
@@ -20,13 +19,23 @@ const Equipe = () => {
       name: "Jivago Rôlo",
       role: "Chief Scientific Officer",
       image: "/jivago-rolo.jpg",
-      bio: "PhD em Ciências Biológicas com mais de 15 anos de experiência em pesquisa pré-clínica e desenvolvimento de modelos animais. Especialista em regulamentação CONCEA/ANVISA."
+      bio: "Médico-veterinário e cientista com mestrado e doutorado em Biologia Animal e especializado em Ciência de Animais de Laboratório, FELASA SPECIALIST D. Atua na interface entre bem-estar animal, ética em pesquisa e desenho experimental aplicado à biomedicina. Tem experiência em gestão e modernização de biotérios acadêmicos, implementação de rotinas de biossegurança, padronização sanitária e alinhamento às diretrizes do CONCEA e normas internacionais, com foco em reprodutibilidade científica e redução do uso de animais. Desenvolve e ministra cursos, treinamentos e disciplinas voltados à ética, legislação, manejo, pontos finais humanitários e planejamento experimental, formando técnicos, estudantes de graduação e pós-graduação. Lidera ainda iniciativas que integram inteligência artificial e análise de comportamento animal para monitoramento objetivo de dor, estresse e bem-estar, além de projetos de educação científica e inovação tecnológica, como a Lab Science Academy e o AURIA, voltados a conectar pesquisa aplicada, formação profissional e soluções de alto impacto para a ciência de animais de laboratório.",
+      contact: {
+        email: "jivagorolo@gmail.com",
+        linkedin: "https://www.linkedin.com/in/jivago-rolo",
+        lattes: "http://lattes.cnpq.br/0401207763557481"
+      }
     },
     {
-      name: "Marta Speck",
+      name: "Marta Lorena Speck da Silva",
       role: "Gerente de Bem-estar Animal",
       image: "/marta-speck.jpg",
-      bio: "Médica Veterinária com especialização em Medicina de Animais de Laboratório. Lidera programas de bem-estar animal e implementação de práticas 3Rs na instituição."
+      bio: "Graduada em Ciências Biológicas com ênfase em Biopatologia e mestre em Ciências Farmacêuticas pela UFRGS. Atualmente, sou doutoranda em Medicina Translacional pela UFC, Acadêmica Titular e Patrona da Cadeira n 6 da Academia Brasileira de Ciência em Animais de Laboratório (ABCAL). Minha atuação abrange as áreas de gestão da qualidade para biotérios, controle genético e monitoramento sanitário de animais de laboratório, além da produção e experimentação com roedores e peixes. Tenho ampla experiência na implementação de metodologias para o aprimoramento de processos, com foco na gestão da qualidade em biotérios e na garantia do bem-estar animal. Fui responsável pela implementação dos elevados padrões internacionais exigidos pela certificação AAALAC, tendo sido gestora do único biotério público no Brasil (UFC) acreditado por essa organização. Dessa forma, asseguro que todas as práticas de manejo e experimentação animal estejam alinhadas às melhores diretrizes globais de cuidado e ética, mantendo o bem-estar animal como prioridade em todas as fases dos processos laboratoriais.",
+      contact: {
+        email: "martaspeck@gmail.com",
+        linkedin: "https://www.linkedin.com/in/marta-speck-b987b9139/",
+        lattes: "http://lattes.cnpq.br/7259678197876031"
+      }
     }
   ];
 
@@ -64,7 +73,6 @@ const Equipe = () => {
 
                       {member.contact && (
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm text-muted-foreground mt-4 border-t pt-4">
-                          {member.contact.phone && <p>📞 {member.contact.phone}</p>}
                           {member.contact.email && <p>✉️ {member.contact.email}</p>}
                           {member.contact.instagram && <p>📸 @{member.contact.instagram}</p>}
                           {member.contact.linkedin && (
