@@ -45,11 +45,11 @@ const Toxicologia = () => {
           <div className="max-w-4xl mx-auto mb-16">
             <h2 className="text-4xl font-bold mb-6">Estudos Toxicológicos de Alta Qualidade</h2>
             <p className="text-lg text-muted-foreground mb-4">
-              Realizamos estudos toxicológicos completos seguindo protocolos internacionais (OECD, ICH, FDA) 
+              Realizamos estudos toxicológicos completos seguindo protocolos internacionais (OECD, ICH, FDA)
               e normas regulatórias brasileiras (ANVISA, CONCEA), com foco em precisão científica e bem-estar animal.
             </p>
             <p className="text-lg text-muted-foreground mb-8">
-              Nossa infraestrutura certificada GLP e equipe especializada garantem resultados confiáveis 
+              Nossa infraestrutura operando em conformidade com as Boas Práticas de Laboratório (BPL) e equipe especializada garantem resultados confiáveis
               para submissões regulatórias e desenvolvimento de produtos seguros.
             </p>
 
@@ -77,7 +77,7 @@ const Toxicologia = () => {
               <CardContent className="p-8">
                 <h3 className="text-2xl font-semibold mb-4">Estudos Sob Demanda</h3>
                 <p className="text-muted-foreground">
-                  Além dos estudos listados, estamos preparados para desenvolver <strong>protocolos adicionais sob demanda</strong>, 
+                  Além dos estudos listados, estamos preparados para desenvolver <strong>protocolos adicionais sob demanda</strong>,
                   conforme as necessidades específicas do projeto, garantindo flexibilidade para atender objetivos experimentais diversos.
                 </p>
               </CardContent>
@@ -92,8 +92,8 @@ const Toxicologia = () => {
             <h2 className="text-3xl font-bold mb-8 text-center">Nosso Diferencial</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="text-center">
-                <div className="text-4xl font-bold text-secondary mb-2">GLP</div>
-                <p className="text-muted-foreground">Certificação em Boas Práticas de Laboratório</p>
+                <div className="text-4xl font-bold text-secondary mb-2">BPL</div>
+                <p className="text-muted-foreground">Conformidade com Boas Práticas de Laboratório</p>
               </div>
               <div className="text-center">
                 <div className="text-4xl font-bold text-secondary mb-2">OECD</div>

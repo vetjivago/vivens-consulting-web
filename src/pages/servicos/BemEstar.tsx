@@ -22,9 +22,10 @@ const BemEstar = () => {
           <div className="max-w-4xl mx-auto mb-16">
             <h2 className="text-4xl font-bold mb-6">Nosso Compromisso</h2>
             <p className="text-lg text-muted-foreground mb-8">
-              O bem-estar animal está no centro de tudo que fazemos. Implementamos as melhores práticas 
-              internacionais e tecnologias avançadas para garantir que todos os animais sob nossos cuidados 
-              recebam o tratamento mais ético e humanitário possível.
+              O bem-estar animal está no centro de tudo que fazemos. Implementamos as melhores práticas
+              internacionais e tecnologias avançadas para garantir que todos os animais sob nossos cuidados
+              recebam o tratamento mais ético e humanitário possível. Valorizamos também o Componente Humano,
+              promovendo uma Cultura de Cuidado que integra compaixão e excelência técnica.
             </p>
           </div>
 
@@ -36,7 +37,7 @@ const BemEstar = () => {
                 </div>
                 <h3 className="text-xl font-semibold mb-3">Substituição (Replace)</h3>
                 <p className="text-muted-foreground">
-                  Sempre que possível, utilizamos métodos alternativos que substituam o uso de animais, 
+                  Sempre que possível, utilizamos métodos alternativos que substituam o uso de animais,
                   como modelos in vitro e simulações computacionais.
                 </p>
               </CardContent>
@@ -49,7 +50,7 @@ const BemEstar = () => {
                 </div>
                 <h3 className="text-xl font-semibold mb-3">Redução (Reduce)</h3>
                 <p className="text-muted-foreground">
-                  Otimizamos protocolos experimentais para minimizar o número de animais necessários, 
+                  Otimizamos protocolos experimentais para minimizar o número de animais necessários,
                   sem comprometer a qualidade científica dos resultados.
                 </p>
               </CardContent>
@@ -62,7 +63,7 @@ const BemEstar = () => {
                 </div>
                 <h3 className="text-xl font-semibold mb-3">Refinamento (Refine)</h3>
                 <p className="text-muted-foreground">
-                  Aprimoramos continuamente nossas práticas para minimizar dor, sofrimento e estresse, 
+                  Aprimoramos continuamente nossas práticas para minimizar dor, sofrimento e estresse,
                   melhorando as condições de alojamento e manejo.
                 </p>
               </CardContent>
@@ -75,7 +76,7 @@ const BemEstar = () => {
                 </div>
                 <h3 className="text-xl font-semibold mb-3">Enriquecimento Ambiental</h3>
                 <p className="text-muted-foreground">
-                  Implementamos programas de enriquecimento que promovem comportamentos naturais e 
+                  Implementamos programas de enriquecimento que promovem comportamentos naturais e
                   melhoram a qualidade de vida dos animais.
                 </p>
               </CardContent>
@@ -89,7 +90,7 @@ const BemEstar = () => {
                 <CardContent className="p-6">
                   <h3 className="text-xl font-semibold mb-3">Avaliação e Monitoramento</h3>
                   <p className="text-muted-foreground">
-                    Realizamos avaliações contínuas do bem-estar animal utilizando métodos científicos validados 
+                    Realizamos avaliações contínuas do bem-estar animal utilizando métodos científicos validados
                     e indicadores comportamentais, fisiológicos e de saúde.
                   </p>
                 </CardContent>
@@ -99,7 +100,7 @@ const BemEstar = () => {
                 <CardContent className="p-6">
                   <h3 className="text-xl font-semibold mb-3">Consultoria CEUA</h3>
                   <p className="text-muted-foreground">
-                    Apoiamos na elaboração e avaliação de protocolos para Comissões de Ética no Uso de Animais, 
+                    Apoiamos na elaboração e avaliação de protocolos para Comissões de Ética no Uso de Animais,
                     garantindo conformidade com legislação e melhores práticas.
                   </p>
                 </CardContent>
@@ -109,7 +110,7 @@ const BemEstar = () => {
                 <CardContent className="p-6">
                   <h3 className="text-xl font-semibold mb-3">Treinamento em Bem-estar</h3>
                   <p className="text-muted-foreground">
-                    Capacitamos equipes em reconhecimento de sinais de dor e sofrimento, pontos de intervenção humana 
+                    Capacitamos equipes em reconhecimento de sinais de dor e sofrimento, pontos de intervenção humana
                     e técnicas de manejo compassivo.
                   </p>
                 </CardContent>
@@ -125,7 +126,7 @@ const BemEstar = () => {
             <ShieldCheck className="w-16 h-16 text-secondary mx-auto mb-6" />
             <h2 className="text-3xl font-bold mb-4">Certificações e Conformidade</h2>
             <p className="text-lg text-muted-foreground">
-              Seguimos rigorosamente as diretrizes do CONCEA, ANVISA e padrões internacionais de bem-estar animal, 
+              Seguimos rigorosamente as diretrizes do CONCEA, ANVISA e padrões internacionais de bem-estar animal,
               incluindo as diretrizes do Guide for the Care and Use of Laboratory Animals.
             </p>
           </div>

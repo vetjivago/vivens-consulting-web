@@ -22,7 +22,7 @@ const Consultoria = () => {
           <div className="max-w-4xl mx-auto mb-16">
             <h2 className="text-4xl font-bold mb-6">Excelência em Consultoria</h2>
             <p className="text-lg text-muted-foreground">
-              Nossa equipe de especialistas oferece consultoria abrangente para garantir que sua pesquisa atenda 
+              Nossa equipe de especialistas oferece consultoria abrangente para garantir que sua pesquisa atenda
               aos mais altos padrões de qualidade, conformidade regulatória e eficiência operacional.
             </p>
           </div>
@@ -51,7 +51,7 @@ const Consultoria = () => {
                 <h3 className="text-xl font-semibold mb-3">Conformidade Regulatória</h3>
                 <ul className="space-y-2 text-muted-foreground">
                   <li>• Adequação às normas CONCEA</li>
-                  <li>• Consultoria ANVISA e órgãos reguladores</li>
+                  <li>• Parcerias sob demanda (ANVISA e outros)</li>
                   <li>• Preparação de documentação técnica</li>
                   <li>• Apoio em auditorias e inspeções</li>
                 </ul>
@@ -65,10 +65,10 @@ const Consultoria = () => {
                 </div>
                 <h3 className="text-xl font-semibold mb-3">Acreditações</h3>
                 <ul className="space-y-2 text-muted-foreground">
-                  <li>• Preparação para certificação GLP</li>
-                  <li>• Consultoria ISO 17025</li>
+                  <li>• Preparação para acreditação AAALAC International</li>
+                  <li>• Conformidade com princípios BPL</li>
                   <li>• Implementação de sistemas de qualidade</li>
-                  <li>• Auditorias internas e de fornecedores</li>
+                  <li>• Parcerias sob demanda (ISO 9001, ISO 17025)</li>
                 </ul>
               </CardContent>
             </Card>
@@ -80,10 +80,10 @@ const Consultoria = () => {
                 </div>
                 <h3 className="text-xl font-semibold mb-3">Otimização de Processos</h3>
                 <ul className="space-y-2 text-muted-foreground">
+                  <li>• Metodologias Ágeis (Lean, Scrum, Kanban)</li>
                   <li>• Gestão eficiente de biotérios</li>
                   <li>• Implementação de tecnologias 3Rs</li>
                   <li>• Melhoria contínua de processos</li>
-                  <li>• Redução de custos operacionais</li>
                 </ul>
               </CardContent>
             </Card>

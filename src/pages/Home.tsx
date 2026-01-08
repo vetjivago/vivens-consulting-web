@@ -139,6 +139,17 @@ const Home = () => {
                   <Link to="/sobre">Conheça Nossa História</Link>
                 </Button>
               </div>
+
+              <div className="mt-16">
+                <h3 className="text-2xl font-bold mb-6">Nossos Parceiros e Clientes</h3>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  {[1, 2, 3, 4].map((i) => (
+                    <div key={i} className="h-20 bg-muted/50 rounded-lg flex items-center justify-center border-2 border-dashed border-muted-foreground/20">
+                      <span className="text-sm text-muted-foreground font-semibold">Cliente {i}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
 
             <div className="relative">

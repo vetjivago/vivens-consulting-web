@@ -1,10 +1,10 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { 
-  FlaskConical, 
-  Users, 
-  GraduationCap, 
+import {
+  FlaskConical,
+  Users,
+  GraduationCap,
   Heart,
   Stethoscope,
   ArrowRight
@@ -19,7 +19,7 @@ const Servicos = () => {
       features: [
         "Consultoria em pesquisa pré-clínica",
         "Conformidade CONCEA/ANVISA",
-        "Acreditações e certificações",
+        "Acreditações (AAALAC)",
         "Otimização de protocolos"
       ],
       link: "/servicos/consultoria"
@@ -27,12 +27,12 @@ const Servicos = () => {
     {
       icon: FlaskConical,
       title: "Testes Pré-clínicos - Toxicologia",
-      description: "Estudos toxicológicos completos seguindo padrões GLP e regulamentações internacionais",
+      description: "Estudos toxicológicos completos seguindo padrões BPL e regulamentações internacionais",
       features: [
         "Estudo de dose máxima tolerada (MTD)",
         "Toxicidade oral de 14, 28, 90 e 180 dias",
         "Protocolos customizados sob demanda",
-        "Análises completas e relatórios GLP"
+        "Análises completas e relatórios BPL"
       ],
       link: "/servicos/toxicologia"
     },
@@ -98,7 +98,7 @@ const Servicos = () => {
                   </div>
                   <h2 className="text-2xl font-bold mb-4">{service.title}</h2>
                   <p className="text-muted-foreground mb-6">{service.description}</p>
-                  
+
                   <ul className="space-y-3 mb-6">
                     {service.features.map((feature, idx) => (
                       <li key={idx} className="flex items-start gap-3">

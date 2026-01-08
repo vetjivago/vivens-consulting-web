@@ -22,7 +22,7 @@ const Educacao = () => {
           <div className="max-w-4xl mx-auto mb-16">
             <h2 className="text-4xl font-bold mb-6">Nossos Programas</h2>
             <p className="text-lg text-muted-foreground mb-8">
-              Oferecemos uma ampla gama de cursos e treinamentos especializados, ministrados por profissionais 
+              Oferecemos uma ampla gama de cursos e treinamentos especializados, ministrados por profissionais
               experientes e alinhados com as mais recentes diretrizes e regulamentações.
             </p>
           </div>
@@ -95,6 +95,7 @@ const Educacao = () => {
                   <li>• Conteúdo personalizado</li>
                   <li>• Formato flexível (presencial/online)</li>
                   <li>• Práticas hands-on</li>
+                  <li>• Treinamento e desenvolvimento de equipes</li>
                   <li>• Material didático exclusivo</li>
                 </ul>
               </CardContent>
