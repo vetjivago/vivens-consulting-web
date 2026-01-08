@@ -167,7 +167,9 @@ const Home = () => {
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-4xl font-bold mb-4">Vivens em Números</h2>
-            <p className="text-xl opacity-90">Dados que refletem nosso compromisso com a excelência</p>
+            <p className="text-xl md:text-2xl mb-8 text-white/90">
+              Consultoria especializada em bem-estar animal e estudos toxicológicos.
+            </p>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-5xl mx-auto">
             <div className="text-center">

@@ -7,14 +7,6 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 const Contato = () => {
-  const [formData, setFormData] = useState({ name: "", email: "", subject: "", message: "" });
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const mailtoLink = `mailto:vivensconsultoria@gmail.com?subject=${encodeURIComponent(formData.subject)}&body=${encodeURIComponent(`Nome: ${formData.name}\nEmail: ${formData.email}\n\nMensagem:\n${formData.message}`)}`;
-    window.location.href = mailtoLink;
-    toast.success("Abrindo seu cliente de email...");
-  };
 
   return (
     <div className="min-h-screen">
@@ -57,11 +49,17 @@ const Contato = () => {
             <Card>
               <CardContent className="p-6">
                 <h3 className="text-2xl font-bold mb-6">Solicitar Orçamento</h3>
-                <form onSubmit={handleSubmit} className="space-y-4">
-                  <Input placeholder="Nome" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} required />
-                  <Input type="email" placeholder="Email" value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} required />
-                  <Input placeholder="Assunto" value={formData.subject} onChange={(e) => setFormData({...formData, subject: e.target.value})} required />
-                  <Textarea placeholder="Mensagem" rows={5} value={formData.message} onChange={(e) => setFormData({...formData, message: e.target.value})} required />
+                <form action="https://formsubmit.co/vivensconsultoria@gmail.com" method="POST" className="space-y-4">
+                  <Input name="name" placeholder="Nome" required />
+                  <Input name="email" type="email" placeholder="Email" required />
+                  <Input name="_subject" placeholder="Assunto" required />
+                  <Textarea name="message" placeholder="Mensagem" rows={5} required />
+
+                  {/* FormSubmit Configuration */}
+                  <input type="hidden" name="_template" value="table" />
+                  <input type="hidden" name="_captcha" value="false" />
+                  <input type="hidden" name="_next" value="https://vivenslab.com/contato?success=true" />
+
                   <Button type="submit" variant="cta" size="lg" className="w-full">Enviar Mensagem</Button>
                 </form>
               </CardContent>
