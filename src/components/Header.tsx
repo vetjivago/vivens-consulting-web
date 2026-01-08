@@ -25,10 +25,7 @@ const Header = () => {
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
           <Link to="/" className="flex items-center space-x-2">
-            <div className="text-2xl font-bold text-primary">VIVENS</div>
-            <div className="hidden md:block text-xs text-muted-foreground max-w-[180px] leading-tight">
-              Vida valorizada,<br />ciência avançada
-            </div>
+            <img src="/src/assets/logo.jpg" alt="VIVENS Logo" className="h-12 w-auto object-contain" />
           </Link>
 
           <nav className="hidden lg:flex items-center space-x-1">
@@ -37,8 +34,8 @@ const Header = () => {
                 key={link.path}
                 to={link.path}
                 className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${isActive(link.path)
-                    ? "bg-accent text-accent-foreground"
-                    : "text-foreground hover:bg-muted"
+                  ? "bg-accent text-accent-foreground"
+                  : "text-foreground hover:bg-muted"
                   }`}
               >
                 {link.name}
@@ -69,8 +66,8 @@ const Header = () => {
                 to={link.path}
                 onClick={() => setIsMenuOpen(false)}
                 className={`block px-4 py-2 rounded-md text-sm font-medium transition-colors ${isActive(link.path)
-                    ? "bg-accent text-accent-foreground"
-                    : "text-foreground hover:bg-muted"
+                  ? "bg-accent text-accent-foreground"
+                  : "text-foreground hover:bg-muted"
                   }`}
               >
                 {link.name}
