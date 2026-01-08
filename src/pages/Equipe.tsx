@@ -36,6 +36,7 @@ const Equipe = () => {
         linkedin: "https://www.linkedin.com/in/marta-speck-b987b9139/",
         lattes: "http://lattes.cnpq.br/7259678197876031"
       }
+    }
   ];
 
   const consultants = [
