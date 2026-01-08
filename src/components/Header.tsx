@@ -3,6 +3,8 @@ import { Link, useLocation } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
+import logoImage from "@/assets/logo.jpg";
+
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
@@ -25,7 +27,7 @@ const Header = () => {
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
           <Link to="/" className="flex items-center space-x-2">
-            <img src="/src/assets/logo.jpg" alt="VIVENS Logo" className="h-12 w-auto object-contain" />
+            <img src={logoImage} alt="VIVENS Logo" className="h-12 w-auto object-contain" />
           </Link>
 
           <nav className="hidden lg:flex items-center space-x-1">
