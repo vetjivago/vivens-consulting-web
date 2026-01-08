@@ -36,7 +36,10 @@ const Equipe = () => {
         linkedin: "https://www.linkedin.com/in/marta-speck-b987b9139/",
         lattes: "http://lattes.cnpq.br/7259678197876031"
       }
-    }
+  ];
+
+  const consultants = [
+    // Placeholder for future consultants
   ];
 
   return (
@@ -44,7 +47,7 @@ const Equipe = () => {
       <section className="py-20 bg-gradient-to-b from-primary to-accent text-white">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center">
-            <h1 className="text-5xl font-bold mb-6">Nossa Equipe</h1>
+            <h1 className="text-5xl font-bold mb-6">Equipe</h1>
             <p className="text-xl opacity-90">
               Profissionais altamente qualificados dedicados à excelência científica
             </p>
@@ -52,9 +55,10 @@ const Equipe = () => {
         </div>
       </section>
 
-      <section className="py-20">
+      <section className="py-16">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto">
+            <h2 className="text-3xl font-bold mb-8 text-primary border-b pb-2">Nossa Equipe</h2>
             {team.map((member, index) => (
               <Card key={index} className="mb-8">
                 <CardContent className="p-8">
@@ -92,6 +96,23 @@ const Equipe = () => {
                 </CardContent>
               </Card>
             ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="py-16 bg-muted/30">
+        <div className="container mx-auto px-4">
+          <div className="max-w-4xl mx-auto">
+            <h2 className="text-3xl font-bold mb-8 text-primary border-b pb-2">Consultores Associados</h2>
+            {consultants.length > 0 ? (
+              consultants.map((member: any, index) => (
+                <Card key={index} className="mb-8">{/* Consultant Card Structure */}</Card>
+              ))
+            ) : (
+              <p className="text-muted-foreground text-center italic">
+                Em breve, apresentaremos nossos consultores associados.
+              </p>
+            )}
           </div>
         </div>
       </section>

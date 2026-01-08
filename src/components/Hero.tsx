@@ -12,16 +12,16 @@ const Hero = () => {
           backgroundImage: `linear-gradient(to right, rgba(26, 60, 91, 0.95), rgba(26, 60, 91, 0.7)), url(${heroImage})`,
         }}
       />
-      
-      <div className="container mx-auto px-4 relative z-10">
-        <div className="max-w-3xl text-white">
+
+      <div className="container mx-auto px-4 relative z-10 flex justify-center">
+        <div className="max-w-4xl text-white text-center">
           <h1 className="text-5xl md:text-6xl font-bold mb-6 leading-tight">
             Vida Valorizada,<br />Ciência Avançada
           </h1>
           <p className="text-xl md:text-2xl mb-8 text-white/90">
-            Centro de pesquisa pré-clínica especializado em bem-estar animal e estudos toxicológicos de excelência
+            Pesquisa pré-clínica especializada em bem-estar animal e estudos toxicológicos de excelência
           </p>
-          <div className="flex flex-col sm:flex-row gap-4">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button variant="cta" size="xl" asChild>
               <Link to="/contato">
                 Solicitar Orçamento <ArrowRight className="ml-2" size={20} />
