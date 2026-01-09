@@ -80,10 +80,10 @@ const Consultoria = () => {
                 </div>
                 <h3 className="text-xl font-semibold mb-3">Otimização de Processos</h3>
                 <ul className="space-y-2 text-muted-foreground">
-                  <li>• Metodologias Ágeis (Lean, Scrum, Kanban)</li>
-                  <li>• Gestão eficiente de biotérios</li>
-                  <li>• Implementação de tecnologias 3Rs</li>
-                  <li>• Melhoria contínua de processos</li>
+                  <li>• Diagnóstico e otimização de processos em biotérios</li>
+                  <li>• Aplicação de metodologias ágeis à gestão operacional</li>
+                  <li>• Implantação de práticas alinhadas aos 3Rs</li>
+                  <li>• Programas de melhoria contínua e eficiência operacional</li>
                 </ul>
               </CardContent>
             </Card>
