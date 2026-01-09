@@ -104,6 +104,7 @@ const Educacao = () => {
         </div>
       </section>
 
+      {/* 
       <section className="py-20 bg-muted/30">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto">
@@ -124,7 +125,8 @@ const Educacao = () => {
             </div>
           </div>
         </div>
-      </section>
+      </section> 
+      */}
 
       <section className="py-20 bg-primary text-primary-foreground">
         <div className="container mx-auto px-4 text-center">
