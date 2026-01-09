@@ -41,8 +41,7 @@ const Sobre = () => {
                 </div>
                 <h3 className="text-2xl font-bold mb-4">Missão</h3>
                 <p className="text-muted-foreground">
-                  Fornecer serviços de alta qualidade e ética na gestão e ciência de animais de laboratório,
-                  contribuindo para o avanço científico com responsabilidade e respeito ao bem-estar animal.
+                  Nascemos da necessidade de reunir diversas expertises e mentes inovadoras em uma única força colaborativa. Nossa missão é integrar profissionais de múltiplas áreas para entregar soluções completas e de excelência em ciência de animais de laboratório, unindo ética, qualidade e técnica.
                 </p>
               </CardContent>
             </Card>
