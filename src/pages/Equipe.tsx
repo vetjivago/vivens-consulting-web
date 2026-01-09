@@ -7,7 +7,7 @@ import patriciaImage from "@/assets/patricia-silva.png";
 const Equipe = () => {
   const team = [
     {
-      name: "Luisa Maria Gomes de Macedo Braga",
+      name: "Luisa Macedo Braga",
       role: "Sócia Proprietária e Administradora",
       image: "/luisa-braga.jpg",
       bio: "Médica Veterinária, Mestre/Doutora e Pós-Doutora, profissional sênior em Ciência de Animais de Laboratório, com atuação estratégica em ética, 3Rs e cultura de cuidado, além de sólida experiência em gestão de biotérios e de pessoas. Foi ex-Presidente da SBCAL e ex-Coordenadora do CONCEA, reunindo visão de governança, docência e prática aplicada às rotinas do biotério. Desenvolve capacitação continuada e formação por competência, apoiando universidades, indústria e CROs na adequação a acreditações e no fortalecimento de sistemas de qualidade, com foco em bem-estar animal, conformidade, padronização e sustentabilidade operacional. Participa da formação de profissionais e difusão de boas práticas.",
