@@ -153,32 +153,23 @@ const Sobre = () => {
             <div className="space-y-6">
               <Card>
                 <CardContent className="p-6">
-                  <h3 className="text-xl font-semibold mb-3">Mercado Global</h3>
-                  <p className="text-muted-foreground">
-                    O mercado global de animais de laboratório foi avaliado em <strong>US$ 10,7 bilhões em 2023</strong>,
-                    com projeção de crescimento anual de <strong>8,2% até 2030</strong>. Este crescimento é impulsionado
-                    pelo aumento de investimentos em P&D, expansão da indústria farmacêutica e biotecnológica,
-                    e crescimento da pesquisa acadêmica.
+                  <h3 className="text-xl font-semibold mb-3">Potencial de Crescimento Acelerado</h3>
+                  <p className="text-muted-foreground text-justify">
+                    O mercado global de pesquisa pré-clínica e modelos animais projeta um crescimento vigoroso (CAGR ~8,2%), impulsionado pela explosão da biotecnologia, novas terapias gênicas e medicina personalizada. Para investidores, este cenário representa uma oportunidade única de alocar capital em um setor resiliente, de alta demanda e essencial para a inovação em saúde.
                   </p>
                 </CardContent>
               </Card>
 
               <Card>
                 <CardContent className="p-6">
-                  <h3 className="text-xl font-semibold mb-3">Nossos Segmentos</h3>
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-4">
-                    <div className="text-center p-4 bg-muted/50 rounded-lg">
-                      <div className="text-2xl font-bold text-secondary mb-1">40%</div>
-                      <div className="text-sm text-muted-foreground">Instituições Acadêmicas</div>
-                    </div>
-                    <div className="text-center p-4 bg-muted/50 rounded-lg">
-                      <div className="text-2xl font-bold text-secondary mb-1">45%</div>
-                      <div className="text-sm text-muted-foreground">Indústria Farmacêutica</div>
-                    </div>
-                    <div className="text-center p-4 bg-muted/50 rounded-lg">
-                      <div className="text-2xl font-bold text-secondary mb-1">20%</div>
-                      <div className="text-sm text-muted-foreground">Biotecnologia</div>
-                    </div>
+                  <h3 className="text-xl font-semibold mb-3">O Diferencial da Especialização</h3>
+                  <p className="text-muted-foreground mb-4 text-justify">
+                    Apesar do alto potencial, o setor apresenta altas barreiras de entrada regulatórias e técnicas (CONCEA, ANVISA, AAALAC). O sucesso do investimento depende diretamente da eficiência operacional e da conformidade estrita.
+                  </p>
+                  <div className="bg-secondary/5 border-l-4 border-secondary p-4 mt-4">
+                    <p className="text-sm italic text-muted-foreground">
+                      "A Vivens atua como o parceiro estratégico que mitiga riscos e acelera o retorno sobre o investimento, garantindo que a infraestrutura e os processos operem com excelência desde o primeiro dia."
+                    </p>
                   </div>
                 </CardContent>
               </Card>
