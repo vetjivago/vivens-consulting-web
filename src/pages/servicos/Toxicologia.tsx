@@ -32,7 +32,7 @@ const Toxicologia = () => {
       <section className="py-20 bg-gradient-to-b from-primary to-accent text-white">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center">
-            <h1 className="text-5xl font-bold mb-6">Testes Pré-clínicos - Toxicologia (em breve)</h1>
+            <h1 className="text-5xl font-bold mb-6">Testes Pré-clínicos - Toxicologia (07/2026)</h1>
             <p className="text-xl opacity-90">
               Estudos toxicológicos completos seguindo padrões GLP e regulamentações internacionais
             </p>
