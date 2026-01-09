@@ -20,7 +20,7 @@ const Home = () => {
   const services = [
     {
       icon: FlaskConical,
-      title: "Testes Pré-clínicos",
+      title: "Testes Pré-clínicos (em breve)",
       description: "Estudos toxicológicos de doses repetidas, MTD e protocolos customizados",
       link: "/servicos/toxicologia"
     },

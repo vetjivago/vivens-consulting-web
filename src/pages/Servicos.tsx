@@ -26,7 +26,7 @@ const Servicos = () => {
     },
     {
       icon: FlaskConical,
-      title: "Testes Pré-clínicos - Toxicologia",
+      title: "Testes Pré-clínicos - Toxicologia (em breve)",
       description: "Estudos toxicológicos completos seguindo padrões BPL e regulamentações internacionais",
       features: [
         "Estudo de dose máxima tolerada (MTD)",
