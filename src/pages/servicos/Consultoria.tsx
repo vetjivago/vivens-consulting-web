@@ -87,6 +87,21 @@ const Consultoria = () => {
                 </ul>
               </CardContent>
             </Card>
+
+            <Card>
+              <CardContent className="p-6">
+                <div className="w-12 h-12 bg-secondary/10 rounded-lg flex items-center justify-center mb-4">
+                  <TrendingUp className="w-6 h-6 text-secondary" />
+                </div>
+                <h3 className="text-xl font-semibold mb-3">Infraestrutura e Fluxos</h3>
+                <ul className="space-y-2 text-muted-foreground">
+                  <li>• Consultoria em plantas e edificações para biotérios</li>
+                  <li>• Planejamento de fluxos operacionais e sanitários</li>
+                  <li>• Adequação de instalações às normas vigentes</li>
+                  <li>• Projetos de barreiras sanitárias e áreas de apoio</li>
+                </ul>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </section>

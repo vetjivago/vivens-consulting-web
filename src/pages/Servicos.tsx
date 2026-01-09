@@ -20,6 +20,7 @@ const Servicos = () => {
         "Consultoria em pesquisa pré-clínica",
         "Conformidade CONCEA/ANVISA",
         "Acreditações (AAALAC)",
+        "Plantas, edificações e fluxos operacionais",
         "Otimização de protocolos"
       ],
       link: "/servicos/consultoria"
