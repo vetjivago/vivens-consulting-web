@@ -95,7 +95,7 @@ const Consultoria = () => {
                 </div>
                 <h3 className="text-xl font-semibold mb-3">Infraestrutura e Fluxos</h3>
                 <ul className="space-y-2 text-muted-foreground">
-                  <li>• Consultoria em plantas e edificações para biotérios</li>
+                  <li>• Consultoria em plantas e edificações para instalações animais</li>
                   <li>• Planejamento de fluxos operacionais e sanitários</li>
                   <li>• Adequação de instalações às normas vigentes</li>
                   <li>• Projetos de barreiras sanitárias e áreas de apoio</li>
