@@ -69,7 +69,7 @@ const Conteudos = () => {
           <div className="max-w-4xl mx-auto mb-16 text-center">
             <h2 className="text-4xl font-bold mb-6">Biblioteca de Conhecimento</h2>
             <p className="text-lg text-muted-foreground">
-              Compilamos materiais técnicos, artigos científicos e recursos educacionais para apoiar 
+              Compilamos materiais técnicos, artigos científicos e recursos educacionais para apoiar
               profissionais e instituições no desenvolvimento de pesquisas de excelência.
             </p>
           </div>
@@ -100,7 +100,7 @@ const Conteudos = () => {
                 <div>
                   <h3 className="text-2xl font-semibold mb-3">Downloads Disponíveis</h3>
                   <p className="text-muted-foreground mb-6">
-                    Nossos materiais educacionais e guias técnicos estão disponíveis para download. 
+                    Nossos materiais educacionais e guias técnicos estão disponíveis para download.
                     Entre em contato para receber acesso aos conteúdos exclusivos da Vivens.
                   </p>
                   <div className="space-y-3">
@@ -149,7 +149,7 @@ const Conteudos = () => {
             <Card>
               <CardContent className="p-8 text-center">
                 <p className="text-lg text-muted-foreground mb-6">
-                  Receba mensalmente conteúdos exclusivos, novidades do setor e insights sobre 
+                  Receba mensalmente conteúdos exclusivos, novidades do setor e insights sobre
                   pesquisa pré-clínica diretamente no seu e-mail.
                 </p>
                 <Button variant="default" size="lg" asChild>
@@ -163,6 +163,7 @@ const Conteudos = () => {
         </div>
       </section>
 
+      {/* 
       <section className="py-20 bg-primary text-primary-foreground">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-6">Precisa de materiais específicos?</h2>
@@ -175,7 +176,8 @@ const Conteudos = () => {
             </Link>
           </Button>
         </div>
-      </section>
+      </section> 
+      */}
     </div>
   );
 };
