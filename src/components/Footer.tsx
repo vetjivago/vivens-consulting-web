@@ -1,18 +1,22 @@
 import { Link } from "react-router-dom";
 import { Mail, MapPin, Phone } from "lucide-react";
 
+import logoImage from "@/assets/logo.jpg";
+
 const Footer = () => {
   return (
     <footer className="bg-primary text-primary-foreground">
       <div className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           <div>
-            <h3 className="text-xl font-bold mb-4">VIVENS</h3>
+            <div className="mb-4 bg-white p-2 rounded max-w-[150px]">
+              <img src={logoImage} alt="VIVENS" className="w-full h-auto object-contain" />
+            </div>
             <p className="text-sm opacity-90">
               Vida valorizada, ciência avançada
             </p>
             <p className="text-sm opacity-80 mt-4">
-              Centro de pesquisa pré-clínica especializado em bem-estar animal e estudos toxicológicos.
+              Consultoria especializada em bem-estar animal e estudos toxicológicos.
             </p>
           </div>
 
@@ -21,7 +25,7 @@ const Footer = () => {
             <ul className="space-y-2 text-sm">
               <li><Link to="/sobre" className="opacity-90 hover:opacity-100 transition-opacity">Sobre</Link></li>
               <li><Link to="/servicos" className="opacity-90 hover:opacity-100 transition-opacity">Serviços</Link></li>
-              <li><Link to="/infraestrutura" className="opacity-90 hover:opacity-100 transition-opacity">Infraestrutura</Link></li>
+              {/* <li><Link to="/infraestrutura" className="opacity-90 hover:opacity-100 transition-opacity">Infraestrutura</Link></li> */}
               <li><Link to="/equipe" className="opacity-90 hover:opacity-100 transition-opacity">Equipe</Link></li>
               <li><Link to="/contato" className="opacity-90 hover:opacity-100 transition-opacity">Contato</Link></li>
             </ul>
