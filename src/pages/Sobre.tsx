@@ -23,8 +23,11 @@ const Sobre = () => {
               <p className="text-lg text-muted-foreground mb-6">
                 A Vivens nasce com o propósito de transformar a ciência de animais de laboratório por meio de uma abordagem ética, inovadora e tecnicamente qualificada. Atuamos na interseção entre o rigor científico e o compromisso com o bem-estar animal, oferecendo soluções completas para instituições que buscam excelência em pesquisa biomédica, conformidade regulatória e desempenho operacional.
               </p>
-              <p className="text-lg text-muted-foreground">
+              <p className="text-lg text-muted-foreground mb-6">
                 Nosso trabalho é sustentado por três pilares fundamentais: qualidade, ética e inovação. Acreditamos que é possível aliar o avanço científico ao respeito pela vida animal, promovendo práticas baseadas nos princípios dos 3Rs (Redução, Refinamento e Substituição) e em alinhamento às normativas nacionais e internacionais, como a Resolução CONCEA nº 51/2021 e as diretrizes da FELASA e OECD.
+              </p>
+              <p className="text-lg text-muted-foreground">
+                Nascemos da necessidade de reunir diversas expertises e mentes inovadoras em uma única força colaborativa. Nossa trajetória é marcada pela integração de profissionais de múltiplas áreas ("collabs"), unindo ética, qualidade e técnica para entregar soluções completas e de excelência.
               </p>
             </div>
           </div>
@@ -41,7 +44,8 @@ const Sobre = () => {
                 </div>
                 <h3 className="text-2xl font-bold mb-4">Missão</h3>
                 <p className="text-muted-foreground">
-                  Nascemos da necessidade de reunir diversas expertises e mentes inovadoras em uma única força colaborativa. Nossa missão é integrar profissionais de múltiplas áreas para entregar soluções completas e de excelência em ciência de animais de laboratório, unindo ética, qualidade e técnica.
+                  Fornecer serviços de alta qualidade e ética na gestão e ciência de animais de laboratório,
+                  contribuindo para o avanço científico com responsabilidade e respeito ao bem-estar animal.
                 </p>
               </CardContent>
             </Card>
