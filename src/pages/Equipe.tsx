@@ -10,7 +10,7 @@ const Equipe = () => {
       name: "Luisa Maria Gomes de Macedo Braga",
       role: "Sócia Proprietária e Administradora",
       image: "/luisa-braga.jpg",
-      bio: "Médica Veterinária, Mestre/Doutora e Pós-Doutora, profissional sênior em Ciência de Animais de Laboratório, com atuação estratégica em ética, 3Rs e cultura de cuidado, além de sólida experiência em gestão de biotérios e de pessoas. Foi ex-Presidente da SBCAL e ex-Coordenadora do CONCEA, reunindo visão de governança e prática aplicada às rotinas do biotério. Atua em docência e formação de equipes, apoiando instituições na adequação a acreditações e no fortalecimento de sistemas de qualidade, com foco em bem-estar animal, conformidade, padronização e sustentabilidade operacional.",
+      bio: "Médica Veterinária, Mestre, Doutora e Pós-Doutora. Profissional sênior em Ciência de Animais de Laboratório, com atuação estratégica em ética, 3Rs e cultura de cuidado. Ex-Presidente da SBCAL e ex-Coordenadora do CONCEA, une visão de governança à prática de rotina em biotérios. Atua na docência, formação de equipes e preparação para acreditações, fortalecendo sistemas de qualidade com foco em conformidade, padronização e sustentabilidade das instituições de pesquisa.",
       contact: {
         email: "lgmacedo@gmail.com",
         linkedin: "https://www.linkedin.com/in/luisa-maria-gomes-de-macedo-braga-8b2b1150",
@@ -22,7 +22,7 @@ const Equipe = () => {
       name: "Jivago Rôlo",
       role: "Sócio Proprietário",
       image: "/jivago-rolo.jpg",
-      bio: "Médico-veterinário e cientista com mestrado e doutorado em Biologia Animal e especializado em Ciência de Animais de Laboratório, FELASA SPECIALIST D. Atua na interface entre bem-estar animal, ética em pesquisa e desenho experimental aplicado à biomedicina. Tem experiência em gestão e modernização de biotérios acadêmicos e implementação de rotinas de biossegurança.",
+      bio: "Médico-veterinário e cientista com mestrado e doutorado em Biologia Animal, FELASA SPECIALIST D. Atua na interface entre bem-estar animal, ética em pesquisa e desenho experimental aplicado à biomedicina. Possui vasta experiência na gestão e modernização de biotérios acadêmicos, implementando rotinas de biossegurança e infraestrutura de ponta. Focado em alinhar rigor científico com os mais altos padrões de cuidado animal e eficiência operacional.",
       contact: {
         email: "jivagorolo@gmail.com",
         linkedin: "https://www.linkedin.com/in/jivago-rolo",
@@ -33,7 +33,7 @@ const Equipe = () => {
       name: "Marta Speck",
       role: "Sócia Proprietária",
       image: "/marta-speck.jpg",
-      bio: "Profissional com sólida atuação em Ciência em Animais de Laboratório, Gestão da Qualidade e Medicina Translacional, com experiência estratégica em biotérios de pesquisa e ambientes altamente regulados. Possui graduação em Ciências Biológicas com ênfase em Biopatologia, mestrado em Ciências Farmacêuticas pela UFRGS e doutoranda em Medicina Translacional pela UFC. Acadêmica Titular e Patrona da Cadeira nº 6 da Academia Brasileira de Ciência em Animais de Laboratório. Atua na estruturação e fortalecimento de sistemas de gestão da qualidade em biotérios, com foco na padronização de processos, controle genético, monitoramento sanitário, melhoria contínua e garantia do bem-estar animal, sempre alinhada às melhores práticas nacionais e internacionais. Detém ampla experiência na implementação de padrões internacionais de excelência, incluindo processos de acreditação AAALAC, com atuação direta na organização institucional, preparação de equipes, condução de auditorias e manutenção de elevados níveis de conformidade técnica, ética e científica. Apresenta perfil marcado por visão sistêmica, liderança técnica e capacidade de condução de mudanças, utilizando métodos ágeis aplicados à gestão da qualidade, como definição de prioridades, ciclos curtos de planejamento e execução, uso de indicadores e melhoria contínua, promovendo eficiência operacional e sustentabilidade dos biotérios como unidades estratégicas de apoio à pesquisa.",
+      bio: "Profissional com sólida atuação em Ciência em Animais de Laboratório, Gestão da Qualidade e Medicina Translacional. Graduada em Ciências Biológicas, Mestre em Ciências Farmacêuticas e Doutoranda em Medicina Translacional. Acadêmica Titular da ABCAL. Especialista na estruturação de sistemas de qualidade e acreditações internacionais (AAALAC). Lidera projetos com visão sistêmica e metodologias ágeis, focando na padronização de processos, bem-estar animal e eficiência operacional para transformar biotérios em unidades estratégicas de excelência.",
       contact: {
         email: "martaspeck@gmail.com",
         linkedin: "https://www.linkedin.com/in/marta-speck-b987b9139/",
