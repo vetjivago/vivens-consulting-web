@@ -18,8 +18,8 @@ const Hero = () => {
           <h1 className="text-5xl md:text-6xl font-bold mb-6 leading-tight">
             Vida Valorizada,<br />Ciência Avançada
           </h1>
-          <p className="text-xl md:text-2xl mb-8 text-white/90">
-            Consultoria especializada em bem-estar animal e estudos toxicológicos.
+          <p className="text-lg md:text-xl mb-8 text-white/90 max-w-3xl mx-auto">
+            Apoiamos instituições a alcançar preparação para acreditações em biotérios, fortalecendo qualidade, 3Rs/cultura de cuidado e formação de equipes com abordagem prática e institucional.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button variant="cta" size="xl" asChild>

@@ -10,7 +10,7 @@ const Equipe = () => {
       name: "Luisa Maria Gomes de Macedo Braga",
       role: "Sócia Proprietária e Administradora",
       image: "/luisa-braga.jpg",
-      bio: "Médica veterinária, trabalhando com ciência de animais de laboratório e ética desde sua graduação. Mestre em Ciências Veterinárias, com ênfase em Embriologia e Doutora em Genética e Biologia Molecular, pela UFRGS. Pós-doutorado em Terapia Celular, pelo Instituto de Cardiologia/RS e INCOR/USP. Ex-presidente da Sociedade Brasileira de Ciência em Animais de Laboratório (SBCAL). Ex-coordenadora do Conselho Nacional de Controle da Experimentação Animal (CONCEA).",
+      bio: "Médica Veterinária, Mestre/Doutora e Pós-Doutora, profissional sênior em Ciência de Animais de Laboratório, com atuação estratégica em ética, 3Rs e cultura de cuidado, além de sólida experiência em gestão de biotérios e de pessoas. Foi ex-Presidente da SBCAL e ex-Coordenadora do CONCEA, reunindo visão de governança e prática aplicada às rotinas do biotério. Atua em docência e formação de equipes, apoiando instituições na adequação a acreditações e no fortalecimento de sistemas de qualidade, com foco em bem-estar animal, conformidade, padronização e sustentabilidade operacional.",
       contact: {
         email: "lgmacedo@gmail.com",
         linkedin: "https://www.linkedin.com/in/luisa-maria-gomes-de-macedo-braga-8b2b1150",
@@ -30,10 +30,10 @@ const Equipe = () => {
       }
     },
     {
-      name: "Marta Lorena Speck da Silva",
+      name: "Marta Speck",
       role: "Sócia Proprietária",
       image: "/marta-speck.jpg",
-      bio: "Graduada em Ciências Biológicas com ênfase em Biopatologia e mestre em Ciências Farmacêuticas pela UFRGS. Doutoranda em Medicina Translacional pela UFC. Acadêmica Titular da ABCAL. Atuação em gestão da qualidade para biotérios e monitoramento sanitário. Foi responsável pela implementação dos padrões AAALAC no biotério da UFC.",
+      bio: "Profissional com sólida atuação em Ciência em Animais de Laboratório, Gestão da Qualidade e Medicina Translacional, com experiência estratégica em biotérios de pesquisa e ambientes altamente regulados. Possui graduação em Ciências Biológicas com ênfase em Biopatologia, mestrado em Ciências Farmacêuticas pela UFRGS e doutoranda em Medicina Translacional pela UFC. Acadêmica Titular e Patrona da Cadeira nº 6 da Academia Brasileira de Ciência em Animais de Laboratório. Atua na estruturação e fortalecimento de sistemas de gestão da qualidade em biotérios, com foco na padronização de processos, controle genético, monitoramento sanitário, melhoria contínua e garantia do bem-estar animal, sempre alinhada às melhores práticas nacionais e internacionais. Detém ampla experiência na implementação de padrões internacionais de excelência, incluindo processos de acreditação AAALAC, com atuação direta na organização institucional, preparação de equipes, condução de auditorias e manutenção de elevados níveis de conformidade técnica, ética e científica. Apresenta perfil marcado por visão sistêmica, liderança técnica e capacidade de condução de mudanças, utilizando métodos ágeis aplicados à gestão da qualidade, como definição de prioridades, ciclos curtos de planejamento e execução, uso de indicadores e melhoria contínua, promovendo eficiência operacional e sustentabilidade dos biotérios como unidades estratégicas de apoio à pesquisa.",
       contact: {
         email: "martaspeck@gmail.com",
         linkedin: "https://www.linkedin.com/in/marta-speck-b987b9139/",
