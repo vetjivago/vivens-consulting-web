@@ -2,10 +2,29 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Users } from "lucide-react";
 
 import ekaterinaImage from "@/assets/ekaterina-rivera.png";
-import patriciaImage from "@/assets/patricia-silva.png";
+// import patriciaImage from "@/assets/patricia-silva.png";
+
+interface ContactInfo {
+  email?: string;
+  linkedin?: string;
+  instagram?: string;
+  lattes?: string;
+}
+
+interface TeamMember {
+  name: string;
+  role: string;
+  image: string;
+  bio: string;
+  contact: ContactInfo;
+}
+
+interface Consultant extends TeamMember {
+  highlight: boolean;
+}
 
 const Equipe = () => {
-  const team = [
+  const team: TeamMember[] = [
     {
       name: "Luisa Macedo Braga",
       role: "Sócia Proprietária e Administradora",
@@ -42,7 +61,7 @@ const Equipe = () => {
     }
   ];
 
-  const consultants = [
+  const consultants: Consultant[] = [
     {
       name: "Ekaterina Akimovna Botovchenco Rivera",
       role: "Consultora Sênior",
@@ -50,20 +69,15 @@ const Equipe = () => {
       highlight: true,
       bio: "Possui graduação em Medicina Veterinária pela Faculdade de Agronomia e de Veterinária da Universidade Federal do Rio Grande do Sul (1967), mestrado em Laboratory Animal Science pelo The Royal Veterinary College, University of London (1989). Doutorado cursado em 1994/95 e Título de Doutora Notório Saber conferido pela UFG (2017). Pesquisadora Emérita CNPq 2019. Premio Internacional Charles River 2020. Coordenadora do Concea (2020-2022). Membro titular do CONCEA pelo CNPq (2018-2020). Homenagem Especial do Concea 2023. Coordenadora do Biotério Central da UFG de 1979 a 2014. Membro do grupo de consultores ad hoc em bem-estar de animais de laboratório da OIE-OMSA.",
       contact: {
-        lattes: "http://lattes.cnpq.br/" // Placeholder if not provided, removed from display if empty
+        lattes: "http://lattes.cnpq.br/"
       }
     },
+    /*
     {
       name: "Patrícia Silva",
-      role: "Especialista em Gestão da Qualidade",
-      image: patriciaImage,
-      highlight: false,
-      bio: "Profissional sênior com mais de 20 anos de experiência em Gestão da Qualidade, Sistemas de Gestão Integrados e Melhoria Contínua. Especialista na implantação, manutenção e auditoria de Sistemas de Gestão (ISO 9001, ISO 14001 e ISO 45001) além tecnica da ISO IEC 17025. Atuação estratégica em projetos Lean Six Sigma, com foco em processos administrativos e de serviços.",
-      contact: {
-        email: "paricia_mp_silva@hotmail.com",
-        linkedin: "https://www.linkedin.com/in/patty-silva"
-      }
+      // ...
     }
+    */
   ];
 
   return (
