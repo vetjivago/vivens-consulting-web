@@ -15,7 +15,7 @@ interface TeamMember {
   name: string;
   role: string;
   image: string;
-  bio: string;
+  bio: React.ReactNode;
   contact: ContactInfo;
 }
 
@@ -67,7 +67,49 @@ const Equipe = () => {
       role: "Consultora Sênior",
       image: ekaterinaImage,
       highlight: true,
-      bio: "Possui graduação em Medicina Veterinária pela Faculdade de Agronomia e de Veterinária da Universidade Federal do Rio Grande do Sul (1967), mestrado em Laboratory Animal Science pelo The Royal Veterinary College, University of London (1989). Doutorado cursado em 1994/95 e Título de Doutora Notório Saber conferido pela UFG (2017). Pesquisadora Emérita CNPq 2019. Premio Internacional Charles River 2020. Coordenadora do Concea (2020-2022). Membro titular do CONCEA pelo CNPq (2018-2020). Homenagem Especial do Concea 2023. Coordenadora do Biotério Central da UFG de 1979 a 2014. Membro do grupo de consultores ad hoc em bem-estar de animais de laboratório da OIE-OMSA.",
+      bio: (
+        <div className="space-y-4">
+          <p>
+            Possui graduação em Medicina Veterinária pela Faculdade de Agronomia e de Veterinária da Universidade Federal do Rio Grande do Sul (1967), mestrado em Laboratory Animal Science pelo The Royal Veterinary College, University of London (1989). Doutorado cursado em 1994/95 e Título de Doutora Notório Saber conferido pela UFG (2017). Pesquisadora Emérita CNPq 2019. Premio Internacional Charles River 2020. Coordenadora do Concea (2020-2022). Membro titular do CONCEA pelo CNPq (2018-2020). Homenagem Especial do Concea 2023. Coordenadora do Biotério Central da UFG de 1979 a 2014. Membro do grupo de consultores ad hoc em bem-estar de animais de laboratório da OIE-OMSA.
+          </p>
+
+          <div className="bg-secondary/5 p-4 rounded-lg border border-secondary/20">
+            <h4 className="font-bold text-primary mb-2">1997-2004: Consultora ONU/PENUD/IBAMA</h4>
+            <p className="mb-2">
+              Em 1997 fui convidada como consultora do programa em ecotoxicologia ONU/PENUD/IBAMA para avaliação de testes com mamíferos, na área de agrotóxicos. Também chamada a auxiliar os novos contratados na ANVISA que avaliariam estes testes.
+            </p>
+            <p className="mb-2">
+              O IBAMA e a ANVISA exigem testes rigorosos (Portaria Normativa IBAMA nº 84/96) para liberação de agrotóxicos. Neste período, promovemos cursos para qualificação de laboratoristas e auditorias para o credenciamento de laboratórios em Boas Práticas Laboratoriais (BPL). Participei do processo pioneiro de credenciamento (1998) e de diversas capacitações internacionais.
+            </p>
+            <p>
+              Uma das minhas principais contribuições foi promover a contratação de médicos veterinários para avaliação de testes e, juntamente com o Prof. Centeno, aplicar o princípio dos 3Rs para reduzir o número de testes exigidos.
+            </p>
+          </div>
+
+          <div>
+            <h4 className="font-bold text-primary border-b border-primary/20 pb-1 mb-2">Produtos e Testes Avaliados</h4>
+            <p className="text-sm italic mb-2">Conforme Portaria 84/96 e normas da OECD:</p>
+            <ul className="list-disc pl-5 space-y-1">
+              <li><strong>Ação Sistêmica:</strong> Toxicidade oral, inalatória e cutânea aguda.</li>
+              <li><strong>Ação Tópica:</strong> Irritação cutânea e ocular primária.</li>
+              <li><strong>Curto/Médio Prazo:</strong> Toxicidade oral com doses repetidas e metabolismo.</li>
+              <li><strong>Longo Prazo:</strong> Teratogênese e oncogênese.</li>
+            </ul>
+          </div>
+
+          <div>
+            <h4 className="font-bold text-primary border-b border-primary/20 pb-1 mb-2">Formação Complementar e BPL</h4>
+            <ul className="list-disc pl-5 text-sm space-y-1">
+              <li>Princípios avançados em Toxicologia (Univ. Guelph, Canadá - 1998)</li>
+              <li>Técnicas de Auditoria para Agências Regulamentadoras (USP - 2005)</li>
+              <li>Interpretação de Dados em Toxicologia Reprodutiva (UNESP)</li>
+              <li>Treinamento em Boas Práticas de Laboratório (Novartis, EUA - 1998)</li>
+              <li>Seminários sobre Neurotoxicidade, Equivalência de Agrotóxicos (ANVISA/OMS) e REACH (UE).</li>
+              <li>Visita técnica à EPA (Environmental Protection Agency, EUA - 2002).</li>
+            </ul>
+          </div>
+        </div>
+      ),
       contact: {
         lattes: "http://lattes.cnpq.br/"
       }
@@ -109,7 +151,7 @@ const Equipe = () => {
                   </div>
                   <h3 className="text-xl font-bold mb-2">{member.name}</h3>
                   <p className="text-secondary font-semibold mb-4 min-h-[3rem]">{member.role}</p>
-                  <p className="text-muted-foreground text-sm text-justify mb-6">{member.bio}</p>
+                  <div className="text-muted-foreground text-sm text-justify mb-6">{member.bio}</div>
 
                   <div className="mt-auto pt-4 border-t w-full flex flex-wrap justify-center gap-4 text-sm text-muted-foreground">
                     {/* Contacts simplified for grid view */}
@@ -157,7 +199,7 @@ const Equipe = () => {
                         )}
                       </div>
 
-                      <p className="text-muted-foreground text-justify mb-6">{member.bio}</p>
+                      <div className="text-muted-foreground text-justify mb-6">{member.bio}</div>
 
                       <div className="flex gap-4 text-sm">
                         {member.contact?.email && (
