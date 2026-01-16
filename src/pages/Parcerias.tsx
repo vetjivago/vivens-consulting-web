@@ -47,6 +47,16 @@ const Parcerias = () => {
                                 />
                             </CardContent>
                         </Card>
+
+                        <Card className="w-full h-48 hover:shadow-xl transition-all duration-300 group">
+                            <CardContent className="h-full bg-white p-6 flex items-center justify-center">
+                                <img
+                                    src="/lg-macedo-logo.png"
+                                    alt="LG Macedo Consultoria"
+                                    className="max-h-full max-w-full object-contain filter group-hover:brightness-110 transition-all"
+                                />
+                            </CardContent>
+                        </Card>
                     </div>
                 </div>
             </section>
