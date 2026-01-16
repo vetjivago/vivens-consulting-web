@@ -15,6 +15,7 @@ const Header = () => {
     { name: "Serviços", path: "/servicos" },
 
     { name: "Setores", path: "/setores" },
+    { name: "Parcerias", path: "/parcerias" },
     { name: "Conteúdos", path: "/conteudos" },
     { name: "Equipe", path: "/equipe" },
     { name: "Contato", path: "/contato" },
