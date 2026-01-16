@@ -141,13 +141,20 @@ const Home = () => {
               </div>
 
               <div className="mt-16">
-                <h3 className="text-2xl font-bold mb-6">Nossos Parceiros e Clientes</h3>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  {[1, 2, 3, 4].map((i) => (
-                    <div key={i} className="h-20 bg-muted/50 rounded-lg flex items-center justify-center border-2 border-dashed border-muted-foreground/20">
-                      <span className="text-sm text-muted-foreground font-semibold">Cliente {i}</span>
-                    </div>
-                  ))}
+                <h3 className="text-2xl font-bold mb-6">Nossos Clientes</h3>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 items-center">
+                  <div className="h-24 bg-white rounded-lg flex items-center justify-center p-4 border shadow-sm hover:shadow-md transition-all">
+                    <img src="/lab-science-logo.png" alt="Lab Science Academy" className="max-h-full max-w-full object-contain" />
+                  </div>
+                  <div className="h-24 bg-white rounded-lg flex items-center justify-center p-4 border shadow-sm hover:shadow-md transition-all">
+                    <img src="/ms-logo.jpg" alt="MS" className="max-h-full max-w-full object-contain" />
+                  </div>
+                  <div className="h-24 bg-white rounded-lg flex items-center justify-center p-4 border shadow-sm hover:shadow-md transition-all">
+                    <img src="/unesp-logo.png" alt="UNESP" className="max-h-full max-w-full object-contain" />
+                  </div>
+                  <div className="h-24 bg-white rounded-lg flex items-center justify-center p-4 border shadow-sm hover:shadow-md transition-all">
+                    <img src="/unesc-logo.jpg" alt="UNESC" className="max-h-full max-w-full object-contain" />
+                  </div>
                 </div>
               </div>
             </div>

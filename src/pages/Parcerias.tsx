@@ -27,9 +27,9 @@ const Parcerias = () => {
 
                     <h2 className="text-3xl font-bold mb-12 text-primary border-b pb-2 text-center">Nossos Parceiros</h2>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center justify-items-center max-w-4xl mx-auto">
-                        <Card className="w-full h-64 hover:shadow-xl transition-all duration-300 group">
-                            <CardContent className="h-full bg-white p-8 flex items-center justify-center">
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-8 items-center justify-items-center max-w-6xl mx-auto">
+                        <Card className="w-full h-48 hover:shadow-xl transition-all duration-300 group">
+                            <CardContent className="h-full bg-white p-6 flex items-center justify-center">
                                 <img
                                     src="/lab-science-logo.png"
                                     alt="Lab Science Academy"
@@ -38,11 +38,31 @@ const Parcerias = () => {
                             </CardContent>
                         </Card>
 
-                        <Card className="w-full h-64 hover:shadow-xl transition-all duration-300 group">
-                            <CardContent className="h-full bg-white p-8 flex items-center justify-center">
+                        <Card className="w-full h-48 hover:shadow-xl transition-all duration-300 group">
+                            <CardContent className="h-full bg-white p-6 flex items-center justify-center">
                                 <img
                                     src="/ms-logo.jpg"
                                     alt="MS"
+                                    className="max-h-full max-w-full object-contain filter group-hover:brightness-110 transition-all"
+                                />
+                            </CardContent>
+                        </Card>
+
+                        <Card className="w-full h-48 hover:shadow-xl transition-all duration-300 group">
+                            <CardContent className="h-full bg-white p-6 flex items-center justify-center">
+                                <img
+                                    src="/unesp-logo.png"
+                                    alt="UNESP"
+                                    className="max-h-full max-w-full object-contain filter group-hover:brightness-110 transition-all"
+                                />
+                            </CardContent>
+                        </Card>
+
+                        <Card className="w-full h-48 hover:shadow-xl transition-all duration-300 group">
+                            <CardContent className="h-full bg-white p-6 flex items-center justify-center">
+                                <img
+                                    src="/unesc-logo.jpg"
+                                    alt="UNESC"
                                     className="max-h-full max-w-full object-contain filter group-hover:brightness-110 transition-all"
                                 />
                             </CardContent>
