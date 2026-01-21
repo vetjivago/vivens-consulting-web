@@ -29,6 +29,8 @@ import { InternalLayout } from "./pages/internal/InternalLayout";
 import { Dashboard } from "./pages/internal/Dashboard";
 import { Clients } from "./pages/internal/Clients";
 import { Projects } from "./pages/internal/Projects";
+import { ReportList } from "./pages/internal/Reports/ReportList";
+import { ReportEditor } from "./pages/internal/Reports/ReportEditor";
 
 const queryClient = new QueryClient();
 
@@ -69,6 +71,9 @@ const App = () => (
               <Route index element={<Dashboard />} />
               <Route path="clients" element={<Clients />} />
               <Route path="projects" element={<Projects />} />
+              <Route path="reports" element={<ReportList />} />
+              <Route path="reports/new" element={<ReportEditor />} />
+              <Route path="reports/:id" element={<ReportEditor />} />
             </Route>
             <Route path="/politicas" element={<Politicas />} />
             <Route path="*" element={<NotFound />} />
