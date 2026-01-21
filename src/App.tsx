@@ -19,6 +19,7 @@ import Conteudos from "./pages/Conteudos";
 import Politicas from "./pages/Politicas";
 import NotFound from "./pages/NotFound";
 import Parcerias from "./pages/Parcerias";
+import TestPage from "./pages/TestPage";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 
@@ -46,6 +47,7 @@ const App = () => (
           <Route path="/contato" element={<Contato />} />
           <Route path="/conteudos" element={<Conteudos />} />
           <Route path="/parcerias" element={<Parcerias />} />
+          <Route path="/test" element={<TestPage />} />
           <Route path="/politicas" element={<Politicas />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
