@@ -20,6 +20,7 @@ import {
 import { Plus, Search } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Label } from "@/components/ui/label";
+import { ClientInvoices } from "@/components/clients/ClientInvoices";
 
 type Client = {
     id: string;
@@ -170,18 +171,19 @@ export const Clients = () => {
                             <TableHead>Contato</TableHead>
                             <TableHead>Email</TableHead>
                             <TableHead>Telefone</TableHead>
+                            <TableHead className="w-[150px]">Ações</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
                         {loading ? (
                             <TableRow>
-                                <TableCell colSpan={4} className="text-center h-24">
+                                <TableCell colSpan={5} className="text-center h-24">
                                     Carregando...
                                 </TableCell>
                             </TableRow>
                         ) : filteredClients.length === 0 ? (
                             <TableRow>
-                                <TableCell colSpan={4} className="text-center h-24 text-gray-500">
+                                <TableCell colSpan={5} className="text-center h-24 text-gray-500">
                                     Nenhum cliente encontrado.
                                 </TableCell>
                             </TableRow>
@@ -192,6 +194,9 @@ export const Clients = () => {
                                     <TableCell>{client.contact_person}</TableCell>
                                     <TableCell>{client.email}</TableCell>
                                     <TableCell>{client.phone}</TableCell>
+                                    <TableCell>
+                                        <ClientInvoices clientId={client.id} clientName={client.name} />
+                                    </TableCell>
                                 </TableRow>
                             ))
                         )}
