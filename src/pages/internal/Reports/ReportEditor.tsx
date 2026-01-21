@@ -424,10 +424,109 @@ export const ReportEditor = () => {
                                                 value={block.data.title}
                                                 onChange={(e) => updateBlock(block.id, { title: e.target.value })}
                                             />
-                                            <div className="text-sm text-muted-foreground text-center py-4 border border-dashed rounded">
-                                                Edição de itens da tabela em breve...
-                                                (Adicione itens manualmente no banco por enquanto ou use observações)
+                                            {/* Table Items Editor */}
+                                            <div className="border rounded-md overflow-hidden">
+                                                <div className="grid grid-cols-12 gap-2 bg-muted p-2 text-xs font-semibold text-center">
+                                                    <div className="col-span-1">Item</div>
+                                                    <div className="col-span-6">Descrição</div>
+                                                    <div className="col-span-2">Classificação</div>
+                                                    <div className="col-span-2">Status</div>
+                                                    <div className="col-span-1"></div>
+                                                </div>
+
+                                                <div className="max-h-[300px] overflow-y-auto">
+                                                    {block.data.items?.map((item: any, idx: number) => (
+                                                        <div key={idx} className="grid grid-cols-12 gap-2 p-2 border-b items-center text-sm">
+                                                            <div className="col-span-1">
+                                                                <Input
+                                                                    className="h-8 p-1"
+                                                                    value={item.itemNumber}
+                                                                    onChange={(e) => {
+                                                                        const newItems = [...block.data.items];
+                                                                        newItems[idx].itemNumber = e.target.value;
+                                                                        updateBlock(block.id, { items: newItems });
+                                                                    }}
+                                                                />
+                                                            </div>
+                                                            <div className="col-span-6">
+                                                                <Textarea
+                                                                    className="h-10 min-h-[40px] p-2 text-xs"
+                                                                    value={item.description}
+                                                                    onChange={(e) => {
+                                                                        const newItems = [...block.data.items];
+                                                                        newItems[idx].description = e.target.value;
+                                                                        updateBlock(block.id, { items: newItems });
+                                                                    }}
+                                                                />
+                                                            </div>
+                                                            <div className="col-span-2">
+                                                                <Select
+                                                                    value={item.classification}
+                                                                    onValueChange={(val) => {
+                                                                        const newItems = [...block.data.items];
+                                                                        newItems[idx].classification = val;
+                                                                        updateBlock(block.id, { items: newItems });
+                                                                    }}
+                                                                >
+                                                                    <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
+                                                                    <SelectContent>
+                                                                        <SelectItem value="Obrigatório">Obrigatório</SelectItem>
+                                                                        <SelectItem value="Recomendado">Recomendado</SelectItem>
+                                                                    </SelectContent>
+                                                                </Select>
+                                                            </div>
+                                                            <div className="col-span-2">
+                                                                <Select
+                                                                    value={item.status}
+                                                                    onValueChange={(val) => {
+                                                                        const newItems = [...block.data.items];
+                                                                        newItems[idx].status = val;
+                                                                        updateBlock(block.id, { items: newItems });
+                                                                    }}
+                                                                >
+                                                                    <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
+                                                                    <SelectContent>
+                                                                        <SelectItem value="Atende">Atende</SelectItem>
+                                                                        <SelectItem value="Não Atende">Não Atende</SelectItem>
+                                                                        <SelectItem value="Atende em Partes">Parcial</SelectItem>
+                                                                        <SelectItem value="Crítico">Crítico</SelectItem>
+                                                                    </SelectContent>
+                                                                </Select>
+                                                            </div>
+                                                            <div className="col-span-1 flex justify-center">
+                                                                <Button
+                                                                    variant="ghost"
+                                                                    size="icon"
+                                                                    className="h-6 w-6 text-red-500 hover:text-red-700 hover:bg-red-50"
+                                                                    onClick={() => {
+                                                                        const newItems = block.data.items.filter((_: any, i: number) => i !== idx);
+                                                                        updateBlock(block.id, { items: newItems });
+                                                                    }}
+                                                                >
+                                                                    <X className="h-4 w-4" />
+                                                                </Button>
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                </div>
                                             </div>
+
+                                            <Button
+                                                variant="outline"
+                                                size="sm"
+                                                className="w-full border-dashed"
+                                                onClick={() => {
+                                                    const newItems = [...(block.data.items || []), {
+                                                        itemNumber: (block.data.items?.length + 1).toString(),
+                                                        description: "",
+                                                        classification: "Obrigatório",
+                                                        status: "Não Atende"
+                                                    }];
+                                                    updateBlock(block.id, { items: newItems });
+                                                }}
+                                            >
+                                                <Plus className="mr-2 h-4 w-4" /> Adicionar Item na Tabela
+                                            </Button>
                                         </CardContent>
                                     )}
                                 </Card>
