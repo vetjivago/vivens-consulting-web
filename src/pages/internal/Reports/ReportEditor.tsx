@@ -432,9 +432,26 @@ export const ReportEditor = () => {
                                     )}
                                 </Card>
                             ))}
+                        </div>
+                    </div>
+                </div>
+
+                {/* Preview Panel - Right */}
+                <div className="w-1/2 bg-zinc-100 flex flex-col">
+                    <div className="h-full">
+                        <PDFViewer width="100%" height="100%" className="border-none">
+                            <PDFTemplate data={{
+                                title: reportMeta.title || "Sem Título",
+                                type: reportMeta.type,
+                                client: reportMeta.client_name || "Cliente",
+                                project: reportMeta.project_title || "Projeto",
+                                date: new Date().toLocaleDateString('pt-BR'),
+                                blocks: blocks
+                            }} />
                         </PDFViewer>
                     </div>
                 </div>
             </div>
-            );
+        </div>
+    );
 };
