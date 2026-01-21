@@ -25,6 +25,10 @@ import Footer from "./components/Footer";
 import Login from "./pages/Login";
 import { AuthProvider } from "./contexts/AuthContext";
 import { ProtectedRoute } from "./components/ProtectedRoute";
+import { InternalLayout } from "./pages/internal/InternalLayout";
+import { Dashboard } from "./pages/internal/Dashboard";
+import { Clients } from "./pages/internal/Clients";
+import { Projects } from "./pages/internal/Projects";
 
 const queryClient = new QueryClient();
 
@@ -55,19 +59,17 @@ const App = () => (
             <Route path="/login" element={<Login />} />
             {/* Protected Internal Routes */}
             <Route
-              path="/internal/*"
+              path="/internal"
               element={
                 <ProtectedRoute>
-                  <div className="pt-24 min-h-screen bg-gray-50">
-                    <div className="container mx-auto px-4 py-8">
-                      <h1 className="text-3xl font-bold mb-6">Área do Sócio (Protegido)</h1>
-                      <p>Bem-vindo ao sistema de gestão Vivens.</p>
-                      {/* Sub-routes will go here */}
-                    </div>
-                  </div>
+                  <InternalLayout />
                 </ProtectedRoute>
               }
-            />
+            >
+              <Route index element={<Dashboard />} />
+              <Route path="clients" element={<Clients />} />
+              <Route path="projects" element={<Projects />} />
+            </Route>
             <Route path="/politicas" element={<Politicas />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
