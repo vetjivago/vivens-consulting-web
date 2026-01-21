@@ -22,38 +22,59 @@ import Parcerias from "./pages/Parcerias";
 import TestPage from "./pages/TestPage";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
+import Login from "./pages/Login";
+import { AuthProvider } from "./contexts/AuthContext";
+import { ProtectedRoute } from "./components/ProtectedRoute";
 
 const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Header />
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/sobre" element={<Sobre />} />
-          <Route path="/servicos" element={<Servicos />} />
-          <Route path="/servicos/consultoria" element={<Consultoria />} />
-          <Route path="/servicos/toxicologia" element={<Toxicologia />} />
-          <Route path="/servicos/educacao" element={<Educacao />} />
-          <Route path="/servicos/bem-estar" element={<BemEstar />} />
-          <Route path="/servicos/veterinaria" element={<Veterinaria />} />
-          {/* <Route path="/infraestrutura" element={<Infraestrutura />} /> */}
-          <Route path="/setores" element={<Setores />} />
-          <Route path="/equipe" element={<Equipe />} />
-          <Route path="/contato" element={<Contato />} />
-          <Route path="/conteudos" element={<Conteudos />} />
-          <Route path="/parcerias" element={<Parcerias />} />
-          <Route path="/test" element={<TestPage />} />
-          <Route path="/politicas" element={<Politicas />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-        <Footer />
-      </BrowserRouter>
-    </TooltipProvider>
+    <AuthProvider>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Header />
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/sobre" element={<Sobre />} />
+            <Route path="/servicos" element={<Servicos />} />
+            <Route path="/servicos/consultoria" element={<Consultoria />} />
+            <Route path="/servicos/toxicologia" element={<Toxicologia />} />
+            <Route path="/servicos/educacao" element={<Educacao />} />
+            <Route path="/servicos/bem-estar" element={<BemEstar />} />
+            <Route path="/servicos/veterinaria" element={<Veterinaria />} />
+            {/* <Route path="/infraestrutura" element={<Infraestrutura />} /> */}
+            <Route path="/setores" element={<Setores />} />
+            <Route path="/equipe" element={<Equipe />} />
+            <Route path="/contato" element={<Contato />} />
+            <Route path="/conteudos" element={<Conteudos />} />
+            <Route path="/parcerias" element={<Parcerias />} />
+            <Route path="/test" element={<TestPage />} />
+            <Route path="/login" element={<Login />} />
+            {/* Protected Internal Routes */}
+            <Route
+              path="/internal/*"
+              element={
+                <ProtectedRoute>
+                  <div className="pt-24 min-h-screen bg-gray-50">
+                    <div className="container mx-auto px-4 py-8">
+                      <h1 className="text-3xl font-bold mb-6">Área do Sócio (Protegido)</h1>
+                      <p>Bem-vindo ao sistema de gestão Vivens.</p>
+                      {/* Sub-routes will go here */}
+                    </div>
+                  </div>
+                </ProtectedRoute>
+              }
+            />
+            <Route path="/politicas" element={<Politicas />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+          <Footer />
+        </BrowserRouter>
+      </TooltipProvider>
+    </AuthProvider>
   </QueryClientProvider>
 );
 

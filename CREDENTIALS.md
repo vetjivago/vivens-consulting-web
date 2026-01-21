@@ -23,3 +23,8 @@ Este arquivo deve ser preenchido com as credenciais reais antes de ser armazenad
 ## 4. GitHub / Vercel
 **GitHub Repo:** `https://github.com/vetjivago/vivens-consulting-web`
 **Vercel Project:** `vivens-consulting-web`
+
+## 5. Supabase (Banco de Dados e Auth)
+**Project URL:** `https://vervrmflqvjbtxxpicmg.supabase.co`
+**Anon Key:** `sb_publishable_HVID88-okdcFaWwEkKu89g_xER8yerE`
+**DB Password:** `sW1DQngOzTrDpqBc`
