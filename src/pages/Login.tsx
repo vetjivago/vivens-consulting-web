@@ -34,7 +34,7 @@ const Login = () => {
                 title: "Bem-vindo de volta!",
                 description: "Login realizado com sucesso.",
             });
-            navigate("/"); // Redirect to home/dashboard
+            navigate("/internal"); // Redirect to dashboard
         }
 
         setLoading(false);
