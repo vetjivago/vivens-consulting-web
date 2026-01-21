@@ -7,65 +7,104 @@ const styles = StyleSheet.create({
     page: {
         flexDirection: "column",
         backgroundColor: "#FFFFFF",
-        padding: 30,
+        padding: 40,
         fontFamily: "Helvetica",
+        color: "#374151", // Gray-700
     },
     header: {
         flexDirection: "row",
         justifyContent: "space-between",
-        marginBottom: 20,
-        borderBottomWidth: 1,
-        borderBottomColor: "#E5E7EB",
-        paddingBottom: 10,
+        alignItems: "center",
+        marginBottom: 30,
+        borderBottomWidth: 2,
+        borderBottomColor: "#2563EB", // Gemini-600
+        paddingBottom: 20,
     },
-    logo: {
-        fontSize: 24,
+    logoImage: {
+        width: 120,
+        objectFit: "contain",
+    },
+    headerText: {
+        textAlign: "right",
+    },
+    companyName: {
+        fontSize: 12,
         fontWeight: "bold",
-        color: "#2563EB", // Gemini-600 like color
+        color: "#2563EB",
     },
-    title: {
+    reportType: {
         fontSize: 18,
         fontWeight: "bold",
-        marginBottom: 10,
-        textAlign: "center",
+        color: "#111827", // Gray-900
+        marginTop: 4,
     },
-    section: {
-        margin: 10,
-        padding: 10,
-    },
-    label: {
+    date: {
         fontSize: 10,
         color: "#6B7280",
-        marginBottom: 2,
+        marginTop: 4,
+    },
+    section: {
+        marginBottom: 20,
+    },
+    title: {
+        fontSize: 24,
+        fontWeight: "bold",
+        color: "#111827",
+        marginBottom: 20,
+        textAlign: "center",
+    },
+    metaGrid: {
+        flexDirection: "row",
+        backgroundColor: "#F3F4F6", // Gray-100
+        padding: 15,
+        borderRadius: 8,
+        marginBottom: 30,
+    },
+    metaItem: {
+        flex: 1,
+    },
+    label: {
+        fontSize: 9,
+        textTransform: "uppercase",
+        color: "#6B7280",
+        fontWeight: "bold",
+        marginBottom: 4,
     },
     value: {
+        fontSize: 11,
+        color: "#1F2937",
+        fontWeight: "medium",
+    },
+    contentSection: {
+        marginTop: 10,
+        lineHeight: 1.6,
         fontSize: 12,
-        marginBottom: 8,
+        textAlign: "justify",
     },
     imageContainer: {
         flexDirection: "row",
         flexWrap: "wrap",
-        marginTop: 20,
+        marginTop: 30,
+        gap: 10,
     },
     imageWrapper: {
-        width: "48%",
-        margin: "1%",
-        height: 200,
+        width: "48%", // Two columns
+        marginBottom: 10,
     },
     image: {
         width: "100%",
-        height: "100%",
+        height: 200,
         objectFit: "cover",
         borderRadius: 4,
     },
     footer: {
         position: "absolute",
         bottom: 30,
-        left: 30,
-        right: 30,
+        left: 40,
+        right: 40,
         textAlign: "center",
         color: "#9CA3AF",
-        fontSize: 10,
+        fontSize: 9,
         borderTopWidth: 1,
         borderTopColor: "#E5E7EB",
         paddingTop: 10,
@@ -87,39 +126,39 @@ export const PDFTemplate = ({ data }: { data: ReportData }) => (
         <Page size="A4" style={styles.page}>
             {/* Header */}
             <View style={styles.header}>
-                <Text style={styles.logo}>VivensLab</Text>
-                <View>
-                    <Text style={{ fontSize: 10, color: "#6B7280" }}>Relatório Técnico</Text>
-                    <Text style={{ fontSize: 10 }}>{data.date}</Text>
+                <Image src="/logo.jpg" style={styles.logoImage} />
+                <View style={styles.headerText}>
+                    <Text style={styles.companyName}>Vivens Consultoria Científica</Text>
+                    <Text style={styles.reportType}>Relatório Técnico</Text>
+                    <Text style={styles.date}>{data.date}</Text>
                 </View>
             </View>
 
-            {/* Info */}
+            {/* Title */}
+            <Text style={styles.title}>{data.title}</Text>
+
+            {/* Meta Info */}
+            <View style={styles.metaGrid}>
+                <View style={styles.metaItem}>
+                    <Text style={styles.label}>Cliente</Text>
+                    <Text style={styles.value}>{data.client}</Text>
+                </View>
+                <View style={styles.metaItem}>
+                    <Text style={styles.label}>Projeto</Text>
+                    <Text style={styles.value}>{data.project}</Text>
+                </View>
+                <View style={styles.metaItem}>
+                    <Text style={styles.label}>Tipo</Text>
+                    <Text style={styles.value}>{data.type}</Text>
+                </View>
+            </View>
+
+            {/* Content */}
             <View style={styles.section}>
-                <Text style={styles.title}>{data.title}</Text>
-
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 10 }}>
-                    <View>
-                        <Text style={styles.label}>Cliente</Text>
-                        <Text style={styles.value}>{data.client}</Text>
-                    </View>
-                    <View>
-                        <Text style={styles.label}>Projeto</Text>
-                        <Text style={styles.value}>{data.project}</Text>
-                    </View>
-                    <View>
-                        <Text style={styles.label}>Tipo</Text>
-                        <Text style={styles.value}>{data.type}</Text>
-                    </View>
-                </View>
-
-                {/* Content */}
-                <View style={{ marginTop: 20 }}>
-                    <Text style={styles.label}>Descrição/Observações</Text>
-                    <Text style={{ fontSize: 12, lineHeight: 1.5 }}>
-                        {data.content}
-                    </Text>
-                </View>
+                <Text style={styles.label}>Descrição e Observações</Text>
+                <Text style={styles.contentSection}>
+                    {data.content}
+                </Text>
             </View>
 
             {/* Images Grid */}
