@@ -1,4 +1,5 @@
 import { Page, Text, View, Document, StyleSheet, Image, Font } from "@react-pdf/renderer";
+import { ReportBlock, StructuredReportData, ComplianceStatus } from "@/types/report";
 
 // Register fonts if needed (optional for now, using standard fonts)
 // Font.register({ family: 'Roboto', src: 'https://cdnjs.cloudflare.com/ajax/libs/ink/3.1.10/fonts/Roboto/roboto-light-webfont.ttf' });
@@ -81,6 +82,82 @@ const styles = StyleSheet.create({
         fontSize: 12,
         textAlign: "justify",
     },
+    // Table Styles
+    tableContainer: {
+        marginTop: 15,
+        marginBottom: 20,
+        borderWidth: 1,
+        borderColor: "#E5E7EB",
+    },
+    tableHeader: {
+        flexDirection: "row",
+        backgroundColor: "#EFF6FF", // Blue-50
+        borderBottomWidth: 1,
+        borderBottomColor: "#E5E7EB",
+        padding: 8,
+    },
+    tableRow: {
+        flexDirection: "row",
+        borderBottomWidth: 1,
+        borderBottomColor: "#F3F4F6",
+        padding: 8,
+        alignItems: 'center',
+    },
+    colItem: { width: "10%" },
+    colDesc: { width: "50%" },
+    colClass: { width: "20%" },
+    colStatus: { width: "20%" },
+
+    tabletext: {
+        fontSize: 10,
+        color: "#374151",
+    },
+    headerTextTable: {
+        fontSize: 10,
+        fontWeight: "bold",
+        color: "#1E40AF", // Blue-800
+    },
+
+    // Status Badges
+    statusBadge: {
+        paddingVertical: 2,
+        paddingHorizontal: 6,
+        borderRadius: 4,
+        fontSize: 8,
+        fontWeight: "bold",
+        textAlign: "center",
+    },
+
+    // Observation Block
+    observationBlock: {
+        marginBottom: 20,
+        backgroundColor: "#F9FAFB",
+        padding: 10,
+        borderRadius: 4,
+    },
+    obsTitle: {
+        fontSize: 14,
+        fontWeight: "bold",
+        color: "#DC2626", // Red-600 for critical/high
+        marginBottom: 5,
+    },
+    obsImage: {
+        width: "100%",
+        height: 200,
+        objectFit: "contain",
+        marginTop: 10,
+        borderRadius: 4,
+    },
+
+    // Executive Summary
+    execSummary: {
+        backgroundColor: "#F0FDF4", // Green-50
+        padding: 15,
+        borderRadius: 8,
+        marginBottom: 20,
+        borderWidth: 1,
+        borderColor: "#BBF7D0",
+    },
     imageContainer: {
         flexDirection: "row",
         flexWrap: "wrap",
@@ -111,17 +188,23 @@ const styles = StyleSheet.create({
     },
 });
 
-type ReportData = {
-    title: string;
-    type: string;
-    client: string; // Client Name
-    project: string; // Project Title
-    date: string;
-    content: string; // Basic text content for now
-    images: string[]; // Array of image URLs
+const StatusBadge = ({ status }: { status: ComplianceStatus }) => {
+    let bg = "#F3F4F6";
+    let color = "#374151";
+
+    if (status === "Atende") { bg = "#DCFCE7"; color = "#166534"; }
+    if (status === "Não Atende") { bg = "#FEE2E2"; color = "#991B1B"; }
+    if (status === "Atende em Partes") { bg = "#FEF9C3"; color = "#854D0E"; }
+    if (status === "Crítico") { bg = "#7F1D1D"; color = "#FFFFFF"; }
+
+    return (
+        <View style={[styles.statusBadge, { backgroundColor: bg }]}>
+            <Text style={{ color: color }}>{status}</Text>
+        </View>
+    );
 };
 
-export const PDFTemplate = ({ data }: { data: ReportData }) => (
+export const PDFTemplate = ({ data }: { data: StructuredReportData }) => (
     <Document>
         <Page size="A4" style={styles.page}>
             {/* Header */}
@@ -134,10 +217,8 @@ export const PDFTemplate = ({ data }: { data: ReportData }) => (
                 </View>
             </View>
 
-            {/* Title */}
+            {/* Title & Info */}
             <Text style={styles.title}>{data.title}</Text>
-
-            {/* Meta Info */}
             <View style={styles.metaGrid}>
                 <View style={styles.metaItem}>
                     <Text style={styles.label}>Cliente</Text>
@@ -147,32 +228,73 @@ export const PDFTemplate = ({ data }: { data: ReportData }) => (
                     <Text style={styles.label}>Projeto</Text>
                     <Text style={styles.value}>{data.project}</Text>
                 </View>
-                <View style={styles.metaItem}>
-                    <Text style={styles.label}>Tipo</Text>
-                    <Text style={styles.value}>{data.type}</Text>
-                </View>
             </View>
 
-            {/* Content */}
-            <View style={styles.section}>
-                <Text style={styles.label}>Descrição e Observações</Text>
-                <Text style={styles.contentSection}>
-                    {data.content}
-                </Text>
-            </View>
+            {/* Render Blocks */}
+            {data.blocks && data.blocks.map((block, index) => {
 
-            {/* Images Grid */}
-            <View style={styles.imageContainer}>
-                {data.images && data.images.map((img, index) => (
-                    <View key={index} style={styles.imageWrapper}>
-                        <Image src={img} style={styles.image} />
-                    </View>
-                ))}
-            </View>
+                // 1. Executive Summary
+                if (block.type === 'executive_summary') {
+                    return (
+                        <View key={block.id} style={styles.execSummary}>
+                            <Text style={[styles.title, { fontSize: 16, marginBottom: 10 }]}>Resumo Executivo</Text>
+                            <Text style={styles.value}>Imagens Analisadas: {block.data.imagesAnalyzed}</Text>
+                            <Text style={styles.value}>Pontos Críticos: {block.data.criticalImages}</Text>
+                            <Text style={[styles.value, { fontWeight: 'bold', marginTop: 5 }]}>Situação Geral: {block.data.generalStatus}</Text>
+                        </View>
+                    );
+                }
+
+                // 2. Compliance Table
+                if (block.type === 'compliance_table') {
+                    return (
+                        <View key={block.id} break={index > 0}>
+                            <Text style={[styles.title, { fontSize: 14, textAlign: 'left', marginTop: 10 }]}>{block.data.title}</Text>
+                            <View style={styles.tableContainer}>
+                                {/* Table Header */}
+                                <View style={styles.tableHeader}>
+                                    <View style={styles.colItem}><Text style={styles.headerTextTable}>Item</Text></View>
+                                    <View style={styles.colDesc}><Text style={styles.headerTextTable}>Descrição (RN57)</Text></View>
+                                    <View style={styles.colClass}><Text style={styles.headerTextTable}>Classificação</Text></View>
+                                    <View style={styles.colStatus}><Text style={styles.headerTextTable}>Status</Text></View>
+                                </View>
+                                {/* Rows */}
+                                {block.data.items?.map((item: any, i: number) => (
+                                    <View key={i} style={styles.tableRow}>
+                                        <View style={styles.colItem}><Text style={styles.tabletext}>{item.itemNumber}</Text></View>
+                                        <View style={styles.colDesc}><Text style={styles.tabletext}>{item.description}</Text></View>
+                                        <View style={styles.colClass}><Text style={styles.tabletext}>{item.classification}</Text></View>
+                                        <View style={styles.colStatus}>
+                                            <StatusBadge status={item.status} />
+                                        </View>
+                                    </View>
+                                ))}
+                            </View>
+                        </View>
+                    );
+                }
+
+                // 3. Observation Block
+                if (block.type === 'observation') {
+                    return (
+                        <View key={block.id} style={styles.observationBlock} break={false}>
+                            <Text style={styles.obsTitle}>
+                                {block.data.title ? block.data.title : "Observação"}
+                            </Text>
+                            <Text style={styles.contentSection}>{block.data.description}</Text>
+                            {block.data.image && (
+                                <Image src={block.data.image} style={styles.obsImage} />
+                            )}
+                        </View>
+                    );
+                }
+
+                return null;
+            })}
 
             {/* Footer */}
             <Text style={styles.footer}>
-                Vivens Consultoria Científica - www.vivenslab.com
+                Vivens Consultoria - {data.project} - {data.client}
             </Text>
         </Page>
     </Document>

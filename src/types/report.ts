@@ -1,0 +1,56 @@
+
+// Basic Block Types
+export type BlockType = 'executive_summary' | 'compliance_table' | 'observation' | 'text_section' | 'images_grid';
+
+export interface ReportBlock {
+    id: string;
+    type: BlockType;
+    // Specific data for each block type will be stored here
+    data: any;
+}
+
+// 1. Executive Summary Data
+export interface ExecutiveSummaryData {
+    imagesAnalyzed: number;
+    criticalImages: number;
+    evaluationDate: string;
+    generalStatus: string;
+}
+
+// 2. Compliance Table Data
+export type ComplianceStatus = 'Atende' | 'Não Atende' | 'Atende em Partes' | 'Crítico';
+
+export interface ComplianceItem {
+    id: string;
+    itemNumber: string;
+    description: string;
+    classification: 'Obrigatório' | 'Recomendado';
+    status: ComplianceStatus;
+}
+
+export interface ComplianceTableData {
+    title: string; // e.g. "Ambientes Físicos da Instalação Animal"
+    items: ComplianceItem[];
+}
+
+// 3. Observation Data (Text + Image)
+export interface ObservationData {
+    title?: string; // Optional title for the observation
+    description: string;
+    image?: string; // URL of the uploaded image
+    imageCaption?: string;
+    severity?: 'critical' | 'high' | 'medium' | 'low' | 'none';
+}
+
+// 4. Report Struct (Full)
+export interface StructuredReportData {
+    title: string;
+    type: string;
+    client: string;
+    project: string;
+    date: string;
+    partnerLogo?: string; // URL for the secondary logo
+
+    // The Main Content is now a list of blocks
+    blocks: ReportBlock[];
+}
