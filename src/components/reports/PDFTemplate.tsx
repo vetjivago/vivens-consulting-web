@@ -289,6 +289,22 @@ export const PDFTemplate = ({ data }: { data: StructuredReportData }) => (
                     );
                 }
 
+                // 4. Text Section Block
+                if (block.type === 'text_section') {
+                    return (
+                        <View key={block.id} style={styles.section} break={false}>
+                            {block.data.title && (
+                                <Text style={[styles.title, { fontSize: 14, textAlign: 'left', marginBottom: 10 }]}>
+                                    {block.data.title}
+                                </Text>
+                            )}
+                            <Text style={styles.contentSection}>
+                                {block.data.text}
+                            </Text>
+                        </View>
+                    );
+                }
+
                 return null;
             })}
 
