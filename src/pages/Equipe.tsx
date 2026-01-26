@@ -182,7 +182,7 @@ const Equipe = () => {
                 <CardContent className="p-0">
                   <div className="flex flex-col">
                     <div className="w-full h-96 relative">
-                      <img src={member.image} alt={member.name} className="w-full h-full object-cover object-top" />
+                      <img src={member.image} alt={member.name} className="w-full h-full object-contain object-top" />
                     </div>
                     <div className="p-8">
                       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-2">
