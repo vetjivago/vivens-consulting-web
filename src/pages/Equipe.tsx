@@ -65,7 +65,7 @@ const Equipe = () => {
     {
       name: "Ekaterina Akimovna Botovchenco Rivera",
       role: "Consultora Sênior",
-      image: ekaterinaImage,
+      image: "/ekaterina-rivera-2025.jpg",
       highlight: true,
       bio: (
         <div className="space-y-4">
