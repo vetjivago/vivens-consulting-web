@@ -180,11 +180,11 @@ const Equipe = () => {
             {consultants.map((member, index) => (
               <Card key={index} className={`overflow-hidden ${member.highlight ? 'border-secondary/50 border-2 shadow-xl' : ''}`}>
                 <CardContent className="p-0">
-                  <div className="flex flex-col md:flex-row">
-                    <div className="md:w-1/3 h-64 md:h-auto relative">
-                      <img src={member.image} alt={member.name} className="w-full h-full object-cover object-top absolute inset-0" />
+                  <div className="flex flex-col">
+                    <div className="w-full h-96 relative">
+                      <img src={member.image} alt={member.name} className="w-full h-full object-cover object-top" />
                     </div>
-                    <div className="p-8 md:w-2/3">
+                    <div className="p-8">
                       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-2">
                         <div>
                           <h3 className="text-2xl font-bold">{member.name}</h3>
