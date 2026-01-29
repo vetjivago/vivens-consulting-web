@@ -17,7 +17,7 @@ import { PDFTemplate } from "@/components/reports/PDFTemplate";
 import { useToast } from "@/components/ui/use-toast";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ReportBlock, StructuredReportData, ComplianceItem } from "@/types/report";
-import { Save, ArrowLeft, Loader2, Upload, X, Plus, Trash2, GripVertical, Image as ImageIcon } from "lucide-react";
+import { Save, ArrowLeft, Loader2, Upload, X, Plus, Trash2, GripVertical, Image as ImageIcon, ArrowUp, ArrowDown } from "lucide-react";
 
 export const ReportEditor = () => {
     const { id } = useParams();
@@ -74,6 +74,17 @@ export const ReportEditor = () => {
 
     const removeBlock = (id: string) => {
         setBlocks(blocks.filter(b => b.id !== id));
+    };
+
+    const moveBlock = (index: number, direction: 'up' | 'down') => {
+        if (direction === 'up' && index === 0) return;
+        if (direction === 'down' && index === blocks.length - 1) return;
+
+        const newBlocks = [...blocks];
+        const targetIndex = direction === 'up' ? index - 1 : index + 1;
+
+        [newBlocks[index], newBlocks[targetIndex]] = [newBlocks[targetIndex], newBlocks[index]];
+        setBlocks(newBlocks);
     };
     // Image handling will be separate
     const [images, setImages] = useState<string[]>([]); // URLs
@@ -276,9 +287,9 @@ export const ReportEditor = () => {
                 </Button>
             </div>
 
-            <div className="flex-1 flex flex-row overflow-hidden">
+            <div className="flex-1 grid grid-cols-2 overflow-hidden">
                 {/* Editor Panel - Left */}
-                <div className="flex-1 border-r bg-muted/10 flex flex-col overflow-hidden min-w-[350px]">
+                <div className="border-r bg-muted/10 flex flex-col overflow-hidden min-w-0">
                     <div className="flex-1 overflow-y-auto p-6 space-y-6">
 
                         {/* Metadata Card */}
@@ -355,7 +366,13 @@ export const ReportEditor = () => {
 
                         {blocks.map((block, index) => (
                             <Card key={block.id} className="relative group">
-                                <div className="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <div className="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
+                                    <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => moveBlock(index, 'up')} disabled={index === 0}>
+                                        <ArrowUp className="h-3 w-3" />
+                                    </Button>
+                                    <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => moveBlock(index, 'down')} disabled={index === blocks.length - 1}>
+                                        <ArrowDown className="h-3 w-3" />
+                                    </Button>
                                     <Button variant="destructive" size="icon" className="h-6 w-6" onClick={() => removeBlock(block.id)}>
                                         <Trash2 className="h-3 w-3" />
                                     </Button>
@@ -610,7 +627,7 @@ export const ReportEditor = () => {
             </div>
 
             {/* Preview Panel - Right */}
-            <div className="flex-1 bg-zinc-100 flex flex-col min-w-0 h-full">
+            <div className="bg-zinc-100 flex flex-col min-w-0 h-full overflow-hidden">
                 <div className="h-full w-full">
                     <PDFViewer width="100%" height="100%" className="border-none w-full h-full">
                         <PDFTemplate data={{
