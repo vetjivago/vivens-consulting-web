@@ -1,6 +1,6 @@
 
 // Basic Block Types
-export type BlockType = 'executive_summary' | 'compliance_table' | 'observation' | 'text_section' | 'images_grid';
+export type BlockType = 'executive_summary' | 'compliance_table' | 'observation' | 'text_section' | 'images_grid' | 'section_header';
 
 export interface ReportBlock {
     id: string;
@@ -18,7 +18,7 @@ export interface ExecutiveSummaryData {
 }
 
 // 2. Compliance Table Data
-export type ComplianceStatus = 'Atende' | 'Não Atende' | 'Atende em Partes' | 'Crítico';
+export type ComplianceStatus = 'Atende' | 'Não Atende' | 'Atende em Partes' | 'Crítico' | 'Não se aplica';
 
 export interface ComplianceItem {
     id: string;
@@ -53,4 +53,9 @@ export interface StructuredReportData {
 
     // The Main Content is now a list of blocks
     blocks: ReportBlock[];
+}
+
+// 5. Section Header Data
+export interface SectionHeaderData {
+    title: string;
 }

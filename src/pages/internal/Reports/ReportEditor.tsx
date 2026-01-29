@@ -58,6 +58,12 @@ export const ReportEditor = () => {
         if (type === 'observation') {
             newBlock.data = { title: "Nova Observação", description: "", severity: "medium" };
         }
+        if (type === 'section_header') {
+            newBlock.data = { title: "Título da Seção" };
+        }
+        if (type === 'section_header') {
+            newBlock.data = { title: "Título da Seção" };
+        }
 
         setBlocks([...blocks, newBlock]);
     };
@@ -193,38 +199,39 @@ export const ReportEditor = () => {
         }
     }, [id, projects]);
 
-    const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    // Image handling for blocks
+    const handleBlockImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, blockId: string) => {
         if (!e.target.files || e.target.files.length === 0) return;
 
         setLoading(true);
         const file = e.target.files[0];
         const fileExt = file.name.split(".").pop();
-        const fileName = `${Math.random()}.${fileExt}`;
+        const fileName = `${reportMeta.project_id || 'temp'}/${blockId}-${Date.now()}.${fileExt}`;
         const filePath = `${fileName}`;
 
-        const { error: uploadError } = await supabase.storage
-            .from("project-images")
-            .upload(filePath, file);
+        try {
+            const { error: uploadError } = await supabase.storage
+                .from("project-images")
+                .upload(filePath, file);
 
-        if (uploadError) {
-            toast({
-                variant: "destructive",
-                title: "Erro no upload",
-                description: uploadError.message,
-            });
-        } else {
+            if (uploadError) throw uploadError;
+
             const { data: { publicUrl } } = supabase.storage
                 .from("project-images")
                 .getPublicUrl(filePath);
 
-            setImages([...images, publicUrl]);
+            updateBlock(blockId, { image: publicUrl });
             toast({ title: "Imagem enviada!" });
-        }
-        setLoading(false);
-    };
 
-    const removeImage = (indexToRemove: number) => {
-        setImages(images.filter((_, index) => index !== indexToRemove));
+        } catch (error: any) {
+            toast({
+                variant: "destructive",
+                title: "Erro no upload",
+                description: error.message,
+            });
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -313,242 +320,288 @@ export const ReportEditor = () => {
                             <div className="flex items-center justify-between">
                                 <h3 className="text-lg font-semibold">Conteúdo do Relatório</h3>
                                 <div className="flex gap-2">
+                                    <Button size="sm" variant="outline" onClick={() => addBlock('section_header')}><Plus className="mr-2 h-3 w-3" /> Cabeçalho</Button>
                                     <Button size="sm" variant="outline" onClick={() => addBlock('executive_summary')}><Plus className="mr-2 h-3 w-3" /> Resumo</Button>
                                     <Button size="sm" variant="outline" onClick={() => addBlock('text_section')}><Plus className="mr-2 h-3 w-3" /> Texto</Button>
                                     <Button size="sm" variant="outline" onClick={() => addBlock('compliance_table')}><Plus className="mr-2 h-3 w-3" /> Tabela</Button>
                                     <Button size="sm" variant="outline" onClick={() => addBlock('observation')}><Plus className="mr-2 h-3 w-3" /> Observação</Button>
                                 </div>
                             </div>
-
-                            {blocks.map((block, index) => (
-                                <Card key={block.id} className="relative group">
-                                    <div className="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                        <Button variant="destructive" size="icon" className="h-6 w-6" onClick={() => removeBlock(block.id)}>
-                                            <Trash2 className="h-3 w-3" />
-                                        </Button>
-                                    </div>
-
-                                    {/* Executive Summary Block UI */}
-                                    {block.type === 'executive_summary' && (
-                                        <CardContent className="pt-6 space-y-4">
-                                            <div className="flex items-center gap-2 mb-2">
-                                                <GripVertical className="text-muted-foreground h-4 w-4" />
-                                                <span className="font-semibold text-sm uppercase text-muted-foreground">Resumo Executivo</span>
-                                            </div>
-                                            <div className="grid grid-cols-2 gap-4">
-                                                <div>
-                                                    <Label>Imagens Analisadas</Label>
-                                                    <Input
-                                                        type="number"
-                                                        value={block.data.imagesAnalyzed}
-                                                        onChange={(e) => updateBlock(block.id, { imagesAnalyzed: parseInt(e.target.value) || 0 })}
-                                                    />
-                                                </div>
-                                                <div>
-                                                    <Label>Pontos Críticos</Label>
-                                                    <Input
-                                                        type="number"
-                                                        value={block.data.criticalImages}
-                                                        onChange={(e) => updateBlock(block.id, { criticalImages: parseInt(e.target.value) || 0 })}
-                                                    />
-                                                </div>
-                                                <div className="col-span-2">
-                                                    <Label>Situação Geral</Label>
-                                                    <Input
-                                                        value={block.data.generalStatus}
-                                                        onChange={(e) => updateBlock(block.id, { generalStatus: e.target.value })}
-                                                    />
-                                                </div>
-                                            </div>
-                                        </CardContent>
-                                    )}
-
-                                    {/* Text Section Block UI */}
-                                    {block.type === 'text_section' && (
-                                        <CardContent className="pt-6 space-y-4">
-                                            <div className="flex items-center gap-2 mb-2">
-                                                <GripVertical className="text-muted-foreground h-4 w-4" />
-                                                <span className="font-semibold text-sm uppercase text-muted-foreground">Seção de Texto</span>
-                                            </div>
-                                            <Input
-                                                placeholder="Título da Seção (ex: Introdução, Metodologia)"
-                                                value={block.data.title}
-                                                onChange={(e) => updateBlock(block.id, { title: e.target.value })}
-                                            />
-                                            <Textarea
-                                                placeholder="Conteúdo detalhado da seção..."
-                                                className="min-h-[100px]"
-                                                value={block.data.text}
-                                                onChange={(e) => updateBlock(block.id, { text: e.target.value })}
-                                            />
-                                        </CardContent>
-                                    )}
-
-                                    {/* Observation Block UI */}
-                                    {block.type === 'observation' && (
-                                        <CardContent className="pt-6 space-y-4">
-                                            <div className="flex items-center gap-2 mb-2">
-                                                <GripVertical className="text-muted-foreground h-4 w-4" />
-                                                <span className="font-semibold text-sm uppercase text-muted-foreground">Observação Detalhada</span>
-                                            </div>
-                                            <Input
-                                                placeholder="Título da Observação (ex: Não conformidade item 4)"
-                                                value={block.data.title}
-                                                onChange={(e) => updateBlock(block.id, { title: e.target.value })}
-                                            />
-                                            <Textarea
-                                                placeholder="Descrição detalhada do problema..."
-                                                className="min-h-[100px]"
-                                                value={block.data.description}
-                                                onChange={(e) => updateBlock(block.id, { description: e.target.value })}
-                                            />
-                                            {/* Image Upload for Observation (Placeholder for logic) */}
-                                            <div className="flex items-center gap-4">
-                                                <Button variant="outline" size="sm" className="w-full">
-                                                    <ImageIcon className="mr-2 h-4 w-4" />
-                                                    {block.data.image ? "Alterar Imagem" : "Adicionar Imagem"}
-                                                </Button>
-                                            </div>
-                                        </CardContent>
-                                    )}
-
-                                    {/* Compliance Table Block UI */}
-                                    {block.type === 'compliance_table' && (
-                                        <CardContent className="pt-6 space-y-4">
-                                            <div className="flex items-center gap-2 mb-2">
-                                                <GripVertical className="text-muted-foreground h-4 w-4" />
-                                                <span className="font-semibold text-sm uppercase text-muted-foreground">Tabela de Conformidade</span>
-                                            </div>
-                                            <Input
-                                                placeholder="Título da Tabela"
-                                                value={block.data.title}
-                                                onChange={(e) => updateBlock(block.id, { title: e.target.value })}
-                                            />
-                                            {/* Table Items Editor */}
-                                            <div className="border rounded-md overflow-hidden">
-                                                <div className="grid grid-cols-12 gap-2 bg-muted p-2 text-xs font-semibold text-center">
-                                                    <div className="col-span-1">Item</div>
-                                                    <div className="col-span-6">Descrição</div>
-                                                    <div className="col-span-2">Classificação</div>
-                                                    <div className="col-span-2">Status</div>
-                                                    <div className="col-span-1"></div>
-                                                </div>
-
-                                                <div className="max-h-[300px] overflow-y-auto">
-                                                    {block.data.items?.map((item: any, idx: number) => (
-                                                        <div key={idx} className="grid grid-cols-12 gap-2 p-2 border-b items-center text-sm">
-                                                            <div className="col-span-1">
-                                                                <Input
-                                                                    className="h-8 p-1"
-                                                                    value={item.itemNumber}
-                                                                    onChange={(e) => {
-                                                                        const newItems = [...block.data.items];
-                                                                        newItems[idx].itemNumber = e.target.value;
-                                                                        updateBlock(block.id, { items: newItems });
-                                                                    }}
-                                                                />
-                                                            </div>
-                                                            <div className="col-span-6">
-                                                                <Textarea
-                                                                    className="h-10 min-h-[40px] p-2 text-xs"
-                                                                    value={item.description}
-                                                                    onChange={(e) => {
-                                                                        const newItems = [...block.data.items];
-                                                                        newItems[idx].description = e.target.value;
-                                                                        updateBlock(block.id, { items: newItems });
-                                                                    }}
-                                                                />
-                                                            </div>
-                                                            <div className="col-span-2">
-                                                                <Select
-                                                                    value={item.classification}
-                                                                    onValueChange={(val) => {
-                                                                        const newItems = [...block.data.items];
-                                                                        newItems[idx].classification = val;
-                                                                        updateBlock(block.id, { items: newItems });
-                                                                    }}
-                                                                >
-                                                                    <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
-                                                                    <SelectContent>
-                                                                        <SelectItem value="Obrigatório">Obrigatório</SelectItem>
-                                                                        <SelectItem value="Recomendado">Recomendado</SelectItem>
-                                                                    </SelectContent>
-                                                                </Select>
-                                                            </div>
-                                                            <div className="col-span-2">
-                                                                <Select
-                                                                    value={item.status}
-                                                                    onValueChange={(val) => {
-                                                                        const newItems = [...block.data.items];
-                                                                        newItems[idx].status = val;
-                                                                        updateBlock(block.id, { items: newItems });
-                                                                    }}
-                                                                >
-                                                                    <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
-                                                                    <SelectContent>
-                                                                        <SelectItem value="Atende">Atende</SelectItem>
-                                                                        <SelectItem value="Não Atende">Não Atende</SelectItem>
-                                                                        <SelectItem value="Atende em Partes">Parcial</SelectItem>
-                                                                        <SelectItem value="Crítico">Crítico</SelectItem>
-                                                                    </SelectContent>
-                                                                </Select>
-                                                            </div>
-                                                            <div className="col-span-1 flex justify-center">
-                                                                <Button
-                                                                    variant="ghost"
-                                                                    size="icon"
-                                                                    className="h-6 w-6 text-red-500 hover:text-red-700 hover:bg-red-50"
-                                                                    onClick={() => {
-                                                                        const newItems = block.data.items.filter((_: any, i: number) => i !== idx);
-                                                                        updateBlock(block.id, { items: newItems });
-                                                                    }}
-                                                                >
-                                                                    <X className="h-4 w-4" />
-                                                                </Button>
-                                                            </div>
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            </div>
-
-                                            <Button
-                                                variant="outline"
-                                                size="sm"
-                                                className="w-full border-dashed"
-                                                onClick={() => {
-                                                    const newItems = [...(block.data.items || []), {
-                                                        itemNumber: (block.data.items?.length + 1).toString(),
-                                                        description: "",
-                                                        classification: "Obrigatório",
-                                                        status: "Não Atende"
-                                                    }];
-                                                    updateBlock(block.id, { items: newItems });
-                                                }}
-                                            >
-                                                <Plus className="mr-2 h-4 w-4" /> Adicionar Item na Tabela
-                                            </Button>
-                                        </CardContent>
-                                    )}
-                                </Card>
-                            ))}
                         </div>
+
+                        {blocks.map((block, index) => (
+                            <Card key={block.id} className="relative group">
+                                <div className="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <Button variant="destructive" size="icon" className="h-6 w-6" onClick={() => removeBlock(block.id)}>
+                                        <Trash2 className="h-3 w-3" />
+                                    </Button>
+                                </div>
+
+                                {/* Section Header Block UI */}
+                                {block.type === 'section_header' && (
+                                    <CardContent className="pt-6 space-y-4">
+                                        <div className="flex items-center gap-2 mb-2">
+                                            <GripVertical className="text-muted-foreground h-4 w-4" />
+                                            <span className="font-semibold text-sm uppercase text-muted-foreground">Cabeçalho de Seção</span>
+                                        </div>
+                                        <Input
+                                            placeholder="Título do Cabeçalho"
+                                            value={block.data.title}
+                                            onChange={(e) => updateBlock(block.id, { title: e.target.value })}
+                                        />
+                                    </CardContent>
+                                )}
+
+                                {/* Executive Summary Block UI */}
+                                {block.type === 'executive_summary' && (
+                                    <CardContent className="pt-6 space-y-4">
+                                        <div className="flex items-center gap-2 mb-2">
+                                            <GripVertical className="text-muted-foreground h-4 w-4" />
+                                            <span className="font-semibold text-sm uppercase text-muted-foreground">Resumo Executivo</span>
+                                        </div>
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <div>
+                                                <Label>Imagens Analisadas</Label>
+                                                <Input
+                                                    type="number"
+                                                    value={block.data.imagesAnalyzed}
+                                                    onChange={(e) => updateBlock(block.id, { imagesAnalyzed: parseInt(e.target.value) || 0 })}
+                                                />
+                                            </div>
+                                            <div>
+                                                <Label>Pontos Críticos</Label>
+                                                <Input
+                                                    type="number"
+                                                    value={block.data.criticalImages}
+                                                    onChange={(e) => updateBlock(block.id, { criticalImages: parseInt(e.target.value) || 0 })}
+                                                />
+                                            </div>
+                                            <div className="col-span-2">
+                                                <Label>Situação Geral</Label>
+                                                <Input
+                                                    value={block.data.generalStatus}
+                                                    onChange={(e) => updateBlock(block.id, { generalStatus: e.target.value })}
+                                                />
+                                            </div>
+                                        </div>
+                                    </CardContent>
+                                )}
+
+                                {/* Text Section Block UI */}
+                                {block.type === 'text_section' && (
+                                    <CardContent className="pt-6 space-y-4">
+                                        <div className="flex items-center gap-2 mb-2">
+                                            <GripVertical className="text-muted-foreground h-4 w-4" />
+                                            <span className="font-semibold text-sm uppercase text-muted-foreground">Seção de Texto</span>
+                                        </div>
+                                        <Input
+                                            placeholder="Título da Seção (ex: Introdução, Metodologia)"
+                                            value={block.data.title}
+                                            onChange={(e) => updateBlock(block.id, { title: e.target.value })}
+                                        />
+                                        <Textarea
+                                            placeholder="Conteúdo detalhado da seção..."
+                                            className="min-h-[100px]"
+                                            value={block.data.text}
+                                            onChange={(e) => updateBlock(block.id, { text: e.target.value })}
+                                        />
+                                    </CardContent>
+                                )}
+
+                                {/* Observation Block UI */}
+                                {block.type === 'observation' && (
+                                    <CardContent className="pt-6 space-y-4">
+                                        <div className="flex items-center gap-2 mb-2">
+                                            <GripVertical className="text-muted-foreground h-4 w-4" />
+                                            <span className="font-semibold text-sm uppercase text-muted-foreground">Observação Detalhada</span>
+                                        </div>
+                                        <Input
+                                            placeholder="Título da Observação (ex: Não conformidade item 4)"
+                                            value={block.data.title}
+                                            onChange={(e) => updateBlock(block.id, { title: e.target.value })}
+                                        />
+                                        <Textarea
+                                            placeholder="Descrição detalhada do problema..."
+                                            className="min-h-[100px]"
+                                            value={block.data.description}
+                                            onChange={(e) => updateBlock(block.id, { description: e.target.value })}
+                                        />
+                                        {/* Image Upload for Observation */}
+                                        <div className="space-y-2">
+                                            <Label>Evidência Fotográfica</Label>
+                                            {block.data.image ? (
+                                                <div className="relative w-full rounded-md border min-h-[100px] bg-muted/20 flex justify-center items-center overflow-hidden">
+                                                    <img
+                                                        src={block.data.image}
+                                                        alt="Preview"
+                                                        className="max-h-[300px] w-auto object-contain"
+                                                    />
+                                                    <Button
+                                                        variant="destructive"
+                                                        size="icon"
+                                                        className="absolute top-2 right-2 h-8 w-8"
+                                                        onClick={() => updateBlock(block.id, { image: '' })}
+                                                    >
+                                                        <Trash2 className="h-4 w-4" />
+                                                    </Button>
+                                                </div>
+                                            ) : (
+                                                <label className="cursor-pointer block">
+                                                    <div className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-md hover:bg-muted/50 transition-colors">
+                                                        <div className="flex flex-col items-center justify-center pt-5 pb-6 text-muted-foreground">
+                                                            <Upload className="w-8 h-8 mb-2" />
+                                                            <p className="text-sm">Clique para upload de imagem</p>
+                                                        </div>
+                                                    </div>
+                                                    <Input
+                                                        type="file"
+                                                        className="hidden"
+                                                        accept="image/*"
+                                                        onChange={(e) => handleBlockImageUpload(e, block.id)}
+                                                    />
+                                                </label>
+                                            )}
+                                        </div>
+                                    </CardContent>
+                                )}
+
+                                {/* Compliance Table Block UI */}
+                                {block.type === 'compliance_table' && (
+                                    <CardContent className="pt-6 space-y-4">
+                                        <div className="flex items-center gap-2 mb-2">
+                                            <GripVertical className="text-muted-foreground h-4 w-4" />
+                                            <span className="font-semibold text-sm uppercase text-muted-foreground">Tabela de Conformidade</span>
+                                        </div>
+                                        <Input
+                                            placeholder="Título da Tabela"
+                                            value={block.data.title}
+                                            onChange={(e) => updateBlock(block.id, { title: e.target.value })}
+                                        />
+                                        {/* Table Items Editor */}
+                                        <div className="border rounded-md overflow-hidden">
+                                            <div className="grid grid-cols-12 gap-2 bg-muted p-2 text-xs font-semibold text-center">
+                                                <div className="col-span-1">Item</div>
+                                                <div className="col-span-6">Descrição</div>
+                                                <div className="col-span-2">Classificação</div>
+                                                <div className="col-span-2">Status</div>
+                                                <div className="col-span-1"></div>
+                                            </div>
+
+                                            <div className="max-h-[300px] overflow-y-auto">
+                                                {block.data.items?.map((item: any, idx: number) => (
+                                                    <div key={idx} className="grid grid-cols-12 gap-2 p-2 border-b items-center text-sm">
+                                                        <div className="col-span-1">
+                                                            <Input
+                                                                className="h-8 p-1"
+                                                                value={item.itemNumber}
+                                                                onChange={(e) => {
+                                                                    const newItems = [...block.data.items];
+                                                                    newItems[idx].itemNumber = e.target.value;
+                                                                    updateBlock(block.id, { items: newItems });
+                                                                }}
+                                                            />
+                                                        </div>
+                                                        <div className="col-span-6">
+                                                            <Textarea
+                                                                className="h-10 min-h-[40px] p-2 text-xs"
+                                                                value={item.description}
+                                                                onChange={(e) => {
+                                                                    const newItems = [...block.data.items];
+                                                                    newItems[idx].description = e.target.value;
+                                                                    updateBlock(block.id, { items: newItems });
+                                                                }}
+                                                            />
+                                                        </div>
+                                                        <div className="col-span-2">
+                                                            <Select
+                                                                value={item.classification}
+                                                                onValueChange={(val) => {
+                                                                    const newItems = [...block.data.items];
+                                                                    newItems[idx].classification = val;
+                                                                    updateBlock(block.id, { items: newItems });
+                                                                }}
+                                                            >
+                                                                <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
+                                                                <SelectContent>
+                                                                    <SelectItem value="Obrigatório">Obrigatório</SelectItem>
+                                                                    <SelectItem value="Recomendado">Recomendado</SelectItem>
+                                                                </SelectContent>
+                                                            </Select>
+                                                        </div>
+                                                        <div className="col-span-2">
+                                                            <Select
+                                                                value={item.status}
+                                                                onValueChange={(val) => {
+                                                                    const newItems = [...block.data.items];
+                                                                    newItems[idx].status = val;
+                                                                    updateBlock(block.id, { items: newItems });
+                                                                }}
+                                                            >
+                                                                <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
+                                                                <SelectContent>
+                                                                    <SelectItem value="Atende">Atende</SelectItem>
+                                                                    <SelectItem value="Não Atende">Não Atende</SelectItem>
+                                                                    <SelectItem value="Atende em Partes">Parcial</SelectItem>
+                                                                    <SelectItem value="Crítico">Crítico</SelectItem>
+                                                                    <SelectItem value="Não se aplica">Não se aplica</SelectItem>
+                                                                </SelectContent>
+                                                            </Select>
+                                                        </div>
+                                                        <div className="col-span-1 flex justify-center">
+                                                            <Button
+                                                                variant="ghost"
+                                                                size="icon"
+                                                                className="h-6 w-6 text-red-500 hover:text-red-700 hover:bg-red-50"
+                                                                onClick={() => {
+                                                                    const newItems = block.data.items.filter((_: any, i: number) => i !== idx);
+                                                                    updateBlock(block.id, { items: newItems });
+                                                                }}
+                                                            >
+                                                                <X className="h-4 w-4" />
+                                                            </Button>
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            className="w-full border-dashed"
+                                            onClick={() => {
+                                                const newItems = [...(block.data.items || []), {
+                                                    itemNumber: (block.data.items?.length + 1).toString(),
+                                                    description: "",
+                                                    classification: "Obrigatório",
+                                                    status: "Não se aplica"
+                                                }];
+                                                updateBlock(block.id, { items: newItems });
+                                            }}
+                                        >
+                                            <Plus className="mr-2 h-4 w-4" /> Adicionar Item na Tabela
+                                        </Button>
+                                    </CardContent>
+                                )}
+                            </Card>
+                        ))}
                     </div>
                 </div>
+            </div>
 
-                {/* Preview Panel - Right */}
-                <div className="w-1/2 bg-zinc-100 flex flex-col">
-                    <div className="h-full">
-                        <PDFViewer width="100%" height="100%" className="border-none">
-                            <PDFTemplate data={{
-                                title: reportMeta.title || "Sem Título",
-                                type: reportMeta.type,
-                                client: reportMeta.client_name || "Cliente",
-                                project: reportMeta.project_title || "Projeto",
-                                date: new Date().toLocaleDateString('pt-BR'),
-                                blocks: blocks
-                            }} />
-                        </PDFViewer>
-                    </div>
+            {/* Preview Panel - Right */}
+            <div className="w-1/2 bg-zinc-100 flex flex-col">
+                <div className="h-full">
+                    <PDFViewer width="100%" height="100%" className="border-none">
+                        <PDFTemplate data={{
+                            title: reportMeta.title || "Sem Título",
+                            type: reportMeta.type,
+                            client: reportMeta.client_name || "Cliente",
+                            project: reportMeta.project_title || "Projeto",
+                            date: new Date().toLocaleDateString('pt-BR'),
+                            blocks: blocks
+                        }} />
+                    </PDFViewer>
                 </div>
             </div>
         </div>

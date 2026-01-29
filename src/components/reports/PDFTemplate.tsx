@@ -54,6 +54,15 @@ const styles = StyleSheet.create({
         marginBottom: 20,
         textAlign: "center",
     },
+    sectionTitle: {
+        fontSize: 16,
+        fontWeight: "bold",
+        color: "#5F9E46", // Vivens Green
+        textAlign: "center",
+        marginBottom: 10,
+        marginTop: 20,
+        textTransform: "uppercase",
+    },
     metaGrid: {
         flexDirection: "row",
         backgroundColor: "#F3F4F6", // Gray-100
@@ -196,6 +205,7 @@ const StatusBadge = ({ status }: { status: ComplianceStatus }) => {
     if (status === "Não Atende") { bg = "#FEE2E2"; color = "#991B1B"; }
     if (status === "Atende em Partes") { bg = "#FEF9C3"; color = "#854D0E"; }
     if (status === "Crítico") { bg = "#7F1D1D"; color = "#FFFFFF"; }
+    if (status === "Não se aplica") { bg = "#E5E7EB"; color = "#374151"; }
 
     return (
         <View style={[styles.statusBadge, { backgroundColor: bg }]}>
@@ -242,6 +252,15 @@ export const PDFTemplate = ({ data }: { data: StructuredReportData }) => (
                             <Text style={styles.value}>Pontos Críticos: {block.data.criticalImages}</Text>
                             <Text style={[styles.value, { fontWeight: 'bold', marginTop: 5 }]}>Situação Geral: {block.data.generalStatus}</Text>
                         </View>
+                    );
+                }
+
+                // 5. Section Header
+                if (block.type === 'section_header') {
+                    return (
+                        <Text key={block.id} style={styles.sectionTitle} break={false}>
+                            {block.data.title}
+                        </Text>
                     );
                 }
 
