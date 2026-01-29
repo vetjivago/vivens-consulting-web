@@ -157,7 +157,20 @@ const styles = StyleSheet.create({
         marginTop: 10,
         borderRadius: 4,
     },
-
+    // Missing styles
+    text: {
+        fontSize: 12,
+        lineHeight: 1.5,
+        color: "#374151",
+        marginBottom: 4,
+    },
+    caption: {
+        fontSize: 10,
+        color: "#6B7280",
+        fontStyle: "italic",
+        textAlign: "center",
+        marginTop: 4,
+    },
     // Executive Summary
     execSummary: {
         backgroundColor: "#F0FDF4", // Green-50
@@ -298,16 +311,40 @@ export const PDFTemplate = ({ data }: { data: StructuredReportData }) => (
                 if (block.type === 'observation') {
                     return (
                         <View key={block.id} style={styles.observationBlock} break={false}>
-                            <Text style={styles.obsTitle}>
-                                {block.data.title ? block.data.title : "Observação"}
+                            <Text style={[styles.title, { fontSize: 13, color: '#333' }]}>
+                                {block.data.title || "Observação"}
                             </Text>
-                            <Text style={styles.contentSection}>{block.data.description}</Text>
-                            {block.data.image && (
-                                <Image src={block.data.image} style={styles.obsImage} />
-                            )}
+                            <Text style={styles.text}>
+                                {block.data.description}
+                            </Text>
+
+                            {/* Multi-Image Support */}
+                            {block.data.images && block.data.images.length > 0 ? (
+                                <View style={{ marginTop: 10 }}>
+                                    {block.data.images.map((img: any, idx: number) => (
+                                        <View key={idx} style={{ marginBottom: 15 }} wrap={false}>
+                                            <Image src={img.url} style={styles.image} />
+                                            {img.caption ? (
+                                                <Text style={[styles.caption, { marginTop: 4, fontStyle: 'italic', fontSize: 10, alignSelf: 'center' }]}>
+                                                    {img.caption}
+                                                </Text>
+                                            ) : null}
+                                        </View>
+                                    ))}
+                                </View>
+                            ) : block.data.image ? (
+                                // Legacy Fallback
+                                <View style={{ marginTop: 10 }} wrap={false}>
+                                    <Image src={block.data.image} style={styles.image} />
+                                    {block.data.imageCaption && (
+                                        <Text style={styles.caption}>{block.data.imageCaption}</Text>
+                                    )}
+                                </View>
+                            ) : null}
                         </View>
                     );
                 }
+
 
                 // 4. Text Section Block
                 if (block.type === 'text_section') {
@@ -338,5 +375,5 @@ export const PDFTemplate = ({ data }: { data: StructuredReportData }) => (
                 Vivens Consultoria - {data.project} - {data.client}
             </Text>
         </Page>
-    </Document>
+    </Document >
 );

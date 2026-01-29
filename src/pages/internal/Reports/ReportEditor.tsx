@@ -65,7 +65,7 @@ export const ReportEditor = () => {
             newBlock.data = { title: "Nova Tabela de Conformidade", items: [] };
         }
         if (type === 'observation') {
-            newBlock.data = { title: "Nova Observação", description: "", severity: "medium" };
+            newBlock.data = { title: "Nova Observação", description: "", severity: "medium", images: [] };
         }
         if (type === 'section_header') {
             newBlock.data = { title: "Título da Seção" };
@@ -285,7 +285,19 @@ export const ReportEditor = () => {
                 .from("project-images")
                 .getPublicUrl(filePath);
 
-            updateBlock(blockId, { image: publicUrl });
+            // Handle multi-image upload
+            const currentBlock = blocks.find(b => b.id === blockId);
+            if (currentBlock && currentBlock.type === 'observation') {
+                const currentImages = currentBlock.data.images || [];
+                // If legacy image exists, migrate it to array first? Or just append?
+                // Let's just append.
+                const newImages = [...currentImages, { url: publicUrl, caption: "" }];
+                updateBlock(blockId, { images: newImages });
+            } else {
+                // Fallback for other blocks if any
+                updateBlock(blockId, { image: publicUrl });
+            }
+
             toast({ title: "Imagem anexada ao relatório!" });
         }
 
@@ -526,26 +538,55 @@ export const ReportEditor = () => {
                                             value={block.data.description}
                                             onChange={(e) => updateBlock(block.id, { description: e.target.value })}
                                         />
-                                        {/* Image Upload for Observation */}
-                                        <div className="space-y-2">
-                                            <Label>Evidência Fotográfica</Label>
-                                            {block.data.image && (
-                                                <div className="relative w-full rounded-md border min-h-[100px] bg-muted/20 flex justify-center items-center overflow-hidden">
-                                                    <img
-                                                        src={block.data.image}
-                                                        alt="Preview"
-                                                        className="max-h-[300px] w-auto object-contain"
-                                                    />
-                                                    <Button
-                                                        variant="destructive"
-                                                        size="icon"
-                                                        className="absolute top-2 right-2 h-8 w-8"
-                                                        onClick={() => updateBlock(block.id, { image: '' })}
-                                                    >
-                                                        <Trash2 className="h-4 w-4" />
-                                                    </Button>
+                                        {/* Multi-Image List */}
+                                        <div className="space-y-4">
+                                            <Label>Evidências Fotográficas</Label>
+
+                                            {/* Legacy Image Migration / Display */}
+                                            {block.data.image && !block.data.images?.length && (
+                                                <div className="relative w-full rounded-md border p-2 bg-muted/20">
+                                                    <div className="mb-2 text-xs text-amber-600 font-bold">Imagem (Legado) - Adicione uma nova para converter em lista</div>
+                                                    <img src={block.data.image} className="max-h-[200px] w-auto object-contain" />
                                                 </div>
                                             )}
+
+                                            <div className="grid grid-cols-1 gap-4">
+                                                {block.data.images?.map((img: any, imgIdx: number) => (
+                                                    <div key={imgIdx} className="flex gap-4 p-3 border rounded-md bg-zinc-50 items-start">
+                                                        <div className="w-[120px] h-[120px] bg-white border rounded flex items-center justify-center shrink-0">
+                                                            <img
+                                                                src={img.url}
+                                                                alt={`Evidência ${imgIdx + 1}`}
+                                                                className="max-h-full max-w-full object-contain"
+                                                            />
+                                                        </div>
+                                                        <div className="flex-1 space-y-2">
+                                                            <Label>Legenda da Imagem</Label>
+                                                            <Input
+                                                                className="text-base"
+                                                                placeholder="Descreva esta imagem..."
+                                                                value={img.caption}
+                                                                onChange={(e) => {
+                                                                    const newImages = [...block.data.images];
+                                                                    newImages[imgIdx].caption = e.target.value;
+                                                                    updateBlock(block.id, { images: newImages });
+                                                                }}
+                                                            />
+                                                            <Button
+                                                                variant="destructive"
+                                                                size="sm"
+                                                                onClick={() => {
+                                                                    const newImages = block.data.images.filter((_: any, i: number) => i !== imgIdx);
+                                                                    updateBlock(block.id, { images: newImages });
+                                                                }}
+                                                            >
+                                                                <Trash2 className="h-4 w-4 mr-2" /> Remover
+                                                            </Button>
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+
                                             <div className="flex items-center gap-4">
                                                 <Button
                                                     variant="outline"
@@ -554,7 +595,7 @@ export const ReportEditor = () => {
                                                     onClick={() => triggerImageUpload(block.id)}
                                                 >
                                                     <ImageIcon className="mr-2 h-4 w-4" />
-                                                    {block.data.image ? "Alterar Imagem" : "Adicionar Imagem"}
+                                                    Adicionar Imagem
                                                 </Button>
                                             </div>
                                         </div>

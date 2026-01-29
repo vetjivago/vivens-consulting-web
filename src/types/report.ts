@@ -37,8 +37,9 @@ export interface ComplianceTableData {
 export interface ObservationData {
     title?: string; // Optional title for the observation
     description: string;
-    image?: string; // URL of the uploaded image
-    imageCaption?: string;
+    image?: string; // URL of the uploaded image (Legacy)
+    imageCaption?: string; // (Legacy)
+    images?: { url: string; caption: string }[]; // New multi-image support
     severity?: 'critical' | 'high' | 'medium' | 'low' | 'none';
 }
 
