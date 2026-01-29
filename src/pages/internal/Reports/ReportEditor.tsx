@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/lib/supabase";
 import { Button } from "@/components/ui/button";
@@ -40,6 +40,14 @@ export const ReportEditor = () => {
 
     // Available projects
     const [projects, setProjects] = useState<any[]>([]);
+
+    // Refs for auto-save (to access latest state in interval)
+    const reportMetaRef = useRef(reportMeta);
+    const blocksRef = useRef(blocks);
+
+    // Update refs whenever state changes
+    useEffect(() => { reportMetaRef.current = reportMeta; }, [reportMeta]);
+    useEffect(() => { blocksRef.current = blocks; }, [blocks]);
 
     // Add a new block helper
     const addBlock = (type: ReportBlock['type']) => {
@@ -153,23 +161,28 @@ export const ReportEditor = () => {
         }
     };
 
-    const handleSave = async () => {
-        if (!reportMeta.title || !reportMeta.project_id) {
-            toast({
-                variant: "destructive",
-                title: "Campos obrigatórios",
-                description: "Preencha o título e selecione um projeto.",
-            });
+    const saveReport = async (silent = false) => {
+        const currentMeta = reportMetaRef.current;
+        const currentBlocks = blocksRef.current;
+
+        if (!currentMeta.title || !currentMeta.project_id) {
+            if (!silent) {
+                toast({
+                    variant: "destructive",
+                    title: "Campos obrigatórios",
+                    description: "Preencha o título e selecione um projeto.",
+                });
+            }
             return;
         }
 
-        setLoading(true);
+        if (!silent) setLoading(true);
         try {
             const reportData = {
-                title: reportMeta.title,
-                type: reportMeta.type,
-                project_id: reportMeta.project_id,
-                content: blocks, // Saving blocks as JSONB
+                title: currentMeta.title,
+                type: currentMeta.type,
+                project_id: currentMeta.project_id,
+                content: currentBlocks, // Saving blocks as JSONB
                 status: 'draft',
                 updated_at: new Date().toISOString(),
             };
@@ -185,21 +198,53 @@ export const ReportEditor = () => {
 
             if (error) throw error;
 
-            toast({
-                title: "Sucesso!",
-                description: "Relatório salvo com sucesso.",
-            });
-            navigate("/internal/reports");
+            if (!silent) {
+                toast({
+                    title: "Sucesso!",
+                    description: "Relatório salvo com sucesso.",
+                });
+                navigate("/internal/reports");
+            } else {
+                console.log("Auto-save successful at", new Date().toLocaleTimeString());
+                toast({
+                    title: "Rascunho salvo",
+                    description: "Alterações salvas automaticamente.",
+                    duration: 2000,
+                });
+            }
         } catch (error: any) {
-            toast({
-                variant: "destructive",
-                title: "Erro ao salvar",
-                description: error.message,
-            });
+            console.error("Save error:", error);
+            if (!silent) {
+                toast({
+                    variant: "destructive",
+                    title: "Erro ao salvar",
+                    description: error.message,
+                });
+            }
         } finally {
-            setLoading(false);
+            if (!silent) setLoading(false);
         }
     };
+
+    const handleSave = () => saveReport(false);
+
+    // Auto-save Interval (3 minutes)
+    useEffect(() => {
+        const intervalId = setInterval(() => {
+            if (id) { // Only auto-save if we are editing an existing report (or handle creation logic if desired, but user starts with ID usually or needs to save once first)
+                // For now, let's allow saving if we have data. 
+                // Actually, 'id' comes from URL. If creating new, 'id' is undefined until saved? 
+                // If creating new, we might want to skip auto-save until first manual save to generate ID?
+                // Or we can INSERT if not exists. But layout relies on 'id' param usually.
+                // Let's check if we have enough data to save.
+                if (reportMetaRef.current.title && reportMetaRef.current.project_id) {
+                    saveReport(true);
+                }
+            }
+        }, 3 * 60 * 1000); // 3 minutes
+
+        return () => clearInterval(intervalId);
+    }, [id]);
 
     useEffect(() => {
         fetchProjects();
