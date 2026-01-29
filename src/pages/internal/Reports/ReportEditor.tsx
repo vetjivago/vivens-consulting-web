@@ -199,43 +199,66 @@ export const ReportEditor = () => {
         }
     }, [id, projects]);
 
-    // Image handling for blocks
-    const handleBlockImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, blockId: string) => {
-        if (!e.target.files || e.target.files.length === 0) return;
+
+
+    const [activeBlockIdForUpload, setActiveBlockIdForUpload] = useState<string | null>(null);
+
+    const handleBlockImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const blockId = activeBlockIdForUpload;
+        if (!blockId || !e.target.files || e.target.files.length === 0) return;
 
         setLoading(true);
         const file = e.target.files[0];
         const fileExt = file.name.split(".").pop();
-        const fileName = `${reportMeta.project_id || 'temp'}/${blockId}-${Date.now()}.${fileExt}`;
-        const filePath = `${fileName}`;
+        const fileName = `${Math.random()}.${fileExt}`;
+        const filePath = `reports/${fileName}`; // Organized in a reports folder
 
-        try {
-            const { error: uploadError } = await supabase.storage
-                .from("project-images")
-                .upload(filePath, file);
+        const { error: uploadError } = await supabase.storage
+            .from("project-images")
+            .upload(filePath, file);
 
-            if (uploadError) throw uploadError;
-
+        if (uploadError) {
+            toast({
+                variant: "destructive",
+                title: "Erro no upload",
+                description: uploadError.message,
+            });
+        } else {
             const { data: { publicUrl } } = supabase.storage
                 .from("project-images")
                 .getPublicUrl(filePath);
 
             updateBlock(blockId, { image: publicUrl });
-            toast({ title: "Imagem enviada!" });
-
-        } catch (error: any) {
-            toast({
-                variant: "destructive",
-                title: "Erro no upload",
-                description: error.message,
-            });
-        } finally {
-            setLoading(false);
+            toast({ title: "Imagem anexada ao relatório!" });
         }
+
+        setLoading(false);
+        setActiveBlockIdForUpload(null);
+        // Reset input
+        e.target.value = '';
+    };
+
+    // Helper to trigger the hidden file input
+    const triggerImageUpload = (blockId: string) => {
+        setActiveBlockIdForUpload(blockId);
+        const fileInput = document.getElementById('hidden-report-file-input') as HTMLInputElement;
+        if (fileInput) fileInput.click();
+    };
+
+    const removeBlockImage = (blockId: string) => {
+        updateBlock(blockId, { image: undefined });
     };
 
     return (
         <div className="h-screen flex flex-col bg-background">
+            {/* Hidden Input for Block Images */}
+            <input
+                type="file"
+                id="hidden-report-file-input"
+                className="hidden"
+                accept="image/*"
+                onChange={handleBlockImageUpload}
+            />
             {/* Header */}
             <div className="border-b px-6 py-4 flex items-center justify-between bg-card">
                 <div className="flex items-center gap-4">
@@ -327,6 +350,7 @@ export const ReportEditor = () => {
                                     <Button size="sm" variant="outline" onClick={() => addBlock('observation')}><Plus className="mr-2 h-3 w-3" /> Observação</Button>
                                 </div>
                             </div>
+
                         </div>
 
                         {blocks.map((block, index) => (
@@ -429,7 +453,7 @@ export const ReportEditor = () => {
                                         {/* Image Upload for Observation */}
                                         <div className="space-y-2">
                                             <Label>Evidência Fotográfica</Label>
-                                            {block.data.image ? (
+                                            {block.data.image && (
                                                 <div className="relative w-full rounded-md border min-h-[100px] bg-muted/20 flex justify-center items-center overflow-hidden">
                                                     <img
                                                         src={block.data.image}
@@ -445,22 +469,18 @@ export const ReportEditor = () => {
                                                         <Trash2 className="h-4 w-4" />
                                                     </Button>
                                                 </div>
-                                            ) : (
-                                                <label className="cursor-pointer block">
-                                                    <div className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-md hover:bg-muted/50 transition-colors">
-                                                        <div className="flex flex-col items-center justify-center pt-5 pb-6 text-muted-foreground">
-                                                            <Upload className="w-8 h-8 mb-2" />
-                                                            <p className="text-sm">Clique para upload de imagem</p>
-                                                        </div>
-                                                    </div>
-                                                    <Input
-                                                        type="file"
-                                                        className="hidden"
-                                                        accept="image/*"
-                                                        onChange={(e) => handleBlockImageUpload(e, block.id)}
-                                                    />
-                                                </label>
                                             )}
+                                            <div className="flex items-center gap-4">
+                                                <Button
+                                                    variant="outline"
+                                                    size="sm"
+                                                    className="w-full"
+                                                    onClick={() => triggerImageUpload(block.id)}
+                                                >
+                                                    <ImageIcon className="mr-2 h-4 w-4" />
+                                                    {block.data.image ? "Alterar Imagem" : "Adicionar Imagem"}
+                                                </Button>
+                                            </div>
                                         </div>
                                     </CardContent>
                                 )}
