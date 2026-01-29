@@ -17,13 +17,14 @@ import { PDFTemplate } from "@/components/reports/PDFTemplate";
 import { useToast } from "@/components/ui/use-toast";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ReportBlock, StructuredReportData, ComplianceItem } from "@/types/report";
-import { Save, ArrowLeft, Loader2, Upload, X, Plus, Trash2, GripVertical, Image as ImageIcon, ArrowUp, ArrowDown, Scissors } from "lucide-react";
+import { Save, ArrowLeft, Loader2, Upload, X, Plus, Trash2, GripVertical, Image as ImageIcon, ArrowUp, ArrowDown, Scissors, Eye, EyeOff } from "lucide-react";
 
 export const ReportEditor = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const { toast } = useToast();
     const [loading, setLoading] = useState(false);
+    const [showPdf, setShowPdf] = useState(true);
 
     // Basic metadata
     const [reportMeta, setReportMeta] = useState({
@@ -281,15 +282,20 @@ export const ReportEditor = () => {
                         <p className="text-sm text-muted-foreground">Editor de Relatórios Estruturado</p>
                     </div>
                 </div>
-                <Button onClick={handleSave} disabled={loading}>
-                    {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
-                    Salvar Relatório
-                </Button>
+                <div className="flex items-center gap-2">
+                    <Button variant="ghost" size="icon" onClick={() => setShowPdf(!showPdf)} title={showPdf ? "Ocultar PDF" : "Mostrar PDF"}>
+                        {showPdf ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                    </Button>
+                    <Button onClick={handleSave} disabled={loading}>
+                        {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
+                        Salvar Relatório
+                    </Button>
+                </div>
             </div>
 
             <div className="flex-1 flex flex-row overflow-hidden">
                 {/* Editor Panel - Left */}
-                <div className="w-1/2 min-w-[50%] border-r bg-muted/10 flex flex-col overflow-hidden">
+                <div className={`transition-all duration-300 ${showPdf ? 'w-1/2 min-w-[50%]' : 'w-full'} border-r bg-muted/10 flex flex-col overflow-hidden`}>
                     <div className="flex-1 overflow-y-auto p-6 space-y-6">
 
                         {/* Metadata Card */}
@@ -580,8 +586,10 @@ export const ReportEditor = () => {
                                                                     <SelectItem value="Atende">Atende</SelectItem>
                                                                     <SelectItem value="Não Atende">Não Atende</SelectItem>
                                                                     <SelectItem value="Atende em Partes">Parcial</SelectItem>
+                                                                    <SelectItem value="Atende em Partes">Parcial</SelectItem>
                                                                     <SelectItem value="Crítico">Crítico</SelectItem>
                                                                     <SelectItem value="Não se aplica">Não se aplica</SelectItem>
+                                                                    <SelectItem value="Não Verificado">Não Verificado</SelectItem>
                                                                 </SelectContent>
                                                             </Select>
                                                         </div>
@@ -637,20 +645,22 @@ export const ReportEditor = () => {
                 </div>
 
                 {/* Preview Panel - Right */}
-                <div className="w-1/2 min-w-[50%] bg-zinc-100 flex flex-col h-full overflow-hidden">
-                    <div className="h-full w-full">
-                        <PDFViewer width="100%" height="100%" className="border-none w-full h-full">
-                            <PDFTemplate data={{
-                                title: reportMeta.title || "Sem Título",
-                                type: reportMeta.type,
-                                client: reportMeta.client_name || "Cliente",
-                                project: reportMeta.project_title || "Projeto",
-                                date: new Date().toLocaleDateString('pt-BR'),
-                                blocks: blocks
-                            }} />
-                        </PDFViewer>
+                {showPdf && (
+                    <div className="w-1/2 min-w-[50%] bg-zinc-100 flex flex-col h-full overflow-hidden">
+                        <div className="h-full w-full">
+                            <PDFViewer width="100%" height="100%" className="border-none w-full h-full">
+                                <PDFTemplate data={{
+                                    title: reportMeta.title || "Sem Título",
+                                    type: reportMeta.type,
+                                    client: reportMeta.client_name || "Cliente",
+                                    project: reportMeta.project_title || "Projeto",
+                                    date: new Date().toLocaleDateString('pt-BR'),
+                                    blocks: blocks
+                                }} />
+                            </PDFViewer>
+                        </div>
                     </div>
-                </div>
+                )}
             </div>
         </div>
     );

@@ -18,7 +18,7 @@ export interface ExecutiveSummaryData {
 }
 
 // 2. Compliance Table Data
-export type ComplianceStatus = 'Atende' | 'Não Atende' | 'Atende em Partes' | 'Crítico' | 'Não se aplica';
+export type ComplianceStatus = 'Atende' | 'Não Atende' | 'Atende em Partes' | 'Crítico' | 'Não se aplica' | 'Não Verificado';
 
 export interface ComplianceItem {
     id: string;

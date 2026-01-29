@@ -89,7 +89,7 @@ const styles = StyleSheet.create({
         marginTop: 10,
         lineHeight: 1.6,
         fontSize: 12,
-        textAlign: "justify",
+        textAlign: "left",
     },
     // Table Styles
     tableContainer: {
@@ -206,6 +206,7 @@ const StatusBadge = ({ status }: { status: ComplianceStatus }) => {
     if (status === "Atende em Partes") { bg = "#FEF9C3"; color = "#854D0E"; }
     if (status === "Crítico") { bg = "#7F1D1D"; color = "#FFFFFF"; }
     if (status === "Não se aplica") { bg = "#E5E7EB"; color = "#374151"; }
+    if (status === "Não Verificado") { bg = "#F3E8FF"; color = "#6B21A8"; }
 
     return (
         <View style={[styles.statusBadge, { backgroundColor: bg }]}>
@@ -222,7 +223,7 @@ export const PDFTemplate = ({ data }: { data: StructuredReportData }) => (
                 <Image src="/logo.jpg" style={styles.logoImage} />
                 <View style={styles.headerText}>
                     <Text style={styles.companyName}>Vivens Consultoria Científica</Text>
-                    <Text style={styles.reportType}>Relatório Técnico</Text>
+                    <Text style={styles.reportType}>{data.type}</Text>
                     <Text style={styles.date}>{data.date}</Text>
                 </View>
             </View>
@@ -267,7 +268,7 @@ export const PDFTemplate = ({ data }: { data: StructuredReportData }) => (
                 // 2. Compliance Table
                 if (block.type === 'compliance_table') {
                     return (
-                        <View key={block.id} break={index > 0}>
+                        <View key={block.id}>
                             <Text style={[styles.title, { fontSize: 14, textAlign: 'left', marginTop: 10 }]}>{block.data.title}</Text>
                             <View style={styles.tableContainer}>
                                 {/* Table Header */}
