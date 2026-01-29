@@ -17,7 +17,7 @@ import { PDFTemplate } from "@/components/reports/PDFTemplate";
 import { useToast } from "@/components/ui/use-toast";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ReportBlock, StructuredReportData, ComplianceItem } from "@/types/report";
-import { Save, ArrowLeft, Loader2, Upload, X, Plus, Trash2, GripVertical, Image as ImageIcon, ArrowUp, ArrowDown } from "lucide-react";
+import { Save, ArrowLeft, Loader2, Upload, X, Plus, Trash2, GripVertical, Image as ImageIcon, ArrowUp, ArrowDown, Scissors } from "lucide-react";
 
 export const ReportEditor = () => {
     const { id } = useParams();
@@ -287,9 +287,9 @@ export const ReportEditor = () => {
                 </Button>
             </div>
 
-            <div className="flex-1 grid grid-cols-2 overflow-hidden">
+            <div className="flex-1 flex flex-row overflow-hidden">
                 {/* Editor Panel - Left */}
-                <div className="border-r bg-muted/10 flex flex-col overflow-hidden min-w-0">
+                <div className="w-1/2 min-w-[50%] border-r bg-muted/10 flex flex-col overflow-hidden">
                     <div className="flex-1 overflow-y-auto p-6 space-y-6">
 
                         {/* Metadata Card */}
@@ -359,6 +359,7 @@ export const ReportEditor = () => {
                                     <Button size="sm" variant="outline" onClick={() => addBlock('text_section')}><Plus className="mr-2 h-3 w-3" /> Texto</Button>
                                     <Button size="sm" variant="outline" onClick={() => addBlock('compliance_table')}><Plus className="mr-2 h-3 w-3" /> Tabela</Button>
                                     <Button size="sm" variant="outline" onClick={() => addBlock('observation')}><Plus className="mr-2 h-3 w-3" /> Observação</Button>
+                                    <Button size="sm" variant="outline" onClick={() => addBlock('page_break')}><Scissors className="mr-2 h-3 w-3" /> Quebra</Button>
                                 </div>
                             </div>
 
@@ -620,6 +621,16 @@ export const ReportEditor = () => {
                                         </Button>
                                     </CardContent>
                                 )}
+
+                                {/* Page Break Block UI */}
+                                {block.type === 'page_break' && (
+                                    <CardContent className="pt-6">
+                                        <div className="flex items-center justify-center gap-2 p-4 border-2 border-dashed border-zinc-300 rounded bg-zinc-50">
+                                            <Scissors className="h-4 w-4 text-muted-foreground" />
+                                            <span className="font-semibold text-sm text-muted-foreground">Quebra de Página no PDF</span>
+                                        </div>
+                                    </CardContent>
+                                )}
                             </Card>
                         ))}
                     </div>
@@ -627,7 +638,7 @@ export const ReportEditor = () => {
             </div>
 
             {/* Preview Panel - Right */}
-            <div className="bg-zinc-100 flex flex-col min-w-0 h-full overflow-hidden">
+            <div className="w-1/2 min-w-[50%] bg-zinc-100 flex flex-col h-full overflow-hidden">
                 <div className="h-full w-full">
                     <PDFViewer width="100%" height="100%" className="border-none w-full h-full">
                         <PDFTemplate data={{

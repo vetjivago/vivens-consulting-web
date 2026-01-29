@@ -1,6 +1,6 @@
 
 // Basic Block Types
-export type BlockType = 'executive_summary' | 'compliance_table' | 'observation' | 'text_section' | 'images_grid' | 'section_header';
+export type BlockType = 'executive_summary' | 'compliance_table' | 'observation' | 'text_section' | 'images_grid' | 'section_header' | 'page_break';
 
 export interface ReportBlock {
     id: string;

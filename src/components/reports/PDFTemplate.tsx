@@ -324,6 +324,11 @@ export const PDFTemplate = ({ data }: { data: StructuredReportData }) => (
                     );
                 }
 
+                // 6. Page Break
+                if (block.type === 'page_break') {
+                    return <View key={block.id} break />;
+                }
+
                 return null;
             })}
 
