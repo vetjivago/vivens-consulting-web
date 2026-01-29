@@ -227,8 +227,64 @@ export const ReportEditor = () => {
         setImages(images.filter((_, index) => index !== indexToRemove));
     };
 
+    const [activeBlockIdForUpload, setActiveBlockIdForUpload] = useState<string | null>(null);
+
+    const handleBlockImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const blockId = activeBlockIdForUpload;
+        if (!blockId || !e.target.files || e.target.files.length === 0) return;
+
+        setLoading(true);
+        const file = e.target.files[0];
+        const fileExt = file.name.split(".").pop();
+        const fileName = `${Math.random()}.${fileExt}`;
+        const filePath = `reports/${fileName}`; // Organized in a reports folder
+
+        const { error: uploadError } = await supabase.storage
+            .from("project-images")
+            .upload(filePath, file);
+
+        if (uploadError) {
+            toast({
+                variant: "destructive",
+                title: "Erro no upload",
+                description: uploadError.message,
+            });
+        } else {
+            const { data: { publicUrl } } = supabase.storage
+                .from("project-images")
+                .getPublicUrl(filePath);
+
+            updateBlock(blockId, { image: publicUrl });
+            toast({ title: "Imagem anexada ao relatório!" });
+        }
+
+        setLoading(false);
+        setActiveBlockIdForUpload(null);
+        // Reset input
+        e.target.value = '';
+    };
+
+    // Helper to trigger the hidden file input
+    const triggerImageUpload = (blockId: string) => {
+        setActiveBlockIdForUpload(blockId);
+        const fileInput = document.getElementById('hidden-report-file-input') as HTMLInputElement;
+        if (fileInput) fileInput.click();
+    };
+
+    const removeBlockImage = (blockId: string) => {
+        updateBlock(blockId, { image: undefined });
+    };
+
     return (
         <div className="h-screen flex flex-col bg-background">
+            {/* Hidden Input for Block Images */}
+            <input
+                type="file"
+                id="hidden-report-file-input"
+                className="hidden"
+                accept="image/*"
+                onChange={handleBlockImageUpload}
+            />
             {/* Header */}
             <div className="border-b px-6 py-4 flex items-center justify-between bg-card">
                 <div className="flex items-center gap-4">
@@ -402,9 +458,30 @@ export const ReportEditor = () => {
                                                 value={block.data.description}
                                                 onChange={(e) => updateBlock(block.id, { description: e.target.value })}
                                             />
-                                            {/* Image Upload for Observation (Placeholder for logic) */}
+
+                                            {/* Image Preview */}
+                                            {block.data.image && (
+                                                <div className="relative w-full h-48 bg-muted rounded-md overflow-hidden border">
+                                                    <img src={block.data.image} alt="Evidência" className="w-full h-full object-contain" />
+                                                    <Button
+                                                        variant="destructive"
+                                                        size="icon"
+                                                        className="absolute top-2 right-2 h-6 w-6"
+                                                        onClick={() => removeBlockImage(block.id)}
+                                                    >
+                                                        <X className="h-3 w-3" />
+                                                    </Button>
+                                                </div>
+                                            )}
+
+                                            {/* Image Upload Button */}
                                             <div className="flex items-center gap-4">
-                                                <Button variant="outline" size="sm" className="w-full">
+                                                <Button
+                                                    variant="outline"
+                                                    size="sm"
+                                                    className="w-full"
+                                                    onClick={() => triggerImageUpload(block.id)}
+                                                >
                                                     <ImageIcon className="mr-2 h-4 w-4" />
                                                     {block.data.image ? "Alterar Imagem" : "Adicionar Imagem"}
                                                 </Button>
