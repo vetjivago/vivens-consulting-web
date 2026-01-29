@@ -250,7 +250,7 @@ export const ReportEditor = () => {
     };
 
     return (
-        <div className="h-screen flex flex-col bg-background">
+        <div className="h-screen w-full flex flex-col bg-background overflow-hidden">
             {/* Hidden Input for Block Images */}
             <input
                 type="file"
