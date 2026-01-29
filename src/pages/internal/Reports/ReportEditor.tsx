@@ -265,46 +265,63 @@ export const ReportEditor = () => {
         if (!blockId || !e.target.files || e.target.files.length === 0) return;
 
         setLoading(true);
-        const file = e.target.files[0];
-        const fileExt = file.name.split(".").pop();
-        const fileName = `${Math.random()}.${fileExt}`;
-        const filePath = `reports/${fileName}`; // Organized in a reports folder
+        const files = Array.from(e.target.files);
+        const newImagesToAdd: { url: string; caption: string }[] = [];
+        let legacyImageUpdate = "";
 
-        const { error: uploadError } = await supabase.storage
-            .from("project-images")
-            .upload(filePath, file);
+        try {
+            const uploadPromises = files.map(async (file) => {
+                const fileExt = file.name.split(".").pop();
+                const fileName = `${Math.random()}.${fileExt}`;
+                const filePath = `reports/${fileName}`;
 
-        if (uploadError) {
-            toast({
-                variant: "destructive",
-                title: "Erro no upload",
-                description: uploadError.message,
+                const { error: uploadError } = await supabase.storage
+                    .from("project-images")
+                    .upload(filePath, file);
+
+                if (uploadError) throw uploadError;
+
+                const { data: { publicUrl } } = supabase.storage
+                    .from("project-images")
+                    .getPublicUrl(filePath);
+
+                return publicUrl;
             });
-        } else {
-            const { data: { publicUrl } } = supabase.storage
-                .from("project-images")
-                .getPublicUrl(filePath);
+
+            const uploadedUrls = await Promise.all(uploadPromises);
+
+            uploadedUrls.forEach(url => {
+                newImagesToAdd.push({ url, caption: "" });
+                // Keep the last one as legacy fallback if needed
+                legacyImageUpdate = url;
+            });
 
             // Handle multi-image upload
             const currentBlock = blocks.find(b => b.id === blockId);
-            if (currentBlock && currentBlock.type === 'observation') {
-                const currentImages = currentBlock.data.images || [];
-                // If legacy image exists, migrate it to array first? Or just append?
-                // Let's just append.
-                const newImages = [...currentImages, { url: publicUrl, caption: "" }];
-                updateBlock(blockId, { images: newImages });
-            } else {
-                // Fallback for other blocks if any
-                updateBlock(blockId, { image: publicUrl });
+            if (currentBlock) {
+                if (currentBlock.type === 'observation') {
+                    const currentImages = currentBlock.data.images || [];
+                    const newImages = [...currentImages, ...newImagesToAdd];
+                    updateBlock(blockId, { images: newImages });
+                } else {
+                    // Fallback for other blocks (overwrites with last image)
+                    updateBlock(blockId, { image: legacyImageUpdate });
+                }
             }
 
-            toast({ title: "Imagem anexada ao relatório!" });
-        }
+            toast({ title: `${files.length} imagem(ns) anexada(s)!` });
 
-        setLoading(false);
-        setActiveBlockIdForUpload(null);
-        // Reset input
-        e.target.value = '';
+        } catch (error: any) {
+            toast({
+                variant: "destructive",
+                title: "Erro no upload",
+                description: error.message,
+            });
+        } finally {
+            setLoading(false);
+            setActiveBlockIdForUpload(null);
+            e.target.value = '';
+        }
     };
 
     // Helper to trigger the hidden file input
@@ -325,6 +342,7 @@ export const ReportEditor = () => {
                 type="file"
                 id="hidden-report-file-input"
                 className="hidden"
+                multiple
                 accept="image/*"
                 onChange={handleBlockImageUpload}
             />
