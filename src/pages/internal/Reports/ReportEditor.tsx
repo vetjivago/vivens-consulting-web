@@ -594,7 +594,7 @@ export const ReportEditor = () => {
                                                                     <SelectItem value="Atende">Atende</SelectItem>
                                                                     <SelectItem value="Não Atende">Não Atende</SelectItem>
                                                                     <SelectItem value="Atende em Partes">Parcial</SelectItem>
-                                                                    <SelectItem value="Atende em Partes">Parcial</SelectItem>
+
                                                                     <SelectItem value="Crítico">Crítico</SelectItem>
                                                                     <SelectItem value="Não se aplica">Não se aplica</SelectItem>
                                                                     <SelectItem value="Não Verificado">Não Verificado</SelectItem>
