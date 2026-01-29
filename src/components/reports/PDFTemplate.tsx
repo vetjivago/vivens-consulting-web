@@ -195,6 +195,7 @@ const styles = StyleSheet.create({
         height: 200,
         objectFit: "contain",
         borderRadius: 4,
+        marginBottom: 10,
     },
     footer: {
         position: "absolute",
@@ -320,9 +321,9 @@ export const PDFTemplate = ({ data }: { data: StructuredReportData }) => (
 
                             {/* Multi-Image Support */}
                             {block.data.images && block.data.images.length > 0 ? (
-                                <View style={{ marginTop: 10 }}>
+                                <View style={{ marginTop: 10, flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' }}>
                                     {block.data.images.map((img: any, idx: number) => (
-                                        <View key={idx} style={{ marginBottom: 15 }} wrap={false}>
+                                        <View key={idx} style={{ marginBottom: 15, width: '48%' }} wrap={false}>
                                             <Image src={img.url} style={styles.image} />
                                             {img.caption ? (
                                                 <Text style={[styles.caption, { marginTop: 4, fontStyle: 'italic', fontSize: 10, alignSelf: 'center' }]}>

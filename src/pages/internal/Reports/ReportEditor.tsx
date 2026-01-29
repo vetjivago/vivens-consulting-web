@@ -90,10 +90,23 @@ export const ReportEditor = () => {
         if (direction === 'down' && index === blocks.length - 1) return;
 
         const newBlocks = [...blocks];
-        const targetIndex = direction === 'up' ? index - 1 : index + 1;
-
-        [newBlocks[index], newBlocks[targetIndex]] = [newBlocks[targetIndex], newBlocks[index]];
+        const swapIndex = direction === 'up' ? index - 1 : index + 1;
+        [newBlocks[index], newBlocks[swapIndex]] = [newBlocks[swapIndex], newBlocks[index]];
         setBlocks(newBlocks);
+    };
+
+    const moveImage = (blockId: string, imageIndex: number, direction: 'up' | 'down') => {
+        const block = blocks.find(b => b.id === blockId);
+        if (!block || !block.data.images) return;
+
+        const images = [...block.data.images];
+        if (direction === 'up' && imageIndex === 0) return;
+        if (direction === 'down' && imageIndex === images.length - 1) return;
+
+        const swapIndex = direction === 'up' ? imageIndex - 1 : imageIndex + 1;
+        [images[imageIndex], images[swapIndex]] = [images[swapIndex], images[imageIndex]];
+
+        updateBlock(blockId, { images });
     };
     // Image handling will be separate
     const [images, setImages] = useState<string[]>([]); // URLs
@@ -600,6 +613,24 @@ export const ReportEditor = () => {
                                                             >
                                                                 <Trash2 className="h-4 w-4 mr-2" /> Remover
                                                             </Button>
+                                                            <div className="flex gap-1">
+                                                                <Button
+                                                                    variant="ghost"
+                                                                    size="icon"
+                                                                    disabled={imgIdx === 0}
+                                                                    onClick={() => moveImage(block.id, imgIdx, 'up')}
+                                                                >
+                                                                    <ArrowUp className="w-4 h-4" />
+                                                                </Button>
+                                                                <Button
+                                                                    variant="ghost"
+                                                                    size="icon"
+                                                                    disabled={imgIdx === block.data.images.length - 1}
+                                                                    onClick={() => moveImage(block.id, imgIdx, 'down')}
+                                                                >
+                                                                    <ArrowDown className="w-4 h-4" />
+                                                                </Button>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 ))}
