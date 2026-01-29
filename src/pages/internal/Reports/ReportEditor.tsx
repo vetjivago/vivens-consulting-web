@@ -276,9 +276,9 @@ export const ReportEditor = () => {
                 </Button>
             </div>
 
-            <div className="flex-1 flex overflow-hidden">
+            <div className="flex-1 flex flex-row overflow-hidden">
                 {/* Editor Panel - Left */}
-                <div className="w-1/2 border-r bg-muted/10 flex flex-col overflow-hidden">
+                <div className="flex-1 border-r bg-muted/10 flex flex-col overflow-hidden min-w-[350px]">
                     <div className="flex-1 overflow-y-auto p-6 space-y-6">
 
                         {/* Metadata Card */}
@@ -610,9 +610,9 @@ export const ReportEditor = () => {
             </div>
 
             {/* Preview Panel - Right */}
-            <div className="w-1/2 bg-zinc-100 flex flex-col">
-                <div className="h-full">
-                    <PDFViewer width="100%" height="100%" className="border-none">
+            <div className="flex-1 bg-zinc-100 flex flex-col min-w-0 h-full">
+                <div className="h-full w-full">
+                    <PDFViewer width="100%" height="100%" className="border-none w-full h-full">
                         <PDFTemplate data={{
                             title: reportMeta.title || "Sem Título",
                             type: reportMeta.type,
