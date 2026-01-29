@@ -308,6 +308,7 @@ export const ReportEditor = () => {
                                     <div className="space-y-2">
                                         <Label>Título do Relatório</Label>
                                         <Input
+                                            className="text-base"
                                             value={reportMeta.title}
                                             onChange={(e) => setReportMeta({ ...reportMeta, title: e.target.value })}
                                             placeholder="Ex: Vistoria Técnica Inicial"
@@ -393,6 +394,7 @@ export const ReportEditor = () => {
                                             <span className="font-semibold text-sm uppercase text-muted-foreground">Cabeçalho de Seção</span>
                                         </div>
                                         <Input
+                                            className="text-base"
                                             placeholder="Título do Cabeçalho"
                                             value={block.data.title}
                                             onChange={(e) => updateBlock(block.id, { title: e.target.value })}
@@ -411,6 +413,7 @@ export const ReportEditor = () => {
                                             <div>
                                                 <Label>Imagens Analisadas</Label>
                                                 <Input
+                                                    className="text-base"
                                                     type="number"
                                                     value={block.data.imagesAnalyzed}
                                                     onChange={(e) => updateBlock(block.id, { imagesAnalyzed: parseInt(e.target.value) || 0 })}
@@ -419,6 +422,7 @@ export const ReportEditor = () => {
                                             <div>
                                                 <Label>Pontos Críticos</Label>
                                                 <Input
+                                                    className="text-base"
                                                     type="number"
                                                     value={block.data.criticalImages}
                                                     onChange={(e) => updateBlock(block.id, { criticalImages: parseInt(e.target.value) || 0 })}
@@ -427,6 +431,7 @@ export const ReportEditor = () => {
                                             <div className="col-span-2">
                                                 <Label>Situação Geral</Label>
                                                 <Input
+                                                    className="text-base"
                                                     value={block.data.generalStatus}
                                                     onChange={(e) => updateBlock(block.id, { generalStatus: e.target.value })}
                                                 />
@@ -443,13 +448,14 @@ export const ReportEditor = () => {
                                             <span className="font-semibold text-sm uppercase text-muted-foreground">Seção de Texto</span>
                                         </div>
                                         <Input
+                                            className="text-base"
                                             placeholder="Título da Seção (ex: Introdução, Metodologia)"
                                             value={block.data.title}
                                             onChange={(e) => updateBlock(block.id, { title: e.target.value })}
                                         />
                                         <Textarea
                                             placeholder="Conteúdo detalhado da seção..."
-                                            className="min-h-[100px]"
+                                            className="min-h-[100px] text-base"
                                             value={block.data.text}
                                             onChange={(e) => updateBlock(block.id, { text: e.target.value })}
                                         />
@@ -464,13 +470,14 @@ export const ReportEditor = () => {
                                             <span className="font-semibold text-sm uppercase text-muted-foreground">Observação Detalhada</span>
                                         </div>
                                         <Input
+                                            className="text-base"
                                             placeholder="Título da Observação (ex: Não conformidade item 4)"
                                             value={block.data.title}
                                             onChange={(e) => updateBlock(block.id, { title: e.target.value })}
                                         />
                                         <Textarea
                                             placeholder="Descrição detalhada do problema..."
-                                            className="min-h-[100px]"
+                                            className="min-h-[100px] text-base"
                                             value={block.data.description}
                                             onChange={(e) => updateBlock(block.id, { description: e.target.value })}
                                         />
@@ -517,6 +524,7 @@ export const ReportEditor = () => {
                                             <span className="font-semibold text-sm uppercase text-muted-foreground">Tabela de Conformidade</span>
                                         </div>
                                         <Input
+                                            className="text-base"
                                             placeholder="Título da Tabela"
                                             value={block.data.title}
                                             onChange={(e) => updateBlock(block.id, { title: e.target.value })}
@@ -536,7 +544,7 @@ export const ReportEditor = () => {
                                                     <div key={idx} className="grid grid-cols-12 gap-2 p-2 border-b items-center text-sm">
                                                         <div className="col-span-1">
                                                             <Input
-                                                                className="h-8 p-1"
+                                                                className="h-8 p-1 text-sm"
                                                                 value={item.itemNumber}
                                                                 onChange={(e) => {
                                                                     const newItems = [...block.data.items];
@@ -547,7 +555,7 @@ export const ReportEditor = () => {
                                                         </div>
                                                         <div className="col-span-6">
                                                             <Textarea
-                                                                className="h-10 min-h-[40px] p-2 text-xs"
+                                                                className="h-10 min-h-[40px] p-2 text-sm"
                                                                 value={item.description}
                                                                 onChange={(e) => {
                                                                     const newItems = [...block.data.items];
