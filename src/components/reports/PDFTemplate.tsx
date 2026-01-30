@@ -112,6 +112,14 @@ const styles = StyleSheet.create({
         padding: 8,
         alignItems: 'center',
     },
+    tableRowHeader: {
+        flexDirection: "row",
+        backgroundColor: "#E0E7FF", // Indigo-50
+        borderBottomWidth: 1,
+        borderBottomColor: "#C7D2FE",
+        padding: 5,
+        alignItems: 'center',
+    },
     colItem: { width: "10%" },
     colDesc: { width: "50%" },
     colClass: { width: "20%" },
@@ -293,16 +301,29 @@ export const PDFTemplate = ({ data }: { data: StructuredReportData }) => (
                                     <View style={styles.colStatus}><Text style={styles.headerTextTable}>Status</Text></View>
                                 </View>
                                 {/* Rows */}
-                                {block.data.items?.map((item: any, i: number) => (
-                                    <View key={i} style={styles.tableRow}>
-                                        <View style={styles.colItem}><Text style={styles.tabletext}>{item.itemNumber}</Text></View>
-                                        <View style={styles.colDesc}><Text style={styles.tabletext}>{item.description}</Text></View>
-                                        <View style={styles.colClass}><Text style={styles.tabletext}>{item.classification}</Text></View>
-                                        <View style={styles.colStatus}>
-                                            <StatusBadge status={item.status} />
+                                {block.data.items?.map((item: any, i: number) => {
+                                    if (item.isHeader) {
+                                        return (
+                                            <View key={i} style={styles.tableRowHeader}>
+                                                <View style={{ width: "100%" }}>
+                                                    <Text style={[styles.tabletext, { fontWeight: "bold", fontSize: 11, color: "#312E81" }]}>
+                                                        {item.description}
+                                                    </Text>
+                                                </View>
+                                            </View>
+                                        );
+                                    }
+                                    return (
+                                        <View key={i} style={styles.tableRow}>
+                                            <View style={styles.colItem}><Text style={styles.tabletext}>{item.itemNumber}</Text></View>
+                                            <View style={styles.colDesc}><Text style={styles.tabletext}>{item.description}</Text></View>
+                                            <View style={styles.colClass}><Text style={styles.tabletext}>{item.classification}</Text></View>
+                                            <View style={styles.colStatus}>
+                                                <StatusBadge status={item.status} />
+                                            </View>
                                         </View>
-                                    </View>
-                                ))}
+                                    );
+                                })}
                             </View>
                         </View>
                     );

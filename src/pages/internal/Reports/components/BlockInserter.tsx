@@ -9,7 +9,7 @@ import {
 import { BlockType } from "@/types/report";
 
 interface BlockInserterProps {
-    onAddBlock: (type: BlockType) => void;
+    onAddBlock: (type: BlockType | 'rn57_template') => void;
 }
 
 export const BlockInserter = ({ onAddBlock }: BlockInserterProps) => {
@@ -40,7 +40,10 @@ export const BlockInserter = ({ onAddBlock }: BlockInserterProps) => {
                             Resumo Executivo
                         </Button>
                         <Button variant="ghost" className="w-full justify-start text-sm h-8 px-2" onClick={() => onAddBlock('compliance_table')}>
-                            Tabela de Conformidade
+                            Tabela de Conformidade (Vazia)
+                        </Button>
+                        <Button variant="ghost" className="w-full justify-start text-sm h-8 px-2 text-blue-600 font-medium" onClick={() => onAddBlock('rn57_template')}>
+                            Tabela RN 57 (Completa)
                         </Button>
                         <Button variant="ghost" className="w-full justify-start text-sm h-8 px-2" onClick={() => onAddBlock('observation')}>
                             Observação (Foto)

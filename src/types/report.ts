@@ -24,8 +24,9 @@ export interface ComplianceItem {
     id: string;
     itemNumber: string;
     description: string;
-    classification: 'Obrigatório' | 'Recomendado';
+    classification: 'Obrigatório' | 'Recomendado' | ''; // Allow empty for headers
     status: ComplianceStatus;
+    isHeader?: boolean; // New field for section headers
 }
 
 export interface ComplianceTableData {

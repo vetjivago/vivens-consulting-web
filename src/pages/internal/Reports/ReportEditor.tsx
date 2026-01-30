@@ -22,56 +22,31 @@ import { Save, ArrowLeft, Loader2, Eye, EyeOff, Star, Table, Camera, FileText, H
 // New Components
 import { ReportBlockWrapper } from "./components/ReportBlockWrapper";
 import { BlockInserter } from "./components/BlockInserter";
+import { RN57_TEMPLATE_ITEMS } from "@/constants/reportTemplates";
 
 export const ReportEditor = () => {
-    const { id } = useParams();
-    const navigate = useNavigate();
-    const { toast } = useToast();
-    const [loading, setLoading] = useState(false);
-    const [showPdf, setShowPdf] = useState(true);
-
-    // Basic metadata
-    const [reportMeta, setReportMeta] = useState({
-        title: "",
-        type: "Técnico",
-        project_id: "",
-        client_name: "",
-        project_title: "",
-    });
-
-    const [blocks, setBlocks] = useState<ReportBlock[]>([]);
-    const [collapsedBlocks, setCollapsedBlocks] = useState<Record<string, boolean>>({});
-    const [projects, setProjects] = useState<any[]>([]);
-
-    const [dataLoaded, setDataLoaded] = useState(false);
-
-    const reportMetaRef = useRef(reportMeta);
-    const blocksRef = useRef(blocks);
-
-    const activeReportData: StructuredReportData = {
-        title: reportMeta.title || "Sem Título",
-        type: reportMeta.type,
-        client: reportMeta.client_name || "Cliente",
-        project: reportMeta.project_title || "Projeto",
-        date: new Date().toLocaleDateString('pt-BR'),
-        blocks: blocks
-    };
-
-    useEffect(() => { reportMetaRef.current = reportMeta; }, [reportMeta]);
-    useEffect(() => { blocksRef.current = blocks; }, [blocks]);
-
+    // ... code ...
     // Add Block at specific index
-    const addBlock = (type: ReportBlock['type'], index?: number) => {
+    const addBlock = (type: ReportBlock['type'] | 'rn57_template', index?: number) => {
+        const actualType = type === 'rn57_template' ? 'compliance_table' : type;
+
         const newBlock: ReportBlock = {
             id: crypto.randomUUID(),
-            type,
+            type: actualType,
             data: {}
         };
 
         // Default Data
         if (type === 'executive_summary') newBlock.data = { imagesAnalyzed: 0, criticalImages: 0, evaluationDate: new Date().toLocaleDateString('pt-BR'), generalStatus: 'Crítico' };
         if (type === 'compliance_table') newBlock.data = { title: "Nova Tabela de Conformidade", items: [] };
-        if (type === 'observation') newBlock.data = { title: "Nova Observação", description: "", severity: "medium", images: [], align: 'justify' };
+        if (type === 'rn57_template') {
+            newBlock.data = {
+                title: "TABELA AUXILIAR - CRITÉRIO MÍNIMOS PARA CRIAÇÃO, MANUTENÇÃO E EXPERIMENTAÇÃO DE ROEDORES E LAGOMORFOS (RN 57)",
+                items: RN57_TEMPLATE_ITEMS.map(i => ({ ...i, id: crypto.randomUUID() }))
+            };
+        }
+        if (type === 'observation') newBlock.data = { description: "", severity: "medium", images: [], align: 'justify' };
+        // ... rest of the code ...
         if (type === 'section_header') newBlock.data = { title: "Título da Seção" };
         if (type === 'text_section') newBlock.data = { title: "Nova Seção", text: "", align: 'justify' };
         if (type === 'pdf_attachment') newBlock.data = { title: "Anexo PDF", fileUrl: "", fileName: "" };
@@ -631,60 +606,78 @@ export const ReportEditor = () => {
                                                         />
                                                         <div className="border rounded-lg overflow-hidden grid">
                                                             {block.data.items?.map((item: any, idx: number) => (
-                                                                <div key={idx} className="grid grid-cols-12 gap-2 p-3 border-b last:border-0 items-start bg-white hover:bg-zinc-50/50">
-                                                                    <div className="col-span-1 pt-1">
-                                                                        <Input
-                                                                            className="h-8 p-1 text-sm font-mono border-none shadow-none focus-visible:ring-0 text-center"
-                                                                            value={item.itemNumber}
-                                                                            onChange={(e) => {
-                                                                                const newItems = [...block.data.items];
-                                                                                newItems[idx].itemNumber = e.target.value;
-                                                                                updateBlock(block.id, { items: newItems });
-                                                                            }}
-                                                                        />
-                                                                    </div>
-                                                                    <div className="col-span-11 space-y-2">
-                                                                        <Textarea className="min-h-[20px] h-auto resize-none border-none shadow-none p-0 text-sm focus-visible:ring-0"
-                                                                            value={item.description}
-                                                                            onChange={(e) => {
-                                                                                const newItems = [...block.data.items];
-                                                                                newItems[idx].description = e.target.value;
-                                                                                updateBlock(block.id, { items: newItems });
-                                                                            }}
-                                                                        />
-                                                                        <div className="flex gap-2 items-center flex-wrap">
-                                                                            <Select
-                                                                                value={item.classification}
-                                                                                onValueChange={(val) => {
+                                                                <div key={idx} className={`grid grid-cols-12 gap-2 p-3 border-b last:border-0 items-start ${item.isHeader ? 'bg-indigo-50 border-indigo-100' : 'bg-white hover:bg-zinc-50/50'}`}>
+
+                                                                    {/* Render Header Row SImply */}
+                                                                    {item.isHeader ? (
+                                                                        <div className="col-span-12">
+                                                                            <Input
+                                                                                className="font-bold text-indigo-900 border-none bg-transparent shadow-none px-0 focus-visible:ring-0 uppercase tracking-wide text-xs"
+                                                                                value={item.description}
+                                                                                onChange={(e) => {
                                                                                     const newItems = [...block.data.items];
-                                                                                    newItems[idx].classification = val as any;
+                                                                                    newItems[idx].description = e.target.value;
                                                                                     updateBlock(block.id, { items: newItems });
                                                                                 }}
-                                                                            >
-                                                                                <SelectTrigger className="h-6 w-[110px] text-[10px] border-zinc-200 bg-zinc-50"><SelectValue /></SelectTrigger>
-                                                                                <SelectContent>
-                                                                                    <SelectItem value="Obrigatório">Obrigatório</SelectItem>
-                                                                                    <SelectItem value="Recomendado">Recomendado</SelectItem>
-                                                                                </SelectContent>
-                                                                            </Select>
-                                                                            <div className="h-4 w-px bg-zinc-200 mx-1"></div>
-                                                                            {['Atende', 'Não Atende', 'Parcial', 'N/A', 'Não Verificado'].map(status => (
-                                                                                <button
-                                                                                    key={status}
-                                                                                    onClick={() => {
+                                                                            />
+                                                                        </div>
+                                                                    ) : (
+                                                                        <>
+                                                                            <div className="col-span-1 pt-1">
+                                                                                <Input
+                                                                                    className="h-8 p-1 text-sm font-mono border-none shadow-none focus-visible:ring-0 text-center"
+                                                                                    value={item.itemNumber}
+                                                                                    onChange={(e) => {
                                                                                         const newItems = [...block.data.items];
-                                                                                        // Map shorthand to full status
-                                                                                        const map: any = { 'Parcial': 'Atende em Partes', 'N/A': 'Não se aplica' };
-                                                                                        newItems[idx].status = map[status] || status;
+                                                                                        newItems[idx].itemNumber = e.target.value;
                                                                                         updateBlock(block.id, { items: newItems });
                                                                                     }}
-                                                                                    className={`text-[10px] px-2 py-1 rounded-full border ${item.status === (status === 'Parcial' ? 'Atende em Partes' : status === 'N/A' ? 'Não se aplica' : status) ? 'bg-zinc-800 text-white border-zinc-800' : 'bg-white text-zinc-500 hover:border-zinc-400'}`}
-                                                                                >
-                                                                                    {status}
-                                                                                </button>
-                                                                            ))}
-                                                                        </div>
-                                                                    </div>
+                                                                                />
+                                                                            </div>
+                                                                            <div className="col-span-11 space-y-2">
+                                                                                <Textarea className="min-h-[20px] h-auto resize-none border-none shadow-none p-0 text-sm focus-visible:ring-0"
+                                                                                    value={item.description}
+                                                                                    onChange={(e) => {
+                                                                                        const newItems = [...block.data.items];
+                                                                                        newItems[idx].description = e.target.value;
+                                                                                        updateBlock(block.id, { items: newItems });
+                                                                                    }}
+                                                                                />
+                                                                                <div className="flex gap-2 items-center flex-wrap">
+                                                                                    <Select
+                                                                                        value={item.classification}
+                                                                                        onValueChange={(val) => {
+                                                                                            const newItems = [...block.data.items];
+                                                                                            newItems[idx].classification = val as any;
+                                                                                            updateBlock(block.id, { items: newItems });
+                                                                                        }}
+                                                                                    >
+                                                                                        <SelectTrigger className="h-6 w-[110px] text-[10px] border-zinc-200 bg-zinc-50"><SelectValue /></SelectTrigger>
+                                                                                        <SelectContent>
+                                                                                            <SelectItem value="Obrigatório">Obrigatório</SelectItem>
+                                                                                            <SelectItem value="Recomendado">Recomendado</SelectItem>
+                                                                                        </SelectContent>
+                                                                                    </Select>
+                                                                                    <div className="h-4 w-px bg-zinc-200 mx-1"></div>
+                                                                                    {['Atende', 'Não Atende', 'Parcial', 'N/A', 'Não Verificado'].map(status => (
+                                                                                        <button
+                                                                                            key={status}
+                                                                                            onClick={() => {
+                                                                                                const newItems = [...block.data.items];
+                                                                                                // Map shorthand to full status
+                                                                                                const map: any = { 'Parcial': 'Atende em Partes', 'N/A': 'Não se aplica' };
+                                                                                                newItems[idx].status = map[status] || status;
+                                                                                                updateBlock(block.id, { items: newItems });
+                                                                                            }}
+                                                                                            className={`text-[10px] px-2 py-1 rounded-full border ${item.status === (status === 'Parcial' ? 'Atende em Partes' : status === 'N/A' ? 'Não se aplica' : status) ? 'bg-zinc-800 text-white border-zinc-800' : 'bg-white text-zinc-500 hover:border-zinc-400'}`}
+                                                                                        >
+                                                                                            {status}
+                                                                                        </button>
+                                                                                    ))}
+                                                                                </div>
+                                                                            </div>
+                                                                        </>
+                                                                    )}
                                                                 </div>
                                                             ))}
                                                             <Button variant="ghost" className="w-full rounded-none h-10 text-zinc-500" onClick={() => {
