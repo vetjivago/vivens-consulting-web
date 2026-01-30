@@ -501,7 +501,17 @@ export const ReportEditor = () => {
                                                         <div className="border rounded-lg overflow-hidden grid">
                                                             {block.data.items?.map((item: any, idx: number) => (
                                                                 <div key={idx} className="grid grid-cols-12 gap-2 p-3 border-b last:border-0 items-start bg-white hover:bg-zinc-50/50">
-                                                                    <div className="col-span-1 font-mono text-sm pt-2">{item.itemNumber}</div>
+                                                                    <div className="col-span-1 pt-1">
+                                                                        <Input
+                                                                            className="h-8 p-1 text-sm font-mono border-none shadow-none focus-visible:ring-0 text-center"
+                                                                            value={item.itemNumber}
+                                                                            onChange={(e) => {
+                                                                                const newItems = [...block.data.items];
+                                                                                newItems[idx].itemNumber = e.target.value;
+                                                                                updateBlock(block.id, { items: newItems });
+                                                                            }}
+                                                                        />
+                                                                    </div>
                                                                     <div className="col-span-11 space-y-2">
                                                                         <Textarea className="min-h-[20px] h-auto resize-none border-none shadow-none p-0 text-sm focus-visible:ring-0"
                                                                             value={item.description}
