@@ -693,7 +693,7 @@ export const ReportEditor = () => {
                                                                                         </SelectContent>
                                                                                     </Select>
                                                                                     <div className="h-4 w-px bg-zinc-200 mx-1"></div>
-                                                                                    {['Atende', 'Não Atende', 'Parcial', 'N/A', 'Não Verificado'].map(status => (
+                                                                                    {['Atende', 'Não Atende', 'Parcial', 'N/A', 'Não Verificado', 'Crítico', 'Alta Prioridade'].map(status => (
                                                                                         <button
                                                                                             key={status}
                                                                                             onClick={() => {

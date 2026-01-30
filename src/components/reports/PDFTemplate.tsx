@@ -227,6 +227,7 @@ const StatusBadge = ({ status }: { status: ComplianceStatus }) => {
     if (status === "Não Atende") { bg = "#FEE2E2"; color = "#991B1B"; }
     if (status === "Atende em Partes") { bg = "#FEF9C3"; color = "#854D0E"; }
     if (status === "Crítico") { bg = "#7F1D1D"; color = "#FFFFFF"; }
+    if (status === "Alta Prioridade") { bg = "#C2410C"; color = "#FFFFFF"; } // Orange-700
     if (status === "Não se aplica") { bg = "#E5E7EB"; color = "#374151"; }
     if (status === "Não Verificado") { bg = "#F3E8FF"; color = "#6B21A8"; }
 
