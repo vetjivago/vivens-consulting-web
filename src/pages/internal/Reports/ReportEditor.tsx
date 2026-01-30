@@ -25,7 +25,41 @@ import { BlockInserter } from "./components/BlockInserter";
 import { RN57_TEMPLATE_ITEMS } from "@/constants/reportTemplates";
 
 export const ReportEditor = () => {
-    // ... code ...
+    const { id } = useParams();
+    const navigate = useNavigate();
+    const { toast } = useToast();
+    const [loading, setLoading] = useState(false);
+    const [showPdf, setShowPdf] = useState(true);
+
+    // Basic metadata
+    const [reportMeta, setReportMeta] = useState({
+        title: "",
+        type: "Técnico",
+        project_id: "",
+        client_name: "",
+        project_title: "",
+    });
+
+    const [blocks, setBlocks] = useState<ReportBlock[]>([]);
+    const [collapsedBlocks, setCollapsedBlocks] = useState<Record<string, boolean>>({});
+    const [projects, setProjects] = useState<any[]>([]);
+
+    const [dataLoaded, setDataLoaded] = useState(false);
+
+    const reportMetaRef = useRef(reportMeta);
+    const blocksRef = useRef(blocks);
+
+    const activeReportData: StructuredReportData = {
+        title: reportMeta.title || "Sem Título",
+        type: reportMeta.type,
+        client: reportMeta.client_name || "Cliente",
+        project: reportMeta.project_title || "Projeto",
+        date: new Date().toLocaleDateString('pt-BR'),
+        blocks: blocks
+    };
+
+    useEffect(() => { reportMetaRef.current = reportMeta; }, [reportMeta]);
+    useEffect(() => { blocksRef.current = blocks; }, [blocks]);
     // Add Block at specific index
     const addBlock = (type: ReportBlock['type'] | 'rn57_template', index?: number) => {
         const actualType = type === 'rn57_template' ? 'compliance_table' : type;
