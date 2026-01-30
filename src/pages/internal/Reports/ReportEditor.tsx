@@ -4,7 +4,7 @@ import { supabase } from "@/lib/supabase";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea"; // Keep generic textarea for simple edits
+import { Textarea } from "@/components/ui/textarea";
 import {
     Select,
     SelectContent,
@@ -15,9 +15,12 @@ import {
 import { PDFViewer } from "@react-pdf/renderer";
 import { PDFTemplate } from "@/components/reports/PDFTemplate";
 import { useToast } from "@/components/ui/use-toast";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ReportBlock, StructuredReportData, ComplianceItem } from "@/types/report";
-import { Save, ArrowLeft, Loader2, Upload, X, Plus, Trash2, GripVertical, Image as ImageIcon, ArrowUp, ArrowDown, Scissors, Eye, EyeOff, ChevronUp, ChevronDown, Star, Table, Camera, FileText, Heading1, File } from "lucide-react";
+import { ReportBlock, StructuredReportData } from "@/types/report";
+import { Save, ArrowLeft, Loader2, Eye, EyeOff, Star, Table, Camera, FileText, Heading1, File, GripVertical, Plus, Scissors, ArrowUp, ArrowDown, Trash2, X, Image as ImageIcon } from "lucide-react";
+
+// New Components
+import { ReportBlockWrapper } from "./components/ReportBlockWrapper";
+import { BlockInserter } from "./components/BlockInserter";
 
 export const ReportEditor = () => {
     const { id } = useParams();
@@ -31,19 +34,14 @@ export const ReportEditor = () => {
         title: "",
         type: "Técnico",
         project_id: "",
-        client_name: "", // Fetched from project
-        project_title: "", // Fetched from project
+        client_name: "",
+        project_title: "",
     });
 
-    // The structured content
     const [blocks, setBlocks] = useState<ReportBlock[]>([]);
-    // Track collapsed state locally (key = block.id, value = boolean)
     const [collapsedBlocks, setCollapsedBlocks] = useState<Record<string, boolean>>({});
-
-    // Available projects
     const [projects, setProjects] = useState<any[]>([]);
 
-    // Refs for auto-save (to access latest state in interval)
     const reportMetaRef = useRef(reportMeta);
     const blocksRef = useRef(blocks);
 
@@ -56,73 +54,31 @@ export const ReportEditor = () => {
         blocks: blocks
     };
 
-    // Update refs whenever state changes
     useEffect(() => { reportMetaRef.current = reportMeta; }, [reportMeta]);
     useEffect(() => { blocksRef.current = blocks; }, [blocks]);
 
-    // Add a new block helper
-    const addBlock = (type: ReportBlock['type']) => {
+    // Add Block at specific index
+    const addBlock = (type: ReportBlock['type'], index?: number) => {
         const newBlock: ReportBlock = {
             id: crypto.randomUUID(),
             type,
             data: {}
         };
 
-        // Default data templates
-        if (type === 'executive_summary') {
-            newBlock.data = { imagesAnalyzed: 0, criticalImages: 0, evaluationDate: new Date().toLocaleDateString('pt-BR'), generalStatus: 'Crítico' };
-        }
-        if (type === 'compliance_table') {
-            newBlock.data = { title: "Nova Tabela de Conformidade", items: [] };
-        }
-        if (type === 'observation') {
-            newBlock.data = { title: "Nova Observação", description: "", severity: "medium", images: [] };
-        }
-        if (type === 'section_header') {
-            newBlock.data = { title: "Título da Seção" };
-        }
-        if (type === 'text_section') {
-            newBlock.data = { title: "Nova Seção", text: "" };
-        }
+        // Default Data
+        if (type === 'executive_summary') newBlock.data = { imagesAnalyzed: 0, criticalImages: 0, evaluationDate: new Date().toLocaleDateString('pt-BR'), generalStatus: 'Crítico' };
+        if (type === 'compliance_table') newBlock.data = { title: "Nova Tabela de Conformidade", items: [] };
+        if (type === 'observation') newBlock.data = { title: "Nova Observação", description: "", severity: "medium", images: [] };
+        if (type === 'section_header') newBlock.data = { title: "Título da Seção" };
+        if (type === 'text_section') newBlock.data = { title: "Nova Seção", text: "" };
+        if (type === 'pdf_attachment') newBlock.data = { title: "Anexo PDF", fileUrl: "", fileName: "" };
 
-        setBlocks([...blocks, newBlock]);
-    };
-
-    // Helpers for UI
-    const getBlockLabel = (type: ReportBlock['type']) => {
-        switch (type) {
-            case 'executive_summary': return "Resumo Executivo";
-            case 'compliance_table': return "Tabela de Conformidade";
-            case 'observation': return "Observação Detalhada";
-            case 'text_section': return "Seção de Texto";
-            case 'section_header': return "Cabeçalho de Seção";
-            case 'images_grid': return "Grid de Imagens";
-            case 'page_break': return "Quebra de Página";
-            case 'pdf_attachment': return "Anexo PDF";
-            default: return "Bloco Desconhecido";
-        }
-    };
-
-    const getBlockIcon = (type: ReportBlock['type']) => {
-        switch (type) {
-            case 'executive_summary': return <Star className="h-4 w-4" />;
-            case 'compliance_table': return <Table className="h-4 w-4" />;
-            case 'observation': return <Camera className="h-4 w-4" />;
-            case 'text_section': return <FileText className="h-4 w-4" />;
-            case 'section_header': return <Heading1 className="h-4 w-4" />;
-            case 'page_break': return <Scissors className="h-4 w-4" />;
-            case 'pdf_attachment': return <File className="h-4 w-4" />;
-            default: return <GripVertical className="h-4 w-4" />;
-        }
-    };
-
-    const getBlockSummary = (block: ReportBlock) => {
-        switch (block.type) {
-            case 'observation': return block.data.title || "Sem título";
-            case 'compliance_table': return `${block.data.items?.length || 0} itens`;
-            case 'text_section': return block.data.title || "Sem título";
-            case 'section_header': return block.data.title || "---";
-            default: return "";
+        if (index !== undefined) {
+            const newBlocks = [...blocks];
+            newBlocks.splice(index, 0, newBlock);
+            setBlocks(newBlocks);
+        } else {
+            setBlocks([...blocks, newBlock]);
         }
     };
 
@@ -137,7 +93,6 @@ export const ReportEditor = () => {
     const moveBlock = (index: number, direction: 'up' | 'down') => {
         if (direction === 'up' && index === 0) return;
         if (direction === 'down' && index === blocks.length - 1) return;
-
         const newBlocks = [...blocks];
         const swapIndex = direction === 'up' ? index - 1 : index + 1;
         [newBlocks[index], newBlocks[swapIndex]] = [newBlocks[swapIndex], newBlocks[index]];
@@ -147,329 +102,190 @@ export const ReportEditor = () => {
     const moveImage = (blockId: string, imageIndex: number, direction: 'up' | 'down') => {
         const block = blocks.find(b => b.id === blockId);
         if (!block || !block.data.images) return;
-
         const images = [...block.data.images];
         if (direction === 'up' && imageIndex === 0) return;
         if (direction === 'down' && imageIndex === images.length - 1) return;
-
         const swapIndex = direction === 'up' ? imageIndex - 1 : imageIndex + 1;
         [images[imageIndex], images[swapIndex]] = [images[swapIndex], images[imageIndex]];
-
         updateBlock(blockId, { images });
     };
 
     const toggleCollapse = (blockId: string) => {
-        setCollapsedBlocks(prev => ({
-            ...prev,
-            [blockId]: !prev[blockId]
-        }));
+        setCollapsedBlocks(prev => ({ ...prev, [blockId]: !prev[blockId] }));
     };
-    // Image handling will be separate
-    const [images, setImages] = useState<string[]>([]); // URLs
 
-    const fetchProjects = async () => {
-        try {
-            const { data, error } = await supabase.from('projects').select('id, title, client:clients(name)');
-            if (error) throw error;
+    // Data Fetching
+    useEffect(() => {
+        const fetchProjects = async () => {
+            const { data } = await supabase.from('projects').select('id, title, client:clients(name)');
             setProjects(data || []);
-        } catch (error: any) {
-            console.error('Error fetching projects:', error);
-        }
-    };
-
-    const fetchReport = async (reportId: string) => {
-        try {
-            setLoading(true);
-            const { data, error } = await supabase.from('reports').select('*').eq('id', reportId).single();
-            if (error) throw error;
-
-            // Map old structure to new structure if needed, or load blocks directly
-            setReportMeta({
-                title: data.title,
-                type: data.type,
-                project_id: data.project_id || "",
-                client_name: "", // Will be updated when project is selected
-                project_title: ""
-            });
-
-            // Handle legacy content (string) vs new content (blocks)
-            if (typeof data.content === 'string') {
-                // Convert legacy string to a text block
-                setBlocks([{ id: 'legacy-1', type: 'text_section', data: { text: data.content } }]);
-            } else {
-                setBlocks(data.content || []);
-            }
-
-            // Trigger project selection to fill client/project names
-            if (data.project_id) {
-                const proj = projects.find(p => p.id === data.project_id);
-                if (proj) {
-                    setReportMeta(prev => ({ ...prev, client_name: proj.client.name, project_title: proj.title }));
-                }
-            }
-
-        } catch (error: any) {
-            toast({
-                variant: "destructive",
-                title: "Erro ao carregar relatório",
-                description: error.message,
-            });
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const saveReport = async (silent = false) => {
-        const currentMeta = reportMetaRef.current;
-        const currentBlocks = blocksRef.current;
-
-        if (!currentMeta.title || !currentMeta.project_id) {
-            if (!silent) {
-                toast({
-                    variant: "destructive",
-                    title: "Campos obrigatórios",
-                    description: "Preencha o título e selecione um projeto.",
-                });
-            }
-            return;
-        }
-
-        if (!silent) setLoading(true);
-        try {
-            const reportData = {
-                title: currentMeta.title,
-                type: currentMeta.type,
-                project_id: currentMeta.project_id,
-                content: currentBlocks, // Saving blocks as JSONB
-                status: 'draft',
-                updated_at: new Date().toISOString(),
-            };
-
-            let error;
-            if (id) {
-                const { error: updateError } = await supabase.from('reports').update(reportData).eq('id', id);
-                error = updateError;
-            } else {
-                const { error: insertError } = await supabase.from('reports').insert([reportData]);
-                error = insertError;
-            }
-
-            if (error) throw error;
-
-            if (!silent) {
-                toast({
-                    title: "Sucesso!",
-                    description: "Relatório salvo com sucesso.",
-                });
-                navigate("/internal/reports");
-            } else {
-                console.log("Auto-save successful at", new Date().toLocaleTimeString());
-                toast({
-                    title: "Rascunho salvo",
-                    description: "Alterações salvas automaticamente.",
-                    duration: 2000,
-                });
-            }
-        } catch (error: any) {
-            console.error("Save error:", error);
-            if (!silent) {
-                toast({
-                    variant: "destructive",
-                    title: "Erro ao salvar",
-                    description: error.message,
-                });
-            }
-        } finally {
-            if (!silent) setLoading(false);
-        }
-    };
-
-    const handleSave = () => saveReport(false);
-
-    // Auto-save Interval (3 minutes)
-    useEffect(() => {
-        const intervalId = setInterval(() => {
-            if (id) {
-                if (reportMetaRef.current.title && reportMetaRef.current.project_id) {
-                    saveReport(true);
-                }
-            }
-        }, 3 * 60 * 1000); // 3 minutes
-
-        return () => clearInterval(intervalId);
-    }, [id]);
-
-    useEffect(() => {
+        };
         fetchProjects();
     }, []);
 
     useEffect(() => {
         if (id && projects.length > 0) {
-            fetchReport(id);
+            const fetchReport = async () => {
+                setLoading(true);
+                const { data } = await supabase.from('reports').select('*').eq('id', id).single();
+                if (data) {
+                    setReportMeta({ title: data.title, type: data.type, project_id: data.project_id || "", client_name: "", project_title: "" });
+                    setBlocks(typeof data.content === 'string' ? [{ id: 'legacy', type: 'text_section', data: { text: data.content } }] : data.content || []);
+                    const proj = projects.find(p => p.id === data.project_id);
+                    if (proj) setReportMeta(prev => ({ ...prev, client_name: proj.client.name, project_title: proj.title }));
+                }
+                setLoading(false);
+            };
+            fetchReport();
         }
     }, [id, projects]);
 
+    // Save Logic
+    const saveReport = async (silent = false) => {
+        const currentMeta = reportMetaRef.current;
+        if (!currentMeta.title || !currentMeta.project_id) {
+            if (!silent) toast({ variant: "destructive", title: "Erro", description: "Preencha título e projeto." });
+            return;
+        }
+        if (!silent) setLoading(true);
+        const reportData = {
+            title: currentMeta.title,
+            type: currentMeta.type,
+            project_id: currentMeta.project_id,
+            content: blocksRef.current,
+            updated_at: new Date().toISOString(),
+        };
 
+        const { error } = id
+            ? await supabase.from('reports').update(reportData).eq('id', id)
+            : await supabase.from('reports').insert([reportData]);
 
-    const [activeBlockIdForUpload, setActiveBlockIdForUpload] = useState<string | null>(null);
-
-    const handleBlockImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        const blockId = activeBlockIdForUpload;
-        if (!blockId || !e.target.files || e.target.files.length === 0) return;
-
-        setLoading(true);
-        const files = Array.from(e.target.files);
-        const newImagesToAdd: { url: string; caption: string }[] = [];
-        let legacyImageUpdate = "";
-
-        try {
-            const uploadPromises = files.map(async (file) => {
-                const fileExt = file.name.split(".").pop();
-                const fileName = `${Math.random()}.${fileExt}`;
-                const filePath = `reports/${fileName}`;
-
-                const { error: uploadError } = await supabase.storage
-                    .from("project-images")
-                    .upload(filePath, file);
-
-                if (uploadError) throw uploadError;
-
-                const { data: { publicUrl } } = supabase.storage
-                    .from("project-images")
-                    .getPublicUrl(filePath);
-
-                return publicUrl;
-            });
-
-            const uploadedUrls = await Promise.all(uploadPromises);
-
-            uploadedUrls.forEach(url => {
-                newImagesToAdd.push({ url, caption: "" });
-                legacyImageUpdate = url;
-            });
-
-            // Handle multi-image upload
-            const currentBlock = blocks.find(b => b.id === blockId);
-            if (currentBlock) {
-                if (currentBlock.type === 'observation') {
-                    const currentImages = currentBlock.data.images || [];
-                    const newImages = [...currentImages, ...newImagesToAdd];
-                    updateBlock(blockId, { images: newImages });
-                } else {
-                    // Fallback for other blocks (overwrites with last image)
-                    updateBlock(blockId, { image: legacyImageUpdate });
-                }
-            }
-
-            toast({ title: `${files.length} imagem(ns) anexada(s)!` });
-
-        } catch (error: any) {
-            toast({
-                variant: "destructive",
-                title: "Erro no upload",
-                description: error.message,
-            });
-        } finally {
+        if (!silent) {
             setLoading(false);
-            setActiveBlockIdForUpload(null);
-            e.target.value = '';
+            if (!error) toast({ title: "Salvo com sucesso!" });
+            else toast({ variant: "destructive", title: "Erro ao salvar", description: error.message });
         }
     };
 
-    // Helper to trigger the hidden file input
-    const triggerImageUpload = (blockId: string) => {
-        setActiveBlockIdForUpload(blockId);
-        const fileInput = document.getElementById('hidden-report-file-input') as HTMLInputElement;
-        if (fileInput) fileInput.click();
+    // Auto-save
+    useEffect(() => {
+        const interval = setInterval(() => { if (id && reportMetaRef.current.title) saveReport(true); }, 3 * 60 * 1000);
+        return () => clearInterval(interval);
+    }, [id]);
+
+    // Image Upload Logic
+    const [activeBlockIdForUpload, setActiveBlockIdForUpload] = useState<string | null>(null);
+    const handleBlockImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (!activeBlockIdForUpload || !e.target.files?.length) return;
+        setLoading(true);
+        const files = Array.from(e.target.files);
+        const newImages: { url: string, caption: string }[] = [];
+
+        for (const file of files) {
+            const fileName = `${Math.random()}.${file.name.split('.').pop()}`;
+            const { error } = await supabase.storage.from('project-images').upload(`reports/${fileName}`, file);
+            if (!error) {
+                const { data } = supabase.storage.from('project-images').getPublicUrl(`reports/${fileName}`);
+                newImages.push({ url: data.publicUrl, caption: "" });
+            }
+        }
+
+        const block = blocks.find(b => b.id === activeBlockIdForUpload);
+        if (block) {
+            if (block.type === 'observation') {
+                updateBlock(block.id, { images: [...(block.data.images || []), ...newImages] });
+            } else {
+                updateBlock(block.id, { image: newImages[0]?.url });
+            }
+        }
+        setLoading(false);
+        setActiveBlockIdForUpload(null);
+        e.target.value = '';
     };
 
-    const removeBlockImage = (blockId: string) => {
-        updateBlock(blockId, { image: undefined });
+    const getBlockLabel = (type: ReportBlock['type']) => {
+        if (type === 'executive_summary') return "Resumo Executivo";
+        if (type === 'compliance_table') return "Tabela de Conformidade";
+        if (type === 'observation') return "Observação";
+        if (type === 'section_header') return "Cabeçalho";
+        if (type === 'text_section') return "Texto";
+        if (type === 'pdf_attachment') return "PDF";
+        if (type === 'page_break') return "Quebra de Página";
+        return "Bloco";
+    };
+
+    const getBlockIcon = (type: ReportBlock['type']) => {
+        if (type === 'executive_summary') return <Star className="h-4 w-4" />;
+        if (type === 'compliance_table') return <Table className="h-4 w-4" />;
+        if (type === 'observation') return <Camera className="h-4 w-4" />;
+        if (type === 'section_header') return <Heading1 className="h-4 w-4" />;
+        if (type === 'pdf_attachment') return <File className="h-4 w-4" />;
+        if (type === 'page_break') return <Scissors className="h-4 w-4" />;
+        return <FileText className="h-4 w-4" />;
     };
 
     return (
-        <div className="h-screen w-full flex flex-col bg-background overflow-hidden">
-            {/* Hidden Input for Block Images */}
-            <input
-                type="file"
-                id="hidden-report-file-input"
-                className="hidden"
-                multiple
-                accept="image/*"
-                onChange={handleBlockImageUpload}
-            />
-            {/* Header */}
-            <div className="border-b px-6 py-4 flex items-center justify-between bg-card">
-                <div className="flex items-center gap-4">
+        <div className="h-screen w-full flex flex-col bg-zinc-100 overflow-hidden text-zinc-900">
+            {/* Hidden Input */}
+            <input type="file" id="hidden-report-file-input" className="hidden" multiple accept="image/*" onChange={handleBlockImageUpload} />
+
+            {/* Top Bar */}
+            <div className="h-14 border-b bg-white px-4 flex items-center justify-between shrink-0 z-20 shadow-sm">
+                <div className="flex items-center gap-3">
                     <Button variant="ghost" size="icon" onClick={() => navigate("/internal/reports")}>
-                        <ArrowLeft className="h-5 w-5" />
+                        <ArrowLeft className="h-4 w-4" />
                     </Button>
-                    <div>
-                        <h1 className="text-xl font-bold">{id ? "Editar Relatório" : "Novo Relatório"}</h1>
-                        <p className="text-sm text-muted-foreground">Editor de Relatórios Estruturado</p>
-                    </div>
+                    <span className="font-medium text-sm text-zinc-500">Editando Relatório</span>
                 </div>
                 <div className="flex items-center gap-2">
-                    <Button variant="ghost" size="icon" onClick={() => setShowPdf(!showPdf)} title={showPdf ? "Ocultar PDF" : "Mostrar PDF"}>
-                        {showPdf ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                    <Button variant="ghost" size="sm" onClick={() => setShowPdf(!showPdf)}>
+                        {showPdf ? <EyeOff className="mr-2 h-4 w-4" /> : <Eye className="mr-2 h-4 w-4" />}
+                        {showPdf ? "Ocultar Preview" : "Ver Preview"}
                     </Button>
-                    <Button onClick={handleSave} disabled={loading}>
+                    <Button size="sm" onClick={() => saveReport(false)} disabled={loading}>
                         {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
-                        Salvar Relatório
+                        Salvar
                     </Button>
                 </div>
             </div>
 
-            <div className="flex-1 flex flex-row overflow-hidden">
-                {/* Editor Panel - Left */}
-                <div className={`transition-all duration-300 ${showPdf ? 'w-1/2 min-w-[50%]' : 'w-full'} border-r bg-muted/10 flex flex-row overflow-hidden`}>
+            <div className="flex-1 flex overflow-hidden">
+                {/* Main Canvas Area */}
+                <div className={`flex-1 flex overflow-hidden transition-all duration-300 relative`}>
 
-                    {/* Navigation Rail */}
-                    <div className="w-14 border-r bg-card flex flex-col items-center py-4 gap-2 overflow-y-auto shrink-0 z-10">
-                        <div className="mb-2">
-                            <Button variant="ghost" size="icon" onClick={() => document.getElementById('metadata-card')?.scrollIntoView({ behavior: 'smooth' })} title="Topo">
-                                <ArrowUp className="h-4 w-4" />
-                            </Button>
-                        </div>
+                    {/* Mini-Map Sidebar */}
+                    <div className="w-16 border-r bg-zinc-50 flex flex-col items-center py-4 gap-2 overflow-y-auto shrink-0 z-10">
                         {blocks.map((block) => (
                             <Button
                                 key={`nav-${block.id}`}
                                 variant="ghost"
                                 size="icon"
-                                className="h-8 w-8 rounded-full"
+                                className="h-8 w-8 rounded-full text-zinc-400 hover:text-zinc-900 hover:bg-zinc-200"
                                 title={getBlockLabel(block.type)}
-                                onClick={() => document.getElementById(block.id)?.scrollIntoView({ behavior: 'smooth' })}
+                                onClick={() => document.getElementById(block.id)?.scrollIntoView({ behavior: 'smooth', block: 'center' })}
                             >
                                 {getBlockIcon(block.type)}
                             </Button>
                         ))}
                     </div>
 
-                    <div className="flex-1 overflow-y-auto p-6 space-y-6 scroll-smooth">
+                    {/* Scrollable Document Area */}
+                    <div className="flex-1 overflow-y-auto bg-zinc-100/50 p-8 scroll-smooth" id="document-scroll-area">
+                        <div className="max-w-4xl mx-auto bg-white min-h-[1123px] shadow-sm rounded-sm p-16 animate-in fade-in duration-500">
 
-                        {/* Metadata Card */}
-                        <Card id="metadata-card">
-                            <CardHeader>
-                                <CardTitle>Informações Gerais</CardTitle>
-                            </CardHeader>
-                            <CardContent className="space-y-4">
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div className="space-y-2">
-                                        <Label>Título do Relatório</Label>
-                                        <Input
-                                            className="text-base"
-                                            value={reportMeta.title}
-                                            onChange={(e) => setReportMeta({ ...reportMeta, title: e.target.value })}
-                                            placeholder="Ex: Vistoria Técnica Inicial"
-                                        />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <Label>Tipo</Label>
-                                        <Select
-                                            value={reportMeta.type}
-                                            onValueChange={(value) => setReportMeta({ ...reportMeta, type: value })}
-                                        >
-                                            <SelectTrigger><SelectValue /></SelectTrigger>
+                            {/* Document Title / Header */}
+                            <div className="group mb-12 space-y-4 border-b pb-8">
+                                <TextAreaAutosize
+                                    className="w-full text-4xl font-bold border-none focus:ring-0 p-0 resize-none placeholder:text-zinc-300"
+                                    placeholder="Título do Relatório"
+                                    value={reportMeta.title}
+                                    onChange={(e) => setReportMeta({ ...reportMeta, title: e.target.value })}
+                                />
+                                <div className="grid grid-cols-2 gap-8 text-sm text-zinc-500">
+                                    <div className="space-y-1">
+                                        <Label className="text-xs uppercase tracking-wider font-semibold text-zinc-400">Tipo</Label>
+                                        <Select value={reportMeta.type} onValueChange={(v) => setReportMeta({ ...reportMeta, type: v })}>
+                                            <SelectTrigger className="border-none shadow-none p-0 h-auto font-medium text-zinc-900"><SelectValue /></SelectTrigger>
                                             <SelectContent>
                                                 <SelectItem value="Técnico">Relatório Técnico</SelectItem>
                                                 <SelectItem value="Vistoria">Relatório de Vistoria</SelectItem>
@@ -477,512 +293,287 @@ export const ReportEditor = () => {
                                             </SelectContent>
                                         </Select>
                                     </div>
-                                </div>
-                                <div className="space-y-2">
-                                    <Label>Projeto / Cliente</Label>
-                                    <Select
-                                        value={reportMeta.project_id}
-                                        onValueChange={(value) => {
-                                            const proj = projects.find(p => p.id === value);
-                                            setReportMeta({
-                                                ...reportMeta,
-                                                project_id: value,
-                                                client_name: proj?.client?.name || "",
-                                                project_title: proj?.title || ""
-                                            });
-                                        }}
-                                    >
-                                        <SelectTrigger><SelectValue placeholder="Selecione um projeto" /></SelectTrigger>
-                                        <SelectContent>
-                                            {projects.map((p) => (
-                                                <SelectItem key={p.id} value={p.id}>
-                                                    {p.title} - {p.client?.name}
-                                                </SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
-                                </div>
-                            </CardContent>
-                        </Card>
-
-                        {/* Blocks Editor Area */}
-                        <div className="space-y-4">
-                            <div className="flex items-center justify-between">
-                                <h3 className="text-lg font-semibold">Conteúdo do Relatório</h3>
-                                <div className="flex gap-2">
-                                    <Button size="sm" variant="outline" onClick={() => addBlock('section_header')}><Plus className="mr-2 h-3 w-3" /> Cabeçalho</Button>
-                                    <Button size="sm" variant="outline" onClick={() => addBlock('executive_summary')}><Plus className="mr-2 h-3 w-3" /> Resumo</Button>
-                                    <Button size="sm" variant="outline" onClick={() => addBlock('text_section')}><Plus className="mr-2 h-3 w-3" /> Texto</Button>
-                                    <Button size="sm" variant="outline" onClick={() => addBlock('compliance_table')}><Plus className="mr-2 h-3 w-3" /> Tabela</Button>
-                                    <Button size="sm" variant="outline" onClick={() => addBlock('observation')}><Plus className="mr-2 h-3 w-3" /> Observação</Button>
-                                    <Button size="sm" variant="outline" onClick={() => addBlock('pdf_attachment')}><Plus className="mr-2 h-3 w-3" /> Anexo PDF</Button>
-                                    <Button size="sm" variant="outline" onClick={() => addBlock('page_break')}><Scissors className="mr-2 h-3 w-3" /> Quebra</Button>
+                                    <div className="space-y-1">
+                                        <Label className="text-xs uppercase tracking-wider font-semibold text-zinc-400">Projeto</Label>
+                                        <Select value={reportMeta.project_id} onValueChange={(v) => {
+                                            const p = projects.find(proj => proj.id === v);
+                                            setReportMeta({ ...reportMeta, project_id: v, client_name: p?.client?.name || "", project_title: p?.title || "" });
+                                        }}>
+                                            <SelectTrigger className="border-none shadow-none p-0 h-auto font-medium text-zinc-900"><SelectValue placeholder="Selecione..." /></SelectTrigger>
+                                            <SelectContent>
+                                                {projects.map(p => <SelectItem key={p.id} value={p.id}>{p.title}</SelectItem>)}
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
 
-                        {blocks.map((block, index) => (
-                            <Card key={block.id} className="relative group border-l-4 border-l-primary/20">
-                                <CardHeader className="flex flex-row items-center justify-between py-2 bg-muted/10 cursor-pointer" onClick={() => toggleCollapse(block.id)}>
-                                    <div className="flex items-center gap-2">
-                                        <div className="bg-primary/10 p-1.5 rounded text-primary">
-                                            {getBlockIcon(block.type)}
-                                        </div>
-                                        <div className="flex flex-col">
-                                            <CardTitle className="text-sm font-medium">
-                                                {getBlockLabel(block.type)}
-                                            </CardTitle>
-                                            <span className="text-xs text-muted-foreground">
-                                                {getBlockSummary(block)}
-                                            </span>
-                                        </div>
-                                    </div>
-                                    <div className="flex items-center gap-1">
-                                        <Button
-                                            variant="ghost"
-                                            size="sm"
-                                            onClick={(e) => { e.stopPropagation(); moveBlock(index, 'up'); }}
-                                            disabled={index === 0}
-                                        >
-                                            <ArrowUp className="h-4 w-4" />
-                                        </Button>
-                                        <Button
-                                            variant="ghost"
-                                            size="sm"
-                                            onClick={(e) => { e.stopPropagation(); moveBlock(index, 'down'); }}
-                                            disabled={index === blocks.length - 1}
-                                        >
-                                            <ArrowDown className="h-4 w-4" />
-                                        </Button>
-                                        <Button
-                                            variant="ghost"
-                                            size="sm"
-                                            className="text-muted-foreground"
-                                        >
-                                            {collapsedBlocks[block.id] ? <ChevronDown className="h-4 w-4" /> : <ChevronUp className="h-4 w-4" />}
-                                        </Button>
-                                        <Button
-                                            variant="ghost"
-                                            size="icon"
-                                            className="text-destructive hover:text-destructive hover:bg-destructive/10"
-                                            onClick={(e) => { e.stopPropagation(); removeBlock(block.id); }}
-                                        >
-                                            <Trash2 className="h-4 w-4" />
-                                        </Button>
-                                    </div>
-                                </CardHeader>
+                            {/* Blocks List */}
+                            <div className="space-y-2">
+                                {/* Initial Inserter */}
+                                <BlockInserter onAddBlock={(type) => addBlock(type, 0)} />
 
-                                {!collapsedBlocks[block.id] && (
-                                    <>
-                                        {/* Section Header Block UI */}
-                                        {block.type === 'section_header' && (
-                                            <CardContent className="pt-6 space-y-4">
-                                                <div className="flex items-center gap-2 mb-2">
-                                                    <GripVertical className="text-muted-foreground h-4 w-4" />
-                                                    <span className="font-semibold text-sm uppercase text-muted-foreground">Cabeçalho de Seção</span>
-                                                </div>
-                                                <Input
-                                                    className="text-base"
-                                                    placeholder="Título do Cabeçalho"
-                                                    value={block.data.title}
-                                                    onChange={(e) => updateBlock(block.id, { title: e.target.value })}
-                                                />
-                                            </CardContent>
-                                        )}
+                                {blocks.map((block, index) => (
+                                    <div key={block.id} id={block.id}>
+                                        <ReportBlockWrapper
+                                            id={block.id}
+                                            blockType={block.type}
+                                            isCollapsed={collapsedBlocks[block.id]}
+                                            onToggleCollapse={() => toggleCollapse(block.id)}
+                                            onMoveUp={() => moveBlock(index, 'up')}
+                                            onMoveDown={() => moveBlock(index, 'down')}
+                                            onDelete={() => removeBlock(block.id)}
+                                        >
+                                            <div className={`transition-all duration-300 ${collapsedBlocks[block.id] ? 'opacity-50 h-10 overflow-hidden' : ''}`}>
 
-                                        {/* Executive Summary Block UI */}
-                                        {block.type === 'executive_summary' && (
-                                            <CardContent className="pt-6 space-y-4">
-                                                <div className="flex items-center gap-2 mb-2">
-                                                    <GripVertical className="text-muted-foreground h-4 w-4" />
-                                                    <span className="font-semibold text-sm uppercase text-muted-foreground">Resumo Executivo</span>
-                                                </div>
-                                                <div className="grid grid-cols-2 gap-4">
-                                                    <div>
-                                                        <Label>Imagens Analisadas</Label>
+                                                {/* Text Section */}
+                                                {block.type === 'text_section' && (
+                                                    <div className="prose max-w-none">
                                                         <Input
-                                                            className="text-base"
-                                                            type="number"
-                                                            value={block.data.imagesAnalyzed}
-                                                            onChange={(e) => updateBlock(block.id, { imagesAnalyzed: parseInt(e.target.value) || 0 })}
+                                                            className="text-lg font-semibold border-none shadow-none px-0 focus-visible:ring-0 mb-2 placeholder:text-zinc-300"
+                                                            placeholder="Título da Seção (Opcional)"
+                                                            value={block.data.title}
+                                                            onChange={(e) => updateBlock(block.id, { title: e.target.value })}
+                                                        />
+                                                        <Textarea
+                                                            className="w-full min-h-[100px] border-none shadow-none px-0 resize-none focus-visible:ring-0 text-base leading-relaxed"
+                                                            placeholder="Escreva seu texto..."
+                                                            value={block.data.text}
+                                                            onChange={(e) => updateBlock(block.id, { text: e.target.value })}
                                                         />
                                                     </div>
-                                                    <div>
-                                                        <Label>Pontos Críticos</Label>
+                                                )}
+
+                                                {/* Section Header */}
+                                                {block.type === 'section_header' && (
+                                                    <div className="my-8 pt-8 border-t">
                                                         <Input
-                                                            className="text-base"
-                                                            type="number"
-                                                            value={block.data.criticalImages}
-                                                            onChange={(e) => updateBlock(block.id, { criticalImages: parseInt(e.target.value) || 0 })}
+                                                            className="text-2xl font-bold uppercase tracking-tight text-vivens-green border-none shadow-none px-0 focus-visible:ring-0 text-center placeholder:text-zinc-300"
+                                                            placeholder="NOVA SEÇÃO"
+                                                            value={block.data.title}
+                                                            onChange={(e) => updateBlock(block.id, { title: e.target.value })}
                                                         />
                                                     </div>
-                                                    <div className="col-span-2">
-                                                        <Label>Situação Geral</Label>
-                                                        <Input
-                                                            className="text-base"
-                                                            value={block.data.generalStatus}
-                                                            onChange={(e) => updateBlock(block.id, { generalStatus: e.target.value })}
-                                                        />
-                                                    </div>
-                                                </div>
-                                            </CardContent>
-                                        )}
+                                                )}
 
-                                        {/* Text Section Block UI */}
-                                        {block.type === 'text_section' && (
-                                            <CardContent className="pt-6 space-y-4">
-                                                <div className="flex items-center gap-2 mb-2">
-                                                    <GripVertical className="text-muted-foreground h-4 w-4" />
-                                                    <span className="font-semibold text-sm uppercase text-muted-foreground">Seção de Texto</span>
-                                                </div>
-                                                <Input
-                                                    className="text-base"
-                                                    placeholder="Título da Seção (ex: Introdução, Metodologia)"
-                                                    value={block.data.title}
-                                                    onChange={(e) => updateBlock(block.id, { title: e.target.value })}
-                                                />
-                                                <Textarea
-                                                    placeholder="Conteúdo detalhado da seção..."
-                                                    className="min-h-[100px] text-base"
-                                                    value={block.data.text}
-                                                    onChange={(e) => updateBlock(block.id, { text: e.target.value })}
-                                                />
-                                            </CardContent>
-                                        )}
-
-                                        {/* Observation Block UI */}
-                                        {block.type === 'observation' && (
-                                            <CardContent className="pt-6 space-y-4">
-                                                <div className="flex items-center gap-2 mb-2">
-                                                    <GripVertical className="text-muted-foreground h-4 w-4" />
-                                                    <span className="font-semibold text-sm uppercase text-muted-foreground">Observação Detalhada</span>
-                                                </div>
-                                                <Input
-                                                    className="text-base"
-                                                    placeholder="Título da Observação (ex: Não conformidade item 4)"
-                                                    value={block.data.title}
-                                                    onChange={(e) => updateBlock(block.id, { title: e.target.value })}
-                                                />
-                                                <Textarea
-                                                    placeholder="Descrição detalhada do problema..."
-                                                    className="min-h-[100px] text-base"
-                                                    value={block.data.description}
-                                                    onChange={(e) => updateBlock(block.id, { description: e.target.value })}
-                                                />
-
-                                                <div className="space-y-4">
-                                                    <Label>Evidências Fotográficas</Label>
-                                                    {/* Legacy Image Migration / Display */}
-                                                    {block.data.image && !block.data.images?.length && (
-                                                        <div className="relative w-full rounded-md border p-2 bg-muted/20">
-                                                            <div className="mb-2 text-xs text-amber-600 font-bold">Imagem (Legado) - Adicione uma nova para converter em lista</div>
-                                                            <img src={block.data.image} className="max-h-[200px] w-auto object-contain" />
+                                                {/* Executive Summary */}
+                                                {block.type === 'executive_summary' && (
+                                                    <div className="bg-green-50 p-6 rounded-lg border border-green-100">
+                                                        <h3 className="text-green-800 font-bold mb-4 uppercase text-sm tracking-wide">Resumo Executivo</h3>
+                                                        <div className="grid grid-cols-3 gap-6">
+                                                            <div>
+                                                                <Label className="text-xs text-green-700 uppercase">Imagens Analisadas</Label>
+                                                                <Input type="number" className="bg-white border-green-200" value={block.data.imagesAnalyzed} onChange={(e) => updateBlock(block.id, { imagesAnalyzed: +e.target.value })} />
+                                                            </div>
+                                                            <div>
+                                                                <Label className="text-xs text-green-700 uppercase">Pontos Críticos</Label>
+                                                                <Input type="number" className="bg-white border-green-200" value={block.data.criticalImages} onChange={(e) => updateBlock(block.id, { criticalImages: +e.target.value })} />
+                                                            </div>
+                                                            <div>
+                                                                <Label className="text-xs text-green-700 uppercase">Situação</Label>
+                                                                <Input className="bg-white border-green-200 font-semibold" value={block.data.generalStatus} onChange={(e) => updateBlock(block.id, { generalStatus: e.target.value })} />
+                                                            </div>
                                                         </div>
-                                                    )}
+                                                    </div>
+                                                )}
 
-                                                    <div className="grid grid-cols-1 gap-4">
-                                                        {block.data.images?.map((img: any, imgIdx: number) => (
-                                                            <div key={imgIdx} className="flex gap-4 p-3 border rounded-md bg-zinc-50 items-start">
-                                                                <div className="w-[120px] h-[120px] bg-white border rounded flex items-center justify-center shrink-0">
-                                                                    <img
-                                                                        src={img.url}
-                                                                        alt={`Evidência ${imgIdx + 1}`}
-                                                                        className="max-h-full max-w-full object-contain"
-                                                                    />
-                                                                </div>
-                                                                <div className="flex-1 space-y-2">
-                                                                    <Label>Legenda da Imagem</Label>
+                                                {/* Observation Block */}
+                                                {block.type === 'observation' && (
+                                                    <div className="bg-zinc-50 p-6 rounded-lg border">
+                                                        <Input
+                                                            className="font-bold text-lg bg-transparent border-none shadow-none px-0 focus-visible:ring-0 mb-4"
+                                                            placeholder="Título da Observação"
+                                                            value={block.data.title}
+                                                            onChange={(e) => updateBlock(block.id, { title: e.target.value })}
+                                                        />
+                                                        <Textarea
+                                                            className="mb-6 bg-white border-zinc-200 resize-none min-h-[80px]"
+                                                            placeholder="Descrição da observação..."
+                                                            value={block.data.description}
+                                                            onChange={(e) => updateBlock(block.id, { description: e.target.value })}
+                                                        />
+
+                                                        <div className="grid grid-cols-2 gap-4">
+                                                            {block.data.images?.map((img: any, idx: number) => (
+                                                                <div key={idx} className="relative group rounded-md overflow-hidden border bg-white">
+                                                                    <img src={img.url} className="w-full h-48 object-contain bg-zinc-100" />
                                                                     <Input
-                                                                        className="text-base"
-                                                                        placeholder="Descreva esta imagem..."
+                                                                        className="border-none rounded-none border-t bg-white focus-visible:ring-0 text-xs"
+                                                                        placeholder="Legenda da imagem..."
                                                                         value={img.caption}
                                                                         onChange={(e) => {
-                                                                            const newImages = [...block.data.images];
-                                                                            newImages[imgIdx].caption = e.target.value;
-                                                                            updateBlock(block.id, { images: newImages });
+                                                                            const imgs = [...block.data.images];
+                                                                            imgs[idx].caption = e.target.value;
+                                                                            updateBlock(block.id, { images: imgs });
                                                                         }}
                                                                     />
-                                                                    <Button
-                                                                        variant="destructive"
-                                                                        size="sm"
-                                                                        onClick={() => {
-                                                                            const newImages = block.data.images.filter((_: any, i: number) => i !== imgIdx);
-                                                                            updateBlock(block.id, { images: newImages });
-                                                                        }}
-                                                                    >
-                                                                        <Trash2 className="h-4 w-4 mr-2" /> Remover
+                                                                    <Button size="icon" variant="destructive" className="absolute top-2 right-2 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity" onClick={() => {
+                                                                        const imgs = block.data.images.filter((_: any, i: number) => i !== idx);
+                                                                        updateBlock(block.id, { images: imgs });
+                                                                    }}>
+                                                                        <Trash2 className="h-3 w-3" />
                                                                     </Button>
-                                                                    <div className="flex gap-1">
-                                                                        <Button
-                                                                            variant="ghost"
-                                                                            size="icon"
-                                                                            disabled={imgIdx === 0}
-                                                                            onClick={() => moveImage(block.id, imgIdx, 'up')}
-                                                                        >
-                                                                            <ArrowUp className="w-4 h-4" />
-                                                                        </Button>
-                                                                        <Button
-                                                                            variant="ghost"
-                                                                            size="icon"
-                                                                            disabled={imgIdx === block.data.images.length - 1}
-                                                                            onClick={() => moveImage(block.id, imgIdx, 'down')}
-                                                                        >
-                                                                            <ArrowDown className="w-4 h-4" />
-                                                                        </Button>
+                                                                </div>
+                                                            ))}
+
+                                                            <div
+                                                                className="h-48 border-2 border-dashed border-zinc-200 rounded-md flex flex-col items-center justify-center cursor-pointer hover:bg-zinc-50 hover:border-zinc-300 transition-all text-zinc-400 hover:text-zinc-600"
+                                                                onClick={() => {
+                                                                    setActiveBlockIdForUpload(block.id);
+                                                                    document.getElementById('hidden-report-file-input')?.click();
+                                                                }}
+                                                            >
+                                                                <Camera className="h-8 w-8 mb-2" />
+                                                                <span className="text-sm font-medium">Adicionar Foto</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                )}
+
+                                                {/* PDF Attachment Block */}
+                                                {block.type === 'pdf_attachment' && (
+                                                    <div className="p-6 rounded-lg border-2 border-dashed border-blue-100 bg-blue-50/30">
+                                                        <div className="flex items-center gap-2 mb-4 text-blue-600">
+                                                            <File className="h-5 w-5" />
+                                                            <span className="font-semibold uppercase text-xs tracking-wider">Anexo PDF</span>
+                                                        </div>
+                                                        <Input
+                                                            className="bg-transparent border-none shadow-none px-0 text-lg font-medium focus-visible:ring-0 mb-4"
+                                                            placeholder="Título do Documento"
+                                                            value={block.data.title}
+                                                            onChange={(e) => updateBlock(block.id, { title: e.target.value })}
+                                                        />
+
+                                                        {!block.data.fileUrl ? (
+                                                            <div className="text-center py-8">
+                                                                <Button variant="outline" className="bg-white" onClick={() => document.getElementById(`pdf-input-${block.id}`)?.click()}>
+                                                                    Selecionar PDF
+                                                                </Button>
+                                                                <input type="file" id={`pdf-input-${block.id}`} className="hidden" accept="application/pdf" onChange={async (e) => {
+                                                                    const file = e.target.files?.[0];
+                                                                    if (!file) return;
+                                                                    setLoading(true);
+                                                                    // Fix for storage bucket
+                                                                    const { data, error } = await supabase.storage.from('project-files').upload(`reports/attachments/${crypto.randomUUID()}.pdf`, file);
+                                                                    if (!error) {
+                                                                        const { data: pub } = supabase.storage.from('project-files').getPublicUrl(data.path);
+                                                                        updateBlock(block.id, { fileUrl: pub.publicUrl, fileName: file.name });
+                                                                        toast({ title: "PDF Salvo" });
+                                                                    } else {
+                                                                        // Fallback to project-images if files fails? No, keep consistensy.
+                                                                        toast({ variant: "destructive", title: "Erro", description: error.message });
+                                                                    }
+                                                                    setLoading(false);
+                                                                }} />
+                                                            </div>
+                                                        ) : (
+                                                            <div className="flex items-center justify-between bg-white p-3 rounded border">
+                                                                <span className="text-sm truncate flex-1">{block.data.fileName}</span>
+                                                                <Button variant="ghost" size="icon" onClick={() => updateBlock(block.id, { fileUrl: "", fileName: "" })}>
+                                                                    <X className="h-4 w-4" />
+                                                                </Button>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                )}
+
+                                                {/* Page Break */}
+                                                {block.type === 'page_break' && (
+                                                    <div className="relative py-4 group">
+                                                        <div className="absolute inset-x-0 top-1/2 border-t-2 border-dashed border-zinc-200"></div>
+                                                        <div className="relative flex justify-center">
+                                                            <span className="bg-white px-2 text-xs text-zinc-400 uppercase tracking-widest font-medium flex items-center gap-2">
+                                                                <Scissors className="h-3 w-3" /> Quebra de Página
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                )}
+
+                                                {/* Compliance Table Block UI - Simplified */}
+                                                {block.type === 'compliance_table' && (
+                                                    <div className="space-y-4">
+                                                        <Input
+                                                            className="text-lg font-semibold border-none shadow-none px-0 focus-visible:ring-0"
+                                                            placeholder="Título da Tabela"
+                                                            value={block.data.title}
+                                                            onChange={(e) => updateBlock(block.id, { title: e.target.value })}
+                                                        />
+                                                        <div className="border rounded-lg overflow-hidden grid">
+                                                            {block.data.items?.map((item: any, idx: number) => (
+                                                                <div key={idx} className="grid grid-cols-12 gap-2 p-3 border-b last:border-0 items-start bg-white hover:bg-zinc-50/50">
+                                                                    <div className="col-span-1 font-mono text-sm pt-2">{item.itemNumber}</div>
+                                                                    <div className="col-span-11 space-y-2">
+                                                                        <Textarea className="min-h-[20px] h-auto resize-none border-none shadow-none p-0 text-sm focus-visible:ring-0"
+                                                                            value={item.description}
+                                                                            onChange={(e) => {
+                                                                                const newItems = [...block.data.items];
+                                                                                newItems[idx].description = e.target.value;
+                                                                                updateBlock(block.id, { items: newItems });
+                                                                            }}
+                                                                        />
+                                                                        <div className="flex gap-2">
+                                                                            {['Atende', 'Não Atende', 'Parcial', 'N/A'].map(status => (
+                                                                                <button
+                                                                                    key={status}
+                                                                                    onClick={() => {
+                                                                                        const newItems = [...block.data.items];
+                                                                                        // Map shorthand to full status
+                                                                                        const map: any = { 'Parcial': 'Atende em Partes', 'N/A': 'Não se aplica' };
+                                                                                        newItems[idx].status = map[status] || status;
+                                                                                        updateBlock(block.id, { items: newItems });
+                                                                                    }}
+                                                                                    className={`text-[10px] px-2 py-1 rounded-full border ${item.status === (status === 'Parcial' ? 'Atende em Partes' : status === 'N/A' ? 'Não se aplica' : status) ? 'bg-zinc-800 text-white border-zinc-800' : 'bg-white text-zinc-500 hover:border-zinc-400'}`}
+                                                                                >
+                                                                                    {status}
+                                                                                </button>
+                                                                            ))}
+                                                                        </div>
                                                                     </div>
                                                                 </div>
-                                                            </div>
-                                                        ))}
-                                                    </div>
-
-                                                    <div className="flex items-center gap-4">
-                                                        <Button
-                                                            variant="outline"
-                                                            size="sm"
-                                                            className="w-full"
-                                                            onClick={() => triggerImageUpload(block.id)}
-                                                        >
-                                                            <ImageIcon className="mr-2 h-4 w-4" />
-                                                            Adicionar Imagem
-                                                        </Button>
-                                                    </div>
-                                                </div>
-                                            </CardContent>
-                                        )}
-
-                                        {/* Compliance Table Block UI */}
-                                        {block.type === 'compliance_table' && (
-                                            <CardContent className="pt-6 space-y-4">
-                                                <div className="flex items-center gap-2 mb-2">
-                                                    <GripVertical className="text-muted-foreground h-4 w-4" />
-                                                    <span className="font-semibold text-sm uppercase text-muted-foreground">Tabela de Conformidade</span>
-                                                </div>
-                                                <Input
-                                                    className="text-base"
-                                                    placeholder="Título da Tabela"
-                                                    value={block.data.title}
-                                                    onChange={(e) => updateBlock(block.id, { title: e.target.value })}
-                                                />
-                                                <div className="border rounded-md overflow-hidden">
-                                                    <div className="grid grid-cols-12 gap-2 bg-muted p-2 text-xs font-semibold text-center">
-                                                        <div className="col-span-1">Item</div>
-                                                        <div className="col-span-6">Descrição</div>
-                                                        <div className="col-span-2">Classificação</div>
-                                                        <div className="col-span-2">Status</div>
-                                                        <div className="col-span-1"></div>
-                                                    </div>
-
-                                                    <div className="max-h-[300px] overflow-y-auto">
-                                                        {block.data.items?.map((item: any, idx: number) => (
-                                                            <div key={idx} className="grid grid-cols-12 gap-2 p-2 border-b items-center text-sm">
-                                                                <div className="col-span-1">
-                                                                    <Input
-                                                                        className="h-8 p-1 text-sm"
-                                                                        value={item.itemNumber}
-                                                                        onChange={(e) => {
-                                                                            const newItems = [...block.data.items];
-                                                                            newItems[idx].itemNumber = e.target.value;
-                                                                            updateBlock(block.id, { items: newItems });
-                                                                        }}
-                                                                    />
-                                                                </div>
-                                                                <div className="col-span-6">
-                                                                    <Textarea
-                                                                        className="h-10 min-h-[40px] p-2 text-sm"
-                                                                        value={item.description}
-                                                                        onChange={(e) => {
-                                                                            const newItems = [...block.data.items];
-                                                                            newItems[idx].description = e.target.value;
-                                                                            updateBlock(block.id, { items: newItems });
-                                                                        }}
-                                                                    />
-                                                                </div>
-                                                                <div className="col-span-2">
-                                                                    <Select
-                                                                        value={item.classification}
-                                                                        onValueChange={(val) => {
-                                                                            const newItems = [...block.data.items];
-                                                                            newItems[idx].classification = val as any;
-                                                                            updateBlock(block.id, { items: newItems });
-                                                                        }}
-                                                                    >
-                                                                        <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
-                                                                        <SelectContent>
-                                                                            <SelectItem value="Obrigatório">Obrigatório</SelectItem>
-                                                                            <SelectItem value="Recomendado">Recomendado</SelectItem>
-                                                                        </SelectContent>
-                                                                    </Select>
-                                                                </div>
-                                                                <div className="col-span-2">
-                                                                    <Select
-                                                                        value={item.status}
-                                                                        onValueChange={(val) => {
-                                                                            const newItems = [...block.data.items];
-                                                                            newItems[idx].status = val as any;
-                                                                            updateBlock(block.id, { items: newItems });
-                                                                        }}
-                                                                    >
-                                                                        <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
-                                                                        <SelectContent>
-                                                                            <SelectItem value="Atende">Atende</SelectItem>
-                                                                            <SelectItem value="Não Atende">Não Atende</SelectItem>
-                                                                            <SelectItem value="Atende em Partes">Parcial</SelectItem>
-                                                                            <SelectItem value="Crítico">Crítico</SelectItem>
-                                                                            <SelectItem value="Não se aplica">N/A</SelectItem>
-                                                                            <SelectItem value="Não Verificado">Não Verificado</SelectItem>
-                                                                        </SelectContent>
-                                                                    </Select>
-                                                                </div>
-                                                                <div className="col-span-1 flex justify-center">
-                                                                    <Button
-                                                                        variant="ghost"
-                                                                        size="icon"
-                                                                        className="h-6 w-6 text-red-500 hover:text-red-700 hover:bg-red-50"
-                                                                        onClick={() => {
-                                                                            const newItems = block.data.items.filter((_: any, i: number) => i !== idx);
-                                                                            updateBlock(block.id, { items: newItems });
-                                                                        }}
-                                                                    >
-                                                                        <X className="h-4 w-4" />
-                                                                    </Button>
-                                                                </div>
-                                                            </div>
-                                                        ))}
-                                                    </div>
-                                                </div>
-
-                                                <Button
-                                                    variant="outline"
-                                                    size="sm"
-                                                    className="w-full border-dashed"
-                                                    onClick={() => {
-                                                        const newItems = [...(block.data.items || []), {
-                                                            itemNumber: (block.data.items?.length + 1).toString(),
-                                                            description: "",
-                                                            classification: "Obrigatório",
-                                                            status: "Não se aplica"
-                                                        }];
-                                                        updateBlock(block.id, { items: newItems });
-                                                    }}
-                                                >
-                                                    <Plus className="mr-2 h-4 w-4" /> Adicionar Item na Tabela
-                                                </Button>
-                                            </CardContent>
-                                        )}
-
-                                        {/* Page Break Block UI */}
-                                        {block.type === 'page_break' && (
-                                            <CardContent className="pt-6">
-                                                <div className="flex items-center justify-center gap-2 p-4 border-2 border-dashed border-zinc-300 rounded bg-zinc-50">
-                                                    <Scissors className="h-4 w-4 text-muted-foreground" />
-                                                    <span className="font-semibold text-sm text-muted-foreground">Quebra de Página no PDF</span>
-                                                </div>
-                                            </CardContent>
-                                        )}
-
-                                        {/* PDF Attachment UI */}
-                                        {block.type === 'pdf_attachment' && (
-                                            <CardContent className="pt-6">
-                                                <div className="flex items-center gap-2 mb-4">
-                                                    <File className="text-muted-foreground h-4 w-4" />
-                                                    <span className="font-semibold text-sm uppercase text-muted-foreground">Anexo PDF</span>
-                                                </div>
-
-                                                <div className="space-y-4">
-                                                    <Input
-                                                        className="text-base"
-                                                        placeholder="Título do Anexo"
-                                                        value={block.data.title}
-                                                        onChange={(e) => updateBlock(block.id, { title: e.target.value })}
-                                                    />
-
-                                                    {!block.data.fileUrl ? (
-                                                        <div className="flex items-center justify-center p-6 border-2 border-dashed rounded-md bg-muted/5">
-                                                            <div className="text-center space-y-2">
-                                                                <File className="h-8 w-8 text-muted-foreground mx-auto" />
-                                                                <div className="text-sm text-muted-foreground">
-                                                                    Clique para adicionar um PDF
-                                                                </div>
-                                                                <Button
-                                                                    variant="outline"
-                                                                    size="sm"
-                                                                    onClick={() => {
-                                                                        // We can reuse the image upload hidden input if we change accept type dynamically,
-                                                                        // or create a new one. Let's create a dedicated one for PDF.
-                                                                        const pdfInput = document.getElementById(`pdf-input-${block.id}`);
-                                                                        if (pdfInput) pdfInput.click();
-                                                                    }}
-                                                                >
-                                                                    Selecionar Arquivo
-                                                                </Button>
-                                                                <input
-                                                                    type="file"
-                                                                    id={`pdf-input-${block.id}`}
-                                                                    className="hidden"
-                                                                    accept="application/pdf"
-                                                                    onChange={async (e) => {
-                                                                        const file = e.target.files?.[0];
-                                                                        if (!file) return;
-
-                                                                        setLoading(true);
-                                                                        try {
-                                                                            const fileExt = file.name.split(".").pop();
-                                                                            const fileName = `${Math.random()}.${fileExt}`;
-                                                                            const filePath = `reports/attachments/${fileName}`;
-
-                                                                            const { error } = await supabase.storage.from('project-files').upload(filePath, file);
-                                                                            if (error) throw error;
-
-                                                                            const { data: { publicUrl } } = supabase.storage.from('project-files').getPublicUrl(filePath);
-
-                                                                            updateBlock(block.id, { fileUrl: publicUrl, fileName: file.name });
-                                                                            toast({ title: "PDF anexado com sucesso!" });
-                                                                        } catch (err: any) {
-                                                                            toast({ variant: "destructive", title: "Erro no upload", description: err.message });
-                                                                        } finally {
-                                                                            setLoading(false);
-                                                                        }
-                                                                    }}
-                                                                />
-                                                            </div>
+                                                            ))}
+                                                            <Button variant="ghost" className="w-full rounded-none h-10 text-zinc-500" onClick={() => {
+                                                                const newItems = [...(block.data.items || []), { itemNumber: (block.data.items?.length + 1).toString(), description: "Nova descrição...", classification: "Obrigatório", status: "Não se aplica" }];
+                                                                updateBlock(block.id, { items: newItems });
+                                                            }}>
+                                                                <Plus className="h-4 w-4 mr-2" /> Adicionar Item
+                                                            </Button>
                                                         </div>
-                                                    ) : (
-                                                        <div className="flex items-center justify-between p-3 border rounded bg-zinc-50">
-                                                            <div className="flex items-center gap-2 overflow-hidden">
-                                                                <File className="h-5 w-5 text-red-500 flex-shrink-0" />
-                                                                <div className="truncate text-sm font-medium">
-                                                                    {block.data.fileName || "Arquivo PDF"}
-                                                                </div>
-                                                            </div>
-                                                            <div className="flex items-center gap-2">
-                                                                <a href={block.data.fileUrl} target="_blank" rel="noreferrer" className="text-xs text-blue-600 hover:underline mr-2">
-                                                                    Visualizar
-                                                                </a>
-                                                                <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => updateBlock(block.id, { fileUrl: "", fileName: "" })}>
-                                                                    <Trash2 className="h-4 w-4" />
-                                                                </Button>
-                                                            </div>
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            </CardContent>
-                                        )}
-                                    </>
+                                                    </div>
+                                                )}
+
+
+                                            </div>
+                                        </ReportBlockWrapper>
+
+                                        {/* Inserter After Block */}
+                                        <BlockInserter onAddBlock={(type) => addBlock(type, index + 1)} />
+                                    </div>
+                                ))}
+
+                                {blocks.length === 0 && (
+                                    <div className="text-center py-20 text-zinc-400">
+                                        <div className="mb-4">Seu relatório está vazio</div>
+                                        <p className="text-sm">Use o botão "+" acima para começar a adicionar conteúdo.</p>
+                                    </div>
                                 )}
-                            </Card>
-                        ))}
+                            </div>
+                        </div>
                     </div>
                 </div>
 
                 {/* PDF Preview Sidebar */}
-                <div className={`transition-all duration-300 ${showPdf ? 'w-1/2 min-w-[50%]' : 'w-0 opacity-0 overflow-hidden'} bg-zinc-900 border-l flex flex-col`}>
+                <div className={`transition-all duration-300 ${showPdf ? 'w-[45%] min-w-[400px]' : 'w-0 opacity-0 overflow-hidden'} bg-zinc-900 border-l flex flex-col`}>
                     {showPdf && activeReportData && (
                         <PDFViewer className="w-full h-full border-none">
                             <PDFTemplate data={activeReportData} />
                         </PDFViewer>
                     )}
                 </div>
+
             </div>
         </div>
     );
 };
+
+// Helper for Auto-Size Text Area (Simple implementation inline or import)
+const TextAreaAutosize = (props: any) => <Textarea {...props} />; 
