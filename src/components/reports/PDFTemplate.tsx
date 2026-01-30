@@ -315,7 +315,7 @@ export const PDFTemplate = ({ data }: { data: StructuredReportData }) => (
                             <Text style={[styles.title, { fontSize: 13, color: '#333' }]}>
                                 {block.data.title || "Observação"}
                             </Text>
-                            <Text style={styles.text}>
+                            <Text style={[styles.text, { textAlign: block.data.align || 'justify' }]}>
                                 {block.data.description}
                             </Text>
 
@@ -356,7 +356,7 @@ export const PDFTemplate = ({ data }: { data: StructuredReportData }) => (
                                     {block.data.title}
                                 </Text>
                             )}
-                            <Text style={styles.contentSection}>
+                            <Text style={[styles.contentSection, { textAlign: block.data.align || 'justify' }]}>
                                 {block.data.text}
                             </Text>
                         </View>

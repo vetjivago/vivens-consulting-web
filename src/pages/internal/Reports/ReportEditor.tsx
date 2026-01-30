@@ -12,11 +12,12 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
-import { PDFViewer } from "@react-pdf/renderer";
+import { PDFViewer, pdf } from "@react-pdf/renderer";
+import { PDFDocument } from 'pdf-lib';
 import { PDFTemplate } from "@/components/reports/PDFTemplate";
 import { useToast } from "@/components/ui/use-toast";
 import { ReportBlock, StructuredReportData } from "@/types/report";
-import { Save, ArrowLeft, Loader2, Eye, EyeOff, Star, Table, Camera, FileText, Heading1, File, GripVertical, Plus, Scissors, ArrowUp, ArrowDown, Trash2, X, Image as ImageIcon } from "lucide-react";
+import { Save, ArrowLeft, Loader2, Eye, EyeOff, Star, Table, Camera, FileText, Heading1, File, GripVertical, Plus, Scissors, ArrowUp, ArrowDown, Trash2, X, Image as ImageIcon, Download, AlignLeft, AlignCenter, AlignRight, AlignJustify } from "lucide-react";
 
 // New Components
 import { ReportBlockWrapper } from "./components/ReportBlockWrapper";
@@ -68,9 +69,9 @@ export const ReportEditor = () => {
         // Default Data
         if (type === 'executive_summary') newBlock.data = { imagesAnalyzed: 0, criticalImages: 0, evaluationDate: new Date().toLocaleDateString('pt-BR'), generalStatus: 'Crítico' };
         if (type === 'compliance_table') newBlock.data = { title: "Nova Tabela de Conformidade", items: [] };
-        if (type === 'observation') newBlock.data = { title: "Nova Observação", description: "", severity: "medium", images: [] };
+        if (type === 'observation') newBlock.data = { title: "Nova Observação", description: "", severity: "medium", images: [], align: 'justify' };
         if (type === 'section_header') newBlock.data = { title: "Título da Seção" };
-        if (type === 'text_section') newBlock.data = { title: "Nova Seção", text: "" };
+        if (type === 'text_section') newBlock.data = { title: "Nova Seção", text: "", align: 'justify' };
         if (type === 'pdf_attachment') newBlock.data = { title: "Anexo PDF", fileUrl: "", fileName: "" };
 
         if (index !== undefined) {
@@ -167,6 +168,68 @@ export const ReportEditor = () => {
         }
     };
 
+    // Download with PDF Merge
+    const downloadReport = async () => {
+        try {
+            setLoading(true);
+            toast({ title: "Gerando PDF..." });
+
+            // 1. Check if there are attachments
+            const hasAttachments = blocksRef.current.some(b => b.type === 'pdf_attachment' && b.data.fileUrl);
+
+            // 2. Generate Base PDF Blob
+            const blob = await pdf(<PDFTemplate data={activeReportData} />).toBlob();
+            const basePdfBytes = await blob.arrayBuffer();
+
+            // 3. If no attachments, download directly
+            if (!hasAttachments) {
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `${reportMeta.title || 'relatorio'}.pdf`;
+                link.click();
+                setLoading(false);
+                return;
+            }
+
+            // 4. Merge Logic
+            const mergedPdf = await PDFDocument.create();
+            const basePdfDoc = await PDFDocument.load(basePdfBytes);
+            const copiedPages = await mergedPdf.copyPages(basePdfDoc, basePdfDoc.getPageIndices());
+            copiedPages.forEach((page) => mergedPdf.addPage(page));
+
+            // 5. Append Attachments
+            for (const block of blocksRef.current) {
+                if (block.type === 'pdf_attachment' && block.data.fileUrl) {
+                    try {
+                        const attachmentBytes = await fetch(block.data.fileUrl).then(res => res.arrayBuffer());
+                        const attachmentDoc = await PDFDocument.load(attachmentBytes);
+                        const attachmentPages = await mergedPdf.copyPages(attachmentDoc, attachmentDoc.getPageIndices());
+                        attachmentPages.forEach((page) => mergedPdf.addPage(page));
+                    } catch (err) {
+                        console.error("Erro ao mesclar anexo:", err);
+                        toast({ title: "Aviso", description: `Falha ao anexar: ${block.data.fileName}` });
+                    }
+                }
+            }
+
+            // 6. Save & Download
+            const mergedPdfBytes = await mergedPdf.save();
+            const mergedBlob = new Blob([mergedPdfBytes as any], { type: 'application/pdf' });
+            const url = URL.createObjectURL(mergedBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `${reportMeta.title || 'relatorio'}_completo.pdf`;
+            link.click();
+
+        } catch (error) {
+            console.error(error);
+            toast({ variant: "destructive", title: "Erro ao gerar PDF", description: "Falha na exportação." });
+        } finally {
+            setLoading(false);
+        }
+    };
+
     // Auto-save
     useEffect(() => {
         const interval = setInterval(() => { if (id && reportMetaRef.current.title) saveReport(true); }, 3 * 60 * 1000);
@@ -238,6 +301,10 @@ export const ReportEditor = () => {
                     <span className="font-medium text-sm text-zinc-500">Editando Relatório</span>
                 </div>
                 <div className="flex items-center gap-2">
+                    <Button variant="outline" size="sm" onClick={downloadReport} disabled={loading} className="border-blue-200 text-blue-700 hover:bg-blue-50">
+                        <Download className="mr-2 h-4 w-4" /> Baixar PDF
+                    </Button>
+                    <div className="h-4 w-px bg-zinc-200 mx-2"></div>
                     <Button variant="ghost" size="sm" onClick={() => setShowPdf(!showPdf)}>
                         {showPdf ? <EyeOff className="mr-2 h-4 w-4" /> : <Eye className="mr-2 h-4 w-4" />}
                         {showPdf ? "Ocultar Preview" : "Ver Preview"}
@@ -328,13 +395,33 @@ export const ReportEditor = () => {
 
                                                 {/* Text Section */}
                                                 {block.type === 'text_section' && (
-                                                    <div className="prose max-w-none">
-                                                        <Input
-                                                            className="text-lg font-semibold border-none shadow-none px-0 focus-visible:ring-0 mb-2 placeholder:text-zinc-300"
-                                                            placeholder="Título da Seção (Opcional)"
-                                                            value={block.data.title}
-                                                            onChange={(e) => updateBlock(block.id, { title: e.target.value })}
-                                                        />
+                                                    <div className="prose max-w-none group/text">
+                                                        <div className="flex justify-between items-start mb-2">
+                                                            <Input
+                                                                className="text-lg font-semibold border-none shadow-none px-0 focus-visible:ring-0 placeholder:text-zinc-300 flex-1"
+                                                                placeholder="Título da Seção (Opcional)"
+                                                                value={block.data.title}
+                                                                onChange={(e) => updateBlock(block.id, { title: e.target.value })}
+                                                            />
+                                                            <div className="flex bg-zinc-100 rounded-md p-0.5 opacity-0 group-hover/text:opacity-100 transition-opacity">
+                                                                {[
+                                                                    { id: 'left', icon: AlignLeft },
+                                                                    { id: 'center', icon: AlignCenter },
+                                                                    { id: 'right', icon: AlignRight },
+                                                                    { id: 'justify', icon: AlignJustify }
+                                                                ].map((align) => (
+                                                                    <Button
+                                                                        key={align.id}
+                                                                        variant="ghost"
+                                                                        size="icon"
+                                                                        className={`h-6 w-6 rounded-sm ${block.data.align === align.id ? 'bg-white shadow-sm text-zinc-900' : 'text-zinc-400 hover:text-zinc-600'}`}
+                                                                        onClick={() => updateBlock(block.id, { align: align.id })}
+                                                                    >
+                                                                        <align.icon className="h-3 w-3" />
+                                                                    </Button>
+                                                                ))}
+                                                            </div>
+                                                        </div>
                                                         <Textarea
                                                             className="w-full min-h-[100px] border-none shadow-none px-0 resize-none focus-visible:ring-0 text-base leading-relaxed"
                                                             placeholder="Escreva seu texto..."
@@ -379,13 +466,33 @@ export const ReportEditor = () => {
 
                                                 {/* Observation Block */}
                                                 {block.type === 'observation' && (
-                                                    <div className="bg-zinc-50 p-6 rounded-lg border">
-                                                        <Input
-                                                            className="font-bold text-lg bg-transparent border-none shadow-none px-0 focus-visible:ring-0 mb-4"
-                                                            placeholder="Título da Observação"
-                                                            value={block.data.title}
-                                                            onChange={(e) => updateBlock(block.id, { title: e.target.value })}
-                                                        />
+                                                    <div className="bg-zinc-50 p-6 rounded-lg border group/obs">
+                                                        <div className="flex justify-between items-start mb-4">
+                                                            <Input
+                                                                className="font-bold text-lg bg-transparent border-none shadow-none px-0 focus-visible:ring-0 flex-1"
+                                                                placeholder="Título da Observação"
+                                                                value={block.data.title}
+                                                                onChange={(e) => updateBlock(block.id, { title: e.target.value })}
+                                                            />
+                                                            <div className="flex bg-white border rounded-md p-0.5 opacity-0 group-hover/obs:opacity-100 transition-opacity">
+                                                                {[
+                                                                    { id: 'left', icon: AlignLeft },
+                                                                    { id: 'center', icon: AlignCenter },
+                                                                    { id: 'right', icon: AlignRight },
+                                                                    { id: 'justify', icon: AlignJustify }
+                                                                ].map((align) => (
+                                                                    <Button
+                                                                        key={align.id}
+                                                                        variant="ghost"
+                                                                        size="icon"
+                                                                        className={`h-6 w-6 rounded-sm ${block.data.align === align.id ? 'bg-zinc-100 text-zinc-900 border' : 'text-zinc-400 hover:text-zinc-600'}`}
+                                                                        onClick={() => updateBlock(block.id, { align: align.id })}
+                                                                    >
+                                                                        <align.icon className="h-3 w-3" />
+                                                                    </Button>
+                                                                ))}
+                                                            </div>
+                                                        </div>
                                                         <Textarea
                                                             className="mb-6 bg-white border-zinc-200 resize-none min-h-[80px]"
                                                             placeholder="Descrição da observação..."
@@ -589,9 +696,14 @@ export const ReportEditor = () => {
                 {/* PDF Preview Sidebar */}
                 <div className={`transition-all duration-300 ${showPdf ? 'w-[45%] min-w-[400px]' : 'w-0 opacity-0 overflow-hidden'} bg-zinc-900 border-l flex flex-col`}>
                     {showPdf && activeReportData && (
-                        <PDFViewer className="w-full h-full border-none">
-                            <PDFTemplate data={activeReportData} />
-                        </PDFViewer>
+                        <div className="flex-1 relative">
+                            <div className="absolute top-2 right-4 z-10 bg-black/75 text-white text-[10px] px-2 py-1 rounded pointer-events-none">
+                                Preview (Sem Anexos)
+                            </div>
+                            <PDFViewer className="w-full h-full border-none" showToolbar={false}>
+                                <PDFTemplate data={activeReportData} />
+                            </PDFViewer>
+                        </div>
                     )}
                 </div>
 
