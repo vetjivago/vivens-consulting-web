@@ -178,7 +178,13 @@ export const ReportEditor = () => {
             const hasAttachments = blocksRef.current.some(b => b.type === 'pdf_attachment' && b.data.fileUrl);
 
             // 2. Generate Base PDF Blob
-            const blob = await pdf(<PDFTemplate data={activeReportData} />).toBlob();
+            // Filter out PDF attachments from the base document to avoid placeholder pages in the final merge
+            const reportDataForBase = {
+                ...activeReportData,
+                blocks: activeReportData.blocks.filter(b => b.type !== 'pdf_attachment')
+            };
+
+            const blob = await pdf(<PDFTemplate data={hasAttachments ? reportDataForBase : activeReportData} />).toBlob();
             const basePdfBytes = await blob.arrayBuffer();
 
             // 3. If no attachments, download directly
