@@ -43,6 +43,8 @@ export const ReportEditor = () => {
     const [collapsedBlocks, setCollapsedBlocks] = useState<Record<string, boolean>>({});
     const [projects, setProjects] = useState<any[]>([]);
 
+    const [dataLoaded, setDataLoaded] = useState(false);
+
     const reportMetaRef = useRef(reportMeta);
     const blocksRef = useRef(blocks);
 
@@ -134,15 +136,26 @@ export const ReportEditor = () => {
                     setBlocks(typeof data.content === 'string' ? [{ id: 'legacy', type: 'text_section', data: { text: data.content } }] : data.content || []);
                     const proj = projects.find(p => p.id === data.project_id);
                     if (proj) setReportMeta(prev => ({ ...prev, client_name: proj.client.name, project_title: proj.title }));
+                    setDataLoaded(true); // Mark as loaded
                 }
                 setLoading(false);
             };
             fetchReport();
+        } else if (!id) {
+            // Logic for a new report (no ID) -> It is "loaded" immediately as empty
+            setDataLoaded(true);
         }
     }, [id, projects]);
 
     // Save Logic
     const saveReport = async (silent = false) => {
+        if (loading) return; // Prevent double save
+        // Critical: Do not save if we are editing an existing report but data hasn't loaded yet.
+        if (id && !dataLoaded) {
+            if (!silent) console.warn("Attempted to save before data load.");
+            return;
+        }
+
         const currentMeta = reportMetaRef.current;
         if (!currentMeta.title || !currentMeta.project_id) {
             if (!silent) toast({ variant: "destructive", title: "Erro", description: "Preencha título e projeto." });
@@ -238,9 +251,14 @@ export const ReportEditor = () => {
 
     // Auto-save
     useEffect(() => {
-        const interval = setInterval(() => { if (id && reportMetaRef.current.title) saveReport(true); }, 3 * 60 * 1000);
+        const interval = setInterval(() => {
+            // Only auto-save if we have an ID (editing), a title, and DATA IS LOADED.
+            if (id && reportMetaRef.current.title && dataLoaded) {
+                saveReport(true);
+            }
+        }, 3 * 60 * 1000);
         return () => clearInterval(interval);
-    }, [id]);
+    }, [id, dataLoaded]);
 
     // Image Upload Logic
     const [activeBlockIdForUpload, setActiveBlockIdForUpload] = useState<string | null>(null);
