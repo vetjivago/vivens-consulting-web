@@ -512,7 +512,7 @@ export const ReportEditor = () => {
                                                                             }}
                                                                         />
                                                                         <div className="flex gap-2">
-                                                                            {['Atende', 'Não Atende', 'Parcial', 'N/A'].map(status => (
+                                                                            {['Atende', 'Não Atende', 'Parcial', 'N/A', 'Não Verificado'].map(status => (
                                                                                 <button
                                                                                     key={status}
                                                                                     onClick={() => {
