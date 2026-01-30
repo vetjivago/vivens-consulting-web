@@ -521,7 +521,22 @@ export const ReportEditor = () => {
                                                                                 updateBlock(block.id, { items: newItems });
                                                                             }}
                                                                         />
-                                                                        <div className="flex gap-2">
+                                                                        <div className="flex gap-2 items-center flex-wrap">
+                                                                            <Select
+                                                                                value={item.classification}
+                                                                                onValueChange={(val) => {
+                                                                                    const newItems = [...block.data.items];
+                                                                                    newItems[idx].classification = val as any;
+                                                                                    updateBlock(block.id, { items: newItems });
+                                                                                }}
+                                                                            >
+                                                                                <SelectTrigger className="h-6 w-[110px] text-[10px] border-zinc-200 bg-zinc-50"><SelectValue /></SelectTrigger>
+                                                                                <SelectContent>
+                                                                                    <SelectItem value="Obrigatório">Obrigatório</SelectItem>
+                                                                                    <SelectItem value="Recomendado">Recomendado</SelectItem>
+                                                                                </SelectContent>
+                                                                            </Select>
+                                                                            <div className="h-4 w-px bg-zinc-200 mx-1"></div>
                                                                             {['Atende', 'Não Atende', 'Parcial', 'N/A', 'Não Verificado'].map(status => (
                                                                                 <button
                                                                                     key={status}
