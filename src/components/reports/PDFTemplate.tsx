@@ -368,6 +368,22 @@ export const PDFTemplate = ({ data }: { data: StructuredReportData }) => (
                     return <View key={block.id} break />;
                 }
 
+                // 7. PDF Attachment (Placeholder Cover)
+                if (block.type === 'pdf_attachment') {
+                    return (
+                        <View key={block.id} break>
+                            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                                <Text style={[styles.title, { fontSize: 28 }]}>ANEXO</Text>
+                                <Text style={[styles.title, { fontSize: 20, marginTop: 20 }]}>{block.data.title}</Text>
+                                <Text style={[styles.text, { marginTop: 40 }]}>Arquivo: {block.data.fileName}</Text>
+                                <Text style={[styles.text, { marginTop: 10, fontStyle: 'italic', color: '#6B7280' }]}>
+                                    (Este documento contém um arquivo anexo. A visualização completa está disponível no arquivo original.)
+                                </Text>
+                            </View>
+                        </View>
+                    );
+                }
+
                 return null;
             })}
 

@@ -1,6 +1,6 @@
 
 // Basic Block Types
-export type BlockType = 'executive_summary' | 'compliance_table' | 'observation' | 'text_section' | 'images_grid' | 'section_header' | 'page_break';
+export type BlockType = 'executive_summary' | 'compliance_table' | 'observation' | 'text_section' | 'images_grid' | 'section_header' | 'page_break' | 'pdf_attachment';
 
 export interface ReportBlock {
     id: string;
@@ -59,4 +59,11 @@ export interface StructuredReportData {
 // 5. Section Header Data
 export interface SectionHeaderData {
     title: string;
+}
+
+// 6. PDF Attachment Data
+export interface PdfAttachmentData {
+    title: string;
+    fileUrl: string;
+    fileName: string;
 }
