@@ -11,6 +11,7 @@ import Toxicologia from "./pages/servicos/Toxicologia";
 import Educacao from "./pages/servicos/Educacao";
 import BemEstar from "./pages/servicos/BemEstar";
 import Veterinaria from "./pages/servicos/Veterinaria";
+import SistemasGestao from "./pages/servicos/SistemasGestao";
 import Infraestrutura from "./pages/Infraestrutura";
 import Setores from "./pages/Setores";
 import Equipe from "./pages/Equipe";
@@ -50,6 +51,7 @@ const AppContent = () => {
         <Route path="/servicos/educacao" element={<Educacao />} />
         <Route path="/servicos/bem-estar" element={<BemEstar />} />
         <Route path="/servicos/veterinaria" element={<Veterinaria />} />
+        <Route path="/servicos/sistemas-gestao" element={<SistemasGestao />} />
         {/* <Route path="/infraestrutura" element={<Infraestrutura />} /> */}
         <Route path="/setores" element={<Setores />} />
         <Route path="/equipe" element={<Equipe />} />

@@ -7,7 +7,8 @@ import {
   GraduationCap,
   Heart,
   Stethoscope,
-  ArrowRight
+  ArrowRight,
+  Layout
 } from "lucide-react";
 
 const Servicos = () => {
@@ -72,6 +73,18 @@ const Servicos = () => {
         "Programas de saúde personalizados"
       ],
       link: "/servicos/veterinaria"
+    },
+    {
+      icon: Layout,
+      title: "Sistemas de Gestão Personalizados",
+      description: "Desenvolvimento de sistemas de gestão modelados conforme a necessidade específica do seu biotério ou instituição",
+      features: [
+        "Software Biogest",
+        "Modelagem personalizada",
+        "Dashboards e indicadores",
+        "Suporte e treinamento"
+      ],
+      link: "/servicos/sistemas-gestao"
     }
   ];
 
