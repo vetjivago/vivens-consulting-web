@@ -34,7 +34,7 @@ const SistemasGestao = () => {
                                 <div className="w-12 h-12 bg-secondary/10 rounded-lg flex items-center justify-center mb-4">
                                     <Cpu className="w-6 h-6 text-secondary" />
                                 </div>
-                                <h3 className="text-xl font-semibold mb-3">Biogest</h3>
+                                <h3 className="text-xl font-semibold mb-3">BiotNEA</h3>
                                 <p className="text-muted-foreground">
                                     Nosso software carro-chefe para gestão completa de biotérios, cobrindo desde o estoque até protocolos éticos.
                                 </p>
@@ -109,7 +109,7 @@ const SistemasGestao = () => {
                 <div className="container mx-auto px-4 text-center">
                     <h2 className="text-3xl font-bold mb-6">Pronto para digitalizar sua gestão?</h2>
                     <p className="text-lg mb-8 opacity-90 max-w-2xl mx-auto">
-                        Agende uma demonstração do Biogest ou solicite um estudo para um sistema customizado.
+                        Agende uma demonstração do BiotNEA ou solicite um estudo para um sistema customizado.
                     </p>
                     <Button variant="secondary" size="xl" asChild>
                         <Link to="/contato">

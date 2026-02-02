@@ -79,7 +79,7 @@ const Servicos = () => {
       title: "Sistemas de Gestão Personalizados",
       description: "Desenvolvimento de sistemas de gestão modelados conforme a necessidade específica do seu biotério ou instituição",
       features: [
-        "Software Biogest",
+        "Software BiotNEA",
         "Modelagem personalizada",
         "Dashboards e indicadores",
         "Suporte e treinamento"
