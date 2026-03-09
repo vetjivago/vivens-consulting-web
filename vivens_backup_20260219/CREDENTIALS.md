@@ -11,9 +11,9 @@ Este arquivo deve ser preenchido com as credenciais reais antes de ser armazenad
 
 ## 2. Banco de Dados
 **Host:** `localhost`
-**Banco:** `josel054_vivens_db`
-**Usuário:** `josel054_vivens`
-**Senha:** `Lara2013!`
+**Banco:** `vivens_db`
+**Usuário:** `vivens_user`
+**Senha:** `[INSERIR_SENHA_DB_AQUI]`
 
 ## 3. WordPress (Admin)
 **URL:** `https://vivenslab.com/wp-admin`

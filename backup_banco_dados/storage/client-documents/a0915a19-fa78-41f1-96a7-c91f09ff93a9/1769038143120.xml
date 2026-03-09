@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<nfse>
+	<nf>
+		<numero_nfse>77</numero_nfse>
+		<serie_nfse>1</serie_nfse>
+		<data_nfse>25/07/2025</data_nfse>
+		<data_fato>25/07/2025</data_fato>
+		<hora_nfse>10:00:10</hora_nfse>
+		<situacao_codigo_nfse>1</situacao_codigo_nfse>
+		<situacao_descricao_nfse>Emitida</situacao_descricao_nfse>
+		<link_nfse>https://alvorada.atende.net/autoatendimento/servicos/consulta-de-autenticidade-de-nota-fiscal-eletronica-nfse/detalhar/1/identificador/8511250725100010300343142802025077394539</link_nfse>
+		<cod_verificador_autenticidade>8511250725100010300343142802025077394539</cod_verificador_autenticidade>
+		<chave_acesso_nfse_nacional>43006041234314280000124000000000007725070000000002</chave_acesso_nfse_nacional>
+		<valor_total>12.000,00</valor_total>
+		<valor_desconto>0,00</valor_desconto>
+		<valor_ir>0,00</valor_ir>
+		<valor_inss>0,00</valor_inss>
+		<valor_contribuicao_social>0,00</valor_contribuicao_social>
+		<valor_rps>0,00</valor_rps>
+		<valor_pis>0,00</valor_pis>
+		<valor_cofins>0,00</valor_cofins>
+		<observacao>0</observacao>
+	</nf>
+	<prestador>
+		<cpfcnpj>34314280000124</cpfcnpj>
+		<cidade>8511</cidade>
+	</prestador>
+	<tomador>
+		<tipo>J</tipo>
+		<cpfcnpj>83661074000104</cpfcnpj>
+		<ie></ie>
+		<sobrenome_nome_fantasia>FUNDAÇÃO EDUCACIONAL DE CRICIÚMA</sobrenome_nome_fantasia>
+		<nome_razao_social>FUNDAÇÃO EDUCACIONAL DE CRICIÚMA</nome_razao_social>
+		<numero_residencia>1105</numero_residencia>
+		<complemento>0</complemento>
+		<ponto_referencia>0</ponto_referencia>
+		<pais>Brasil</pais>
+		<siglaPais>BR</siglaPais>
+		<codigoIbgePais>1058</codigoIbgePais>
+		<estado>SC</estado>
+		<cidade>8089</cidade>
+		<logradouro> alameda avenida avenida universitária</logradouro>
+		<bairro>CENTRO</bairro>
+		<cep>88806000</cep>
+		<ddd_fone_residencial>0</ddd_fone_residencial>
+		<ddd_fone_comercial>0</ddd_fone_comercial>
+		<fone_residencial></fone_residencial>
+		<fone_comercial>0</fone_comercial>
+		<ddd_fax>0</ddd_fax>
+		<fone_fax>0</fone_fax>
+		<email>faleconosco@unesc.net</email>
+	</tomador>
+	<itens>
+		<lista>
+			<codigo_local_prestacao_servico>8511</codigo_local_prestacao_servico>
+			<codigo_item_lista_servico>201</codigo_item_lista_servico>
+			<descritivo>Consultoria em serviços de Biotério</descritivo>
+			<aliquota_item_lista_servico>2,8263</aliquota_item_lista_servico>
+			<situacao_tributaria>0</situacao_tributaria>
+			<valor_tributavel>12.000,00</valor_tributavel>
+			<valor_deducao>0,00</valor_deducao>
+			<valor_issrf>0,00</valor_issrf>
+			<tributa_municipio_prestador>S</tributa_municipio_prestador>
+			<tributa_municipio_tomador>N</tributa_municipio_tomador>
+		</lista>
+	</itens>
+</nfse>

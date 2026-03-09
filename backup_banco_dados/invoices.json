@@ -1,0 +1,26 @@
+[
+  {
+    "id": "490527b8-c4bc-4556-8e79-dd9a9d4cf1df",
+    "client_id": "532e291e-9463-4ef5-8066-f97e5970b2ec",
+    "number": "0000001",
+    "issue_date": "2025-12-04",
+    "value": 25000,
+    "status": "Pago",
+    "file_url": "https://vervrmflqvjbtxxpicmg.supabase.co/storage/v1/object/public/client-documents/532e291e-9463-4ef5-8066-f97e5970b2ec/1769037614378.pdf",
+    "file_type": "pdf",
+    "notes": "",
+    "created_at": "2026-01-21T23:20:16.355385+00:00"
+  },
+  {
+    "id": "ec05b817-07cd-49b0-8dfb-cb066d1f0201",
+    "client_id": "a0915a19-fa78-41f1-96a7-c91f09ff93a9",
+    "number": "77",
+    "issue_date": "2025-07-25",
+    "value": 12000,
+    "status": "Pago",
+    "file_url": "https://vervrmflqvjbtxxpicmg.supabase.co/storage/v1/object/public/client-documents/a0915a19-fa78-41f1-96a7-c91f09ff93a9/1769038143120.xml",
+    "file_type": "xml",
+    "notes": "",
+    "created_at": "2026-01-21T23:29:04.500811+00:00"
+  }
+]
