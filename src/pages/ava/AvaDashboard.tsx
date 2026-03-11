@@ -24,7 +24,7 @@ export const AvaDashboard = () => {
       {/* Sidebar */}
       <aside className="w-64 bg-white border-r border-slate-200 flex flex-col hidden md:flex">
         <div className="p-6">
-          <h1 className="text-2xl font-bold text-[#1E4658]">Vivens VLE</h1>
+          <h1 className="text-2xl font-bold text-[#1E4658]">Vivens AVA</h1>
         </div>
         <nav className="flex-1 px-4 space-y-2">
           <a href="#" className="flex items-center gap-3 px-4 py-3 text-[#5BB2A1] bg-[#5BB2A1]/10 rounded-lg font-medium">

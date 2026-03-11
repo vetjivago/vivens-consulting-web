@@ -5,7 +5,7 @@ export const AvaLogin = () => {
         {/* Placeholder image or abstract shape */}
         <div className="absolute inset-0 opacity-20 bg-[url('https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=2670&auto=format&fit=crop')] bg-cover bg-center blend-overlay" />
         <div className="relative z-10 text-center text-white px-12">
-          <h1 className="text-4xl font-bold mb-4">Vivens VLE</h1>
+          <h1 className="text-4xl font-bold mb-4">Vivens AVA</h1>
           <p className="text-xl">Plataforma premium de aprendizagem contínua.</p>
         </div>
       </div>
