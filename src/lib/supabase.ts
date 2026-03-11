@@ -1,7 +1,7 @@
 import { User, Session } from "@supabase/supabase-js";
 
-// VITE_API_URL deve apontar para onde a pasta /api/ está hospedada no HostGator (ex: https://labscienceacademy.com/api)
-const API_URL = import.meta.env.VITE_API_URL || 'https://labscienceacademy.com/api';
+// VITE_API_URL deve apontar para onde a pasta /api/ está hospedada no HostGator
+const API_URL = import.meta.env.VITE_API_URL || 'https://mail.vivenslab.com/api';
 
 const getHeaders = () => {
     const sessionStr = localStorage.getItem('vivens_session');
