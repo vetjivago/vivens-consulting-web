@@ -1,5 +1,6 @@
 <?php
 require_once 'config.php';
+require_once 'cors.php'; // Adiciona headers CORS
 require_once 'jwt.php';
 
 header("Content-Type: application/json; charset=UTF-8");
