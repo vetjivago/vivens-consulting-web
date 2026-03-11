@@ -38,6 +38,7 @@ import { AvaLayout } from "./pages/ava/AvaLayout";
 import { AvaLogin } from "./pages/ava/AvaLogin";
 import { AvaDashboard } from "./pages/ava/AvaDashboard";
 import { AvaCoursePlayer } from "./pages/ava/AvaCoursePlayer";
+import { AvaSettings } from "./pages/ava/AvaSettings";
 
 const queryClient = new QueryClient();
 
@@ -100,6 +101,7 @@ const AppContent = () => {
         <Route path="/ava" element={<AvaLayout />}>
           <Route path="dashboard" element={<AvaDashboard />} />
           <Route path="curso/:id" element={<AvaCoursePlayer />} />
+          <Route path="configuracoes" element={<AvaSettings />} />
         </Route>
 
         <Route path="*" element={<NotFound />} />
