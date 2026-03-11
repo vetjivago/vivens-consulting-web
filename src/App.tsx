@@ -33,6 +33,12 @@ import { Projects } from "./pages/internal/Projects";
 import { ReportList } from "./pages/internal/Reports/ReportList";
 import { ReportEditor } from "./pages/internal/Reports/ReportEditor";
 
+// AVA (VLE) Routes
+import { AvaLayout } from "./pages/ava/AvaLayout";
+import { AvaLogin } from "./pages/ava/AvaLogin";
+import { AvaDashboard } from "./pages/ava/AvaDashboard";
+import { AvaCoursePlayer } from "./pages/ava/AvaCoursePlayer";
+
 const queryClient = new QueryClient();
 
 const AppContent = () => {
@@ -88,6 +94,14 @@ const AppContent = () => {
         } />
 
         <Route path="/politicas" element={<Politicas />} />
+        
+        {/* AVA (VLE) Routes */}
+        <Route path="/ava/login" element={<AvaLogin />} />
+        <Route path="/ava" element={<AvaLayout />}>
+          <Route path="dashboard" element={<AvaDashboard />} />
+          <Route path="curso/:id" element={<AvaCoursePlayer />} />
+        </Route>
+
         <Route path="*" element={<NotFound />} />
       </Routes>
       {!isFullscreenRoute && <Footer />}

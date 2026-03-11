@@ -12,7 +12,7 @@ const getHeaders = () => {
         try {
             const session = JSON.parse(sessionStr);
             if (session.access_token) {
-                headers['Authorization'] = \`Bearer \${session.access_token}\`;
+                headers['Authorization'] = `Bearer ${session.access_token}`;
             }
         } catch (e) {}
     }
@@ -23,7 +23,7 @@ const getHeaders = () => {
 const auth = {
     async signInWithPassword({ email, password }: any) {
         try {
-            const res = await fetch(\`\${API_URL}/auth.php\`, {
+            const res = await fetch(`${API_URL}/auth.php`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, password })
@@ -100,7 +100,7 @@ class QueryBuilder {
     }
 
     eq(col: string, val: string | number) {
-        this.params.append(\`\${col}.eq\`, val.toString());
+        this.params.append(`${col}.eq`, val.toString());
         return this;
     }
 
@@ -120,7 +120,7 @@ class QueryBuilder {
 
     // Resolves the GET request automatically if awaited
     then(resolve: (value: any) => void, reject: (reason?: any) => void) {
-        const url = \`\${API_URL}/\${this.table}.php?\${this.params.toString()}\`;
+        const url = `${API_URL}/${this.table}.php?${this.params.toString()}`;
         fetch(url, { headers: getHeaders() })
             .then(res => res.json())
             .then(data => {
@@ -135,14 +135,14 @@ class QueryBuilder {
 
     async insert(data: any | any[]) {
         try {
-            const res = await fetch(\`\${API_URL}/\${this.table}.php\`, {
+            const res = await fetch(`${API_URL}/${this.table}.php`, {
                 method: 'POST',
                 headers: getHeaders(),
                 body: JSON.stringify(data)
             });
             const result = await res.json();
             if (!res.ok || result.error) throw new Error(result.error || 'Insert failed');
-            return { data: result, error: null, error: null };
+            return { data: result, error: null };
         } catch (error: any) {
             return { data: null, error };
         }
@@ -150,7 +150,7 @@ class QueryBuilder {
 
     async update(data: any) {
         try {
-            const res = await fetch(\`\${API_URL}/\${this.table}.php?\${this.params.toString()}\`, {
+            const res = await fetch(`${API_URL}/${this.table}.php?${this.params.toString()}`, {
                 method: 'PUT',
                 headers: getHeaders(),
                 body: JSON.stringify(data)
@@ -165,7 +165,7 @@ class QueryBuilder {
 
     async delete() {
         try {
-            const res = await fetch(\`\${API_URL}/\${this.table}.php?\${this.params.toString()}\`, {
+            const res = await fetch(`${API_URL}/${this.table}.php?${this.params.toString()}`, {
                 method: 'DELETE',
                 headers: getHeaders()
             });
@@ -193,7 +193,7 @@ const storage = {
                     const headers = getHeaders();
                     delete headers['Content-Type'];
 
-                    const res = await fetch(\`\${API_URL}/upload.php\`, {
+                    const res = await fetch(`${API_URL}/upload.php`, {
                         method: 'POST',
                         headers,
                         body: formData
@@ -207,7 +207,7 @@ const storage = {
             },
             getPublicUrl(path: string) {
                 return {
-                    data: { publicUrl: \`\${API_URL}/uploads/\${bucket}/\${path.replace(/^[/]+/, '')}\` }
+                    data: { publicUrl: `${API_URL}/uploads/${bucket}/${path.replace(/^[/]+/, '')}` }
                 };
             }
         };
