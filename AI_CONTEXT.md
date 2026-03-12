@@ -28,7 +28,7 @@ Este arquivo serve como um ponto de entrada para agentes de IA entenderem o cont
 - `npm run preview`: Visualiza o build localmente
 
 ## 4. Estado Atual e Histórico Recente
-- **Backup:** Um backup completo foi realizado para `/Volumes/SSD2TB/Vivens` em 21/01/2026.
+- **Backup:** Um backup completo foi realizado para `/Volumes/SSD2/Vivens` (vivens_backup_20260219.zip) em 12/03/2026.
 - **Credenciais:** Criado template `CREDENTIALS.md` para armazenar acessos seguros.
 - **Funcionalidades Recentes:**
     - Página de Parcerias criada.
