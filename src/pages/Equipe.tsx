@@ -16,6 +16,7 @@ interface TeamMember {
   role: string;
   image: string;
   bio: React.ReactNode;
+  ownership?: string;
   contact: ContactInfo;
 }
 
@@ -30,6 +31,7 @@ const Equipe = () => {
       role: "CEO - Chief Executive Officer",
       image: "/luisa-braga-2025.jpg",
       bio: "Médica Veterinária, Mestre/Doutora e Pós-Doutora, profissional sênior em Ciência de Animais de Laboratório, com atuação estratégica em ética, 3Rs e cultura de cuidado, além de sólida experiência em gestão de biotérios e de pessoas. Foi ex-Presidente da SBCAL e ex-Coordenadora do CONCEA, reunindo visão de governança, docência e prática aplicada às rotinas do biotério. Desenvolve capacitação continuada e formação por competência, apoiando universidades, indústria e CROs na adequação a acreditações e no fortalecimento de sistemas de qualidade, com foco em bem-estar animal, conformidade, padronização e sustentabilidade operacional. Participa da formação de profissionais e difusão de boas práticas.",
+      ownership: "Sócia Proprietária",
       contact: {
         email: "lgmacedo@gmail.com",
         linkedin: "https://www.linkedin.com/in/luisa-maria-gomes-de-macedo-braga-8b2b1150",
@@ -42,6 +44,7 @@ const Equipe = () => {
       role: "CSO - Diretor Científico",
       image: "/jivago-rolo.jpg",
       bio: "Médico-veterinário e cientista com mestrado e doutorado em Biologia Animal, certificado como FELASA SPECIALIST D. Atua na interface estratégica entre bem-estar animal, ética em pesquisa e desenho experimental aplicado à biomedicina, com foco em inovação e conformidade. Lidera projetos de gestão e modernização de biotérios acadêmicos e industriais, implementando rotinas rigorosas de biossegurança e infraestrutura de ponta. Sua atuação busca harmonizar a excelência científica com os mais elevados padrões de cuidado animal, promovendo eficiência operacional, redução de variáveis e robustez nos resultados. Dedica-se à consultoria especializada para o aprimoramento contínuo de instalações e processos em instituições de pesquisa.",
+      ownership: "Sócio Proprietário",
       contact: {
         email: "jivagorolo@gmail.com",
         linkedin: "https://www.linkedin.com/in/jivago-rolo",
@@ -53,6 +56,7 @@ const Equipe = () => {
       role: "COO - Diretora de Operações",
       image: "/marta-speck.jpg",
       bio: "Profissional com sólida atuação em Ciência em Animais de Laboratório, Gestão da Qualidade e Medicina Translacional, com experiência em biotérios de pesquisa e ambientes altamente regulados. Graduada em Ciências Biológicas com ênfase em Biopatologia, mestre em Ciências Farmacêuticas pela UFRGS e doutoranda em Medicina Translacional pela UFC. Atua na estruturação de sistemas de gestão da qualidade em biotérios, com foco em padronização de processos, controle genético, monitoramento sanitário, melhoria contínua e bem-estar animal, alinhados às melhores práticas nacionais e internacionais. Possui experiência na implementação de padrões internacionais, incluindo acreditação AAALAC, com atuação em auditorias, preparação de equipes e manutenção da conformidade técnica, ética e científica.",
+      ownership: "Sócia Proprietária",
       contact: {
         email: "martaspeck@gmail.com",
         linkedin: "https://www.linkedin.com/in/marta-speck-b987b9139/",
@@ -150,7 +154,10 @@ const Equipe = () => {
                     )}
                   </div>
                   <h3 className="text-xl font-bold mb-2">{member.name}</h3>
-                  <p className="text-secondary font-semibold mb-4 min-h-[3rem]">{member.role}</p>
+                  <p className="text-secondary font-semibold mb-1">{member.role}</p>
+                  {member.ownership && (
+                    <p className="text-primary text-sm font-medium mb-4">{member.ownership}</p>
+                  )}
                   <div className="text-muted-foreground text-sm text-justify mb-6">{member.bio}</div>
 
                   <div className="mt-auto pt-4 border-t w-full flex flex-wrap justify-center gap-4 text-sm text-muted-foreground">
