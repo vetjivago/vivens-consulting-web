@@ -151,7 +151,29 @@ export const ReportEditor = () => {
             };
             fetchReport();
         } else if (!id) {
-            // Logic for a new report (no ID) -> It is "loaded" immediately as empty
+            // Logic for a new report (no ID) -> Pre-populate with default RN57 Template blocks if empty
+            if (blocks.length === 0) {
+                setBlocks([
+                    {
+                        id: crypto.randomUUID(),
+                        type: 'executive_summary',
+                        data: {
+                            imagesAnalyzed: 0,
+                            criticalImages: 0,
+                            evaluationDate: new Date().toLocaleDateString('pt-BR'),
+                            generalStatus: 'Em Análise'
+                        }
+                    },
+                    {
+                        id: crypto.randomUUID(),
+                        type: 'compliance_table',
+                        data: {
+                            title: "TABELA AUXILIAR - CRITÉRIO MÍNIMOS PARA CRIAÇÃO, MANUTENÇÃO E EXPERIMENTAÇÃO DE ROEDORES E LAGOMORFOS (RN 57)",
+                            items: RN57_TEMPLATE_ITEMS.map(i => ({ ...i, id: crypto.randomUUID() }))
+                        }
+                    }
+                ]);
+            }
             setDataLoaded(true);
         }
     }, [id, projects]);
