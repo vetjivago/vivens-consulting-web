@@ -1933,6 +1933,44 @@ const getCorePayload = (table: string, item: any) => {
     return { id, created_at, ...item };
 };
 
+const enrichRelations = (table: string, item: any) => {
+    if (!item) return item;
+    const enriched = { ...item };
+
+    if (table === 'projects') {
+        if (!enriched.clients && enriched.client_id) {
+            const allClients = getLocalData('clients');
+            const foundClient = allClients.find((c: any) => c.id === enriched.client_id);
+            if (foundClient) {
+                enriched.clients = { name: foundClient.name || foundClient.fantasy_name || '' };
+            }
+        }
+    }
+
+    if (table === 'reports') {
+        if (enriched.project_id) {
+            const allProjects = getLocalData('projects');
+            const foundProject = allProjects.find((p: any) => p.id === enriched.project_id);
+            if (foundProject) {
+                let clientObj = foundProject.clients;
+                if (!clientObj && foundProject.client_id) {
+                    const allClients = getLocalData('clients');
+                    const foundClient = allClients.find((c: any) => c.id === foundProject.client_id);
+                    if (foundClient) {
+                        clientObj = { name: foundClient.name || foundClient.fantasy_name || '' };
+                    }
+                }
+                enriched.projects = {
+                    title: foundProject.title || '',
+                    clients: clientObj || { name: '' }
+                };
+            }
+        }
+    }
+
+    return enriched;
+};
+
 // Mock Query Builder
 class QueryBuilder {
     table: string;
@@ -1987,7 +2025,8 @@ class QueryBuilder {
                     const localOnly = local.filter((l: any) => !serverIds.has(l.id));
                     const merged = [...data, ...localOnly];
                     setLocalData(this.table, merged);
-                    resolve({ data: this.isSingle ? (merged[0] || null) : merged, error: null });
+                    const enrichedMerged = merged.map(item => enrichRelations(this.table, item));
+                    resolve({ data: this.isSingle ? (enrichedMerged[0] || null) : enrichedMerged, error: null });
                 }
             })
             .catch(() => {
@@ -1998,7 +2037,8 @@ class QueryBuilder {
                     const colName = k.replace('.eq', '');
                     local = local.filter((item: any) => String(item[colName]) === String(val));
                 }
-                resolve({ data: this.isSingle ? (local[0] || null) : local, error: null });
+                const enrichedLocal = local.map(item => enrichRelations(this.table, item));
+                resolve({ data: this.isSingle ? (enrichedLocal[0] || null) : enrichedLocal, error: null });
             });
     }
 
