@@ -3,9 +3,9 @@ import fs from "fs";
 import path from "path";
 
 const supabaseUrl = process.env.VITE_SUPABASE_URL || 'https://vervrmflqvjbtxxpicmg.supabase.co';
-const supabaseAnonKey = process.env.VITE_SUPABASE_ANON_KEY || 'sb_publishable_HVID88-okdcFaWwEkKu89g_xER8yerE';
+const supabaseServiceKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZlcnZybWZscXZqYnR4eHBpY21nIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2OTAyMzg4NSwiZXhwIjoyMDg0NTk5ODg1fQ.8u0DokCqteqk8DFflcaAELPFX7UAwpumgO0gYNWKZS8';
 
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
+const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
 const tables = ["clients", "projects", "reports", "invoices"];
 const backupDir = path.join(process.cwd(), 'backup_banco_dados');

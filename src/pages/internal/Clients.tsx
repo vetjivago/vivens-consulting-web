@@ -75,12 +75,14 @@ export const Clients = () => {
             .order("created_at", { ascending: false });
 
         if (error) {
+            console.error("fetchClients error:", error);
             toast({
                 variant: "destructive",
                 title: "Erro ao carregar clientes",
                 description: error.message,
             });
         } else {
+            console.log("fetchClients data:", data);
             setClients(data || []);
         }
         setLoading(false);
@@ -182,10 +184,10 @@ export const Clients = () => {
         }
     };
 
-    const filteredClients = clients.filter((client) =>
-        client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    const filteredClients = Array.isArray(clients) ? clients.filter((client) =>
+        (client.name && client.name.toLowerCase().includes(searchTerm.toLowerCase())) ||
         (client.fantasy_name && client.fantasy_name.toLowerCase().includes(searchTerm.toLowerCase()))
-    );
+    ) : [];
 
     return (
         <div className="space-y-6">

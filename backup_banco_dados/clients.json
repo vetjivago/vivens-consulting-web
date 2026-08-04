@@ -1,1 +1,40 @@
-[]
+[
+  {
+    "id": "a0915a19-fa78-41f1-96a7-c91f09ff93a9",
+    "name": "FUNDACAO EDUCACIONAL DE CRICIUMA",
+    "contact_person": "",
+    "email": "",
+    "phone": "004804312500",
+    "document": "83.661.074/0001-04",
+    "address": "UNIVERSITARIA, 1105 - UNIVERSITARIO, CRICIUMA/SC",
+    "created_at": "2026-01-21T23:16:35.725864+00:00",
+    "updated_at": "2026-01-21T23:16:35.725864+00:00",
+    "fantasy_name": "UNIVERSIDADE DO EXTREMO SUL CATARINENSE - UNESC",
+    "state_registration": "",
+    "zip_code": "88806000",
+    "neighborhood": "UNIVERSITARIO",
+    "city": "CRICIUMA",
+    "state": "SC",
+    "street": "UNIVERSITARIA",
+    "number": "1105"
+  },
+  {
+    "id": "532e291e-9463-4ef5-8066-f97e5970b2ec",
+    "name": "FUNDACAO PARA O DESENVOLVIMENTO MEDICO E HOSPITALAR",
+    "contact_person": "",
+    "email": "diretoria@famesp.org.br",
+    "phone": "1438814800",
+    "document": "46230439000101",
+    "address": "JOAO BUTIGNOLI, S/N - RUBIAO JUNIOR, BOTUCATU/SP",
+    "created_at": "2026-01-21T23:19:12.090345+00:00",
+    "updated_at": "2026-01-21T23:19:12.090345+00:00",
+    "fantasy_name": "FUNDACAO PARA O DESENVOLVIMENTO MEDICO E HOSPITALAR",
+    "state_registration": "",
+    "zip_code": "18618220",
+    "neighborhood": "RUBIAO JUNIOR",
+    "city": "BOTUCATU",
+    "state": "SP",
+    "street": "JOAO BUTIGNOLI",
+    "number": "S/N"
+  }
+]

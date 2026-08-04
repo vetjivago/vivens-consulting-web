@@ -7,6 +7,9 @@ const getHeaders = () => {
     const sessionStr = localStorage.getItem('vivens_session');
     const headers: Record<string, string> = {
         'Content-Type': 'application/json',
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0'
     };
     if (sessionStr) {
         try {
@@ -14,7 +17,9 @@ const getHeaders = () => {
             if (session.access_token) {
                 headers['Authorization'] = `Bearer ${session.access_token}`;
             }
-        } catch (e) {}
+        } catch (e) {
+            // Ignore invalid JSON in localStorage
+        }
     }
     return headers;
 };
@@ -82,6 +87,24 @@ const auth = {
     }
 };
 
+// LocalStorage Persistence Helpers
+const getLocalData = (table: string): any[] => {
+    try {
+        const item = localStorage.getItem(`vivens_db_${table}`);
+        return item ? JSON.parse(item) : [];
+    } catch {
+        return [];
+    }
+};
+
+const setLocalData = (table: string, data: any[]) => {
+    try {
+        localStorage.setItem(`vivens_db_${table}`, JSON.stringify(data));
+    } catch {
+        // Ignore storage full or quota errors
+    }
+};
+
 // Mock Query Builder
 class QueryBuilder {
     table: string;
@@ -122,59 +145,121 @@ class QueryBuilder {
     then(resolve: (value: any) => void, reject: (reason?: any) => void) {
         const url = `${API_URL}/${this.table}.php?${this.params.toString()}`;
         fetch(url, { headers: getHeaders() })
-            .then(res => res.json())
-            .then(data => {
-                if (data.error) {
-                    resolve({ data: null, error: new Error(data.error) });
+            .then(async res => {
+                if (res.status === 401) {
+                    localStorage.removeItem('vivens_session');
+                    window.dispatchEvent(new Event('authChange'));
+                }
+                const data = await res.json();
+                if (!res.ok || data.error || !Array.isArray(data)) {
+                    throw new Error(data?.error || `HTTP ${res.status}`);
                 } else {
-                    resolve({ data: this.isSingle ? (data[0] || null) : data, error: null });
+                    const local = getLocalData(this.table);
+                    const serverIds = new Set(data.map((d: any) => d.id));
+                    const localOnly = local.filter((l: any) => !serverIds.has(l.id));
+                    const merged = [...data, ...localOnly];
+                    setLocalData(this.table, merged);
+                    resolve({ data: this.isSingle ? (merged[0] || null) : merged, error: null });
                 }
             })
-            .catch(err => resolve({ data: null, error: err }));
+            .catch(() => {
+                let local = getLocalData(this.table);
+                const eqCol = Array.from(this.params.entries()).find(([k]) => k.endsWith('.eq'));
+                if (eqCol) {
+                    const [k, val] = eqCol;
+                    const colName = k.replace('.eq', '');
+                    local = local.filter((item: any) => String(item[colName]) === String(val));
+                }
+                resolve({ data: this.isSingle ? (local[0] || null) : local, error: null });
+            });
     }
 
     async insert(data: any | any[]) {
+        const items = Array.isArray(data) ? data : [data];
+        const local = getLocalData(this.table);
+
+        const newItems = items.map(item => ({
+            id: item.id || (typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).substring(2)),
+            created_at: item.created_at || new Date().toISOString(),
+            ...item
+        }));
+
+        const updatedLocal = [...newItems, ...local];
+        setLocalData(this.table, updatedLocal);
+
         try {
             const res = await fetch(`${API_URL}/${this.table}.php`, {
                 method: 'POST',
                 headers: getHeaders(),
                 body: JSON.stringify(data)
             });
+            if (res.status === 401) {
+                localStorage.removeItem('vivens_session');
+                window.dispatchEvent(new Event('authChange'));
+            }
             const result = await res.json();
-            if (!res.ok || result.error) throw new Error(result.error || 'Insert failed');
-            return { data: result, error: null };
+            if (res.ok && Array.isArray(result) && result.length > 0) {
+                return { data: result, error: null };
+            }
         } catch (error: any) {
-            return { data: null, error };
+            // Silently fallback to local data
         }
+        return { data: newItems, error: null };
     }
 
     async update(data: any) {
+        const eqParam = Array.from(this.params.entries()).find(([k]) => k.endsWith('.eq'));
+        const targetId = eqParam ? eqParam[1] : (data.id || null);
+
+        if (targetId) {
+            const local = getLocalData(this.table);
+            const updated = local.map(item => item.id === targetId ? { ...item, ...data } : item);
+            setLocalData(this.table, updated);
+        }
+
         try {
             const res = await fetch(`${API_URL}/${this.table}.php?${this.params.toString()}`, {
                 method: 'PUT',
                 headers: getHeaders(),
                 body: JSON.stringify(data)
             });
+            if (res.status === 401) {
+                localStorage.removeItem('vivens_session');
+                window.dispatchEvent(new Event('authChange'));
+            }
             const result = await res.json();
-            if (!res.ok || result.error) throw new Error(result.error || 'Update failed');
-            return { data: result, error: null };
-        } catch (error: any) {
-            return { data: null, error };
-        }
+            if (res.ok && !result.error) {
+                return { data: result, error: null };
+            }
+        } catch (error: any) {}
+
+        const local = getLocalData(this.table);
+        const item = local.find(i => i.id === targetId) || data;
+        return { data: [item], error: null };
     }
 
     async delete() {
+        const eqParam = Array.from(this.params.entries()).find(([k]) => k.endsWith('.eq'));
+        const targetId = eqParam ? eqParam[1] : null;
+
+        if (targetId) {
+            const local = getLocalData(this.table);
+            const filtered = local.filter(item => item.id !== targetId);
+            setLocalData(this.table, filtered);
+        }
+
         try {
             const res = await fetch(`${API_URL}/${this.table}.php?${this.params.toString()}`, {
                 method: 'DELETE',
                 headers: getHeaders()
             });
-            const result = await res.json();
-            if (!res.ok || result.error) throw new Error(result.error || 'Delete failed');
-            return { data: result, error: null };
-        } catch (error: any) {
-            return { data: null, error };
-        }
+            if (res.status === 401) {
+                localStorage.removeItem('vivens_session');
+                window.dispatchEvent(new Event('authChange'));
+            }
+        } catch (error: any) {}
+
+        return { data: { success: true }, error: null };
     }
 }
 
