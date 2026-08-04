@@ -105,6 +105,49 @@ const setLocalData = (table: string, data: any[]) => {
     }
 };
 
+const getCorePayload = (table: string, item: any) => {
+    const id = item.id || (typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).substring(2));
+    const created_at = item.created_at || new Date().toISOString();
+
+    if (table === 'clients') {
+        const fullAddr = item.address || `${item.street || ''}, ${item.number || ''} - ${item.neighborhood || ''}, ${item.city || ''}/${item.state || ''}`.replace(/^[\s,-/]+|[\s,-/]+$/g, '');
+        return {
+            id,
+            name: item.name || item.fantasy_name || 'Novo Cliente',
+            document: item.document || '',
+            email: item.email || '',
+            phone: item.phone || '',
+            address: fullAddr,
+            status: item.status || 'active',
+            created_at
+        };
+    }
+    if (table === 'projects') {
+        return {
+            id,
+            title: item.title || 'Novo Projeto',
+            client_id: item.client_id || null,
+            status: item.status || 'active',
+            start_date: item.start_date || null,
+            end_date: item.end_date || null,
+            description: item.description || '',
+            created_at
+        };
+    }
+    if (table === 'reports') {
+        return {
+            id,
+            title: item.title || 'Novo Relatório',
+            project_id: item.project_id || null,
+            type: item.type || 'relatorio',
+            status: item.status || 'draft',
+            content: typeof item.content === 'object' ? JSON.stringify(item.content) : (item.content || ''),
+            created_at
+        };
+    }
+    return { id, created_at, ...item };
+};
+
 // Mock Query Builder
 class QueryBuilder {
     table: string;
@@ -178,15 +221,11 @@ class QueryBuilder {
         const items = Array.isArray(data) ? data : [data];
         const local = getLocalData(this.table);
 
-        const newItems = items.map(item => ({
-            id: item.id || (typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).substring(2)),
-            created_at: item.created_at || new Date().toISOString(),
-            ...item
-        }));
-
-        const updatedLocal = [...newItems, ...local];
+        const preparedItems = items.map(item => getCorePayload(this.table, item));
+        const updatedLocal = [...preparedItems, ...local];
         setLocalData(this.table, updatedLocal);
 
+        // 1. Try sending full payload
         try {
             const res = await fetch(`${API_URL}/${this.table}.php`, {
                 method: 'POST',
@@ -202,9 +241,23 @@ class QueryBuilder {
                 return { data: result, error: null };
             }
         } catch (error: any) {
-            // Silently fallback to local data
+            // Silently retry
         }
-        return { data: newItems, error: null };
+
+        // 2. Retry with sanitized core payload matching exact MySQL table columns
+        try {
+            const res = await fetch(`${API_URL}/${this.table}.php`, {
+                method: 'POST',
+                headers: getHeaders(),
+                body: JSON.stringify(preparedItems)
+            });
+            const result = await res.json();
+            if (res.ok && Array.isArray(result) && result.length > 0) {
+                return { data: result, error: null };
+            }
+        } catch (error: any) {}
+
+        return { data: preparedItems, error: null };
     }
 
     async update(data: any) {
