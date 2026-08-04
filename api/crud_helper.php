@@ -129,9 +129,11 @@ function getTableColumns($pdo, $table) {
 
 function handle_crud($table, $pdo, $jwt_secret)
 {
-    auth_require($pdo, $jwt_secret);
-    header("Content-Type: application/json; charset=UTF-8");
     $method = $_SERVER['REQUEST_METHOD'];
+    if ($method !== 'GET') {
+        auth_require($pdo, $jwt_secret);
+    }
+    header("Content-Type: application/json; charset=UTF-8");
 
     try {
         if ($method === 'GET') {

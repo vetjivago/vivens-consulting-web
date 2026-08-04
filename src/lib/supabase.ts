@@ -87,14 +87,65 @@ const auth = {
     }
 };
 
+const INITIAL_SEEDS: Record<string, any[]> = {
+    clients: [
+        {
+            id: "a0915a19-fa78-41f1-96a7-c91f09ff93a9",
+            name: "FUNDACAO EDUCACIONAL DE CRICIUMA",
+            fantasy_name: "UNIVERSIDADE DO EXTREMO SUL CATARINENSE - UNESC",
+            email: "",
+            phone: "004804312500",
+            document: "83.661.074/0001-04",
+            address: "UNIVERSITARIA, 1105 - UNIVERSITARIO, CRICIUMA/SC",
+            created_at: "2026-01-21T23:16:35.725864+00:00"
+        },
+        {
+            id: "532e291e-9463-4ef5-8066-f97e5970b2ec",
+            name: "FUNDACAO PARA O DESENVOLVIMENTO MEDICO E HOSPITALAR",
+            fantasy_name: "FUNDACAO PARA O DESENVOLVIMENTO MEDICO E HOSPITALAR",
+            email: "diretoria@famesp.org.br",
+            phone: "1438814800",
+            document: "46230439000101",
+            address: "JOAO BUTIGNOLI, S/N - RUBIAO JUNIOR, BOTUCATU/SP",
+            created_at: "2026-01-21T23:19:12.090345+00:00"
+        }
+    ],
+    projects: [
+        {
+            id: "8ba4d040-970e-422c-9b28-d2789f529b3a",
+            client_id: "a0915a19-fa78-41f1-96a7-c91f09ff93a9",
+            title: "Consultoria 01",
+            status: "completed",
+            start_date: "2026-01-21",
+            created_at: "2026-01-21T23:21:05.774592+00:00",
+            clients: { name: "FUNDACAO EDUCACIONAL DE CRICIUMA" }
+        },
+        {
+            id: "d4f5a8e1-1f50-46d4-894e-d44fdd29463e",
+            client_id: "532e291e-9463-4ef5-8066-f97e5970b2ec",
+            title: "Consultoria 02",
+            status: "active",
+            start_date: "2026-01-21",
+            created_at: "2026-01-21T23:21:05.774592+00:00",
+            clients: { name: "FUNDACAO PARA O DESENVOLVIMENTO MEDICO E HOSPITALAR" }
+        }
+    ]
+};
+
 // LocalStorage Persistence Helpers
 const getLocalData = (table: string): any[] => {
     try {
         const item = localStorage.getItem(`vivens_db_${table}`);
-        return item ? JSON.parse(item) : [];
-    } catch {
-        return [];
+        if (item) {
+            const parsed = JSON.parse(item);
+            if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        }
+    } catch {}
+    const seed = INITIAL_SEEDS[table] || [];
+    if (seed.length > 0) {
+        setLocalData(table, seed);
     }
+    return seed;
 };
 
 const setLocalData = (table: string, data: any[]) => {
