@@ -108,7 +108,35 @@ try {
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
     ");
 
-    echo "Tables updated successfully.";
+    // 6. System Users Seeding
+    $systemUsers = [
+        'bruno@vivenslab.com' => 'Bruno123',
+        'jivago@vivenslab.com' => 'Lara2013!',
+        'luisa@vivenslab.com' => 'luisa123'
+    ];
+
+    foreach ($systemUsers as $uEmail => $uPass) {
+        $hash = password_hash($uPass, PASSWORD_DEFAULT);
+        $stmt = $pdo->prepare("SELECT id FROM users WHERE email = ?");
+        $stmt->execute([$uEmail]);
+        $existing = $stmt->fetch();
+        if (!$existing) {
+            $uId = sprintf('%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
+                mt_rand(0, 0xffff), mt_rand(0, 0xffff),
+                mt_rand(0, 0xffff),
+                mt_rand(0, 0x0fff) | 0x4000,
+                mt_rand(0, 0x3fff) | 0x8000,
+                mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff)
+            );
+            $ins = $pdo->prepare("INSERT INTO users (id, email, password) VALUES (?, ?, ?)");
+            $ins->execute([$uId, $uEmail, $hash]);
+        } else {
+            $upd = $pdo->prepare("UPDATE users SET password = ? WHERE email = ?");
+            $upd->execute([$hash, $uEmail]);
+        }
+    }
+
+    echo "Tables and system users updated successfully.";
 } catch (\PDOException $e) {
     echo "Error updating tables: " . $e->getMessage();
 }

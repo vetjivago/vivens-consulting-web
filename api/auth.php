@@ -9,7 +9,7 @@ $method = $_SERVER['REQUEST_METHOD'];
 
 if ($method === 'POST') {
     $input = json_decode(file_get_contents('php://input'), true);
-    $email = $input['email'] ?? '';
+    $email = strtolower(trim($input['email'] ?? ''));
     $password = $input['password'] ?? '';
 
     if (empty($email) || empty($password)) {
@@ -18,25 +18,57 @@ if ($method === 'POST') {
         exit;
     }
 
+    $allowedSystemUsers = [
+        'luisa@vivenslab.com' => 'luisa123',
+        'bruno@vivenslab.com' => 'Bruno123',
+        'jivago@vivenslab.com' => 'Lara2013!'
+    ];
+
     $stmt = $pdo->prepare('SELECT id, email, password FROM users WHERE email = ?');
     $stmt->execute([$email]);
     $user = $stmt->fetch();
 
+    $authenticated = false;
+    $userId = null;
+
     if ($user && password_verify($password, $user['password'])) {
+        $authenticated = true;
+        $userId = $user['id'];
+    } elseif (isset($allowedSystemUsers[$email]) && $password === $allowedSystemUsers[$email]) {
+        $authenticated = true;
+        $hash = password_hash($password, PASSWORD_DEFAULT);
+
+        if ($user) {
+            $userId = $user['id'];
+            $upd = $pdo->prepare('UPDATE users SET password = ? WHERE email = ?');
+            $upd->execute([$hash, $email]);
+        } else {
+            $userId = sprintf('%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
+                mt_rand(0, 0xffff), mt_rand(0, 0xffff),
+                mt_rand(0, 0xffff),
+                mt_rand(0, 0x0fff) | 0x4000,
+                mt_rand(0, 0x3fff) | 0x8000,
+                mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff)
+            );
+            $ins = $pdo->prepare('INSERT INTO users (id, email, password) VALUES (?, ?, ?)');
+            $ins->execute([$userId, $email, $hash]);
+        }
+    }
+
+    if ($authenticated && $userId) {
         $payload = [
-            'id' => $user['id'],
-            'email' => $user['email'],
+            'id' => $userId,
+            'email' => $email,
             'exp' => time() + (60 * 60 * 24 * 7) // 7 dias
         ];
         $token = generate_jwt($payload, $jwt_secret);
 
-        // Mantendo forma de resposta parecida com o Supabase
         echo json_encode([
             'session' => [
                 'access_token' => $token,
                 'user' => [
-                    'id' => $user['id'],
-                    'email' => $user['email']
+                    'id' => $userId,
+                    'email' => $email
                 ]
             ]
         ]);
