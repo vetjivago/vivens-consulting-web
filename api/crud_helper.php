@@ -178,6 +178,14 @@ function handle_crud($table, $pdo, $jwt_secret)
             
             $result = [];
             foreach ($rows as $row) {
+                foreach ($row as $k => $v) {
+                    if (is_string($v) && strlen($v) > 1 && ($v[0] === '[' || $v[0] === '{')) {
+                        $decoded = json_decode($v, true);
+                        if (json_last_error() === JSON_ERROR_NONE) {
+                            $row[$k] = $decoded;
+                        }
+                    }
+                }
                 $result[] = fetchRelations($pdo, $row, $parsedSelect, $table);
             }
             
@@ -200,10 +208,19 @@ function handle_crud($table, $pdo, $jwt_secret)
                 $filteredInput = [];
                 foreach ($input as $k => $v) {
                     if (in_array($k, $validCols)) {
+                        if (is_array($v) || is_object($v)) {
+                            $v = json_encode($v, JSON_UNESCAPED_UNICODE);
+                        }
                         $filteredInput[$k] = $v;
                     }
                 }
                 $input = $filteredInput;
+            } else {
+                foreach ($input as $k => $v) {
+                    if (is_array($v) || is_object($v)) {
+                        $input[$k] = json_encode($v, JSON_UNESCAPED_UNICODE);
+                    }
+                }
             }
 
             $columns = array_keys($input);
@@ -216,6 +233,16 @@ function handle_crud($table, $pdo, $jwt_secret)
             $stmt = $pdo->prepare("SELECT * FROM `$table` WHERE id = ?");
             $stmt->execute([$input['id']]);
             $inserted = $stmt->fetch(\PDO::FETCH_ASSOC);
+            if ($inserted) {
+                foreach ($inserted as $k => $v) {
+                    if (is_string($v) && strlen($v) > 1 && ($v[0] === '[' || $v[0] === '{')) {
+                        $decoded = json_decode($v, true);
+                        if (json_last_error() === JSON_ERROR_NONE) {
+                            $inserted[$k] = $decoded;
+                        }
+                    }
+                }
+            }
             echo json_encode([$inserted]);
 
         } elseif ($method === 'PUT' || $method === 'PATCH') {
@@ -235,10 +262,19 @@ function handle_crud($table, $pdo, $jwt_secret)
                 $filteredInput = [];
                 foreach ($input as $k => $v) {
                     if (in_array($k, $validCols)) {
+                        if (is_array($v) || is_object($v)) {
+                            $v = json_encode($v, JSON_UNESCAPED_UNICODE);
+                        }
                         $filteredInput[$k] = $v;
                     }
                 }
                 $input = $filteredInput;
+            } else {
+                foreach ($input as $k => $v) {
+                    if (is_array($v) || is_object($v)) {
+                        $input[$k] = json_encode($v, JSON_UNESCAPED_UNICODE);
+                    }
+                }
             }
 
             $setClause = [];
