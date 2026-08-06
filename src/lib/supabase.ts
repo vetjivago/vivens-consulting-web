@@ -2040,11 +2040,15 @@ class QueryBuilder {
     table: string;
     params: URLSearchParams;
     isSingle: boolean;
+    updateData: any | null;
+    isDelete: boolean;
 
     constructor(table: string) {
         this.table = table;
         this.params = new URLSearchParams();
         this.isSingle = false;
+        this.updateData = null;
+        this.isDelete = false;
     }
 
     select(cols: string = '*') {
@@ -2071,35 +2075,100 @@ class QueryBuilder {
         return this;
     }
 
-    // Resolves the GET request automatically if awaited
+    update(data: any) {
+        this.updateData = data;
+        return this;
+    }
+
+    delete() {
+        this.isDelete = true;
+        return this;
+    }
+
+    // Resolves automatically if awaited
     then(resolve: (value: any) => void, reject: (reason?: any) => void) {
+        if (this.updateData) {
+            this.handleUpdate().then(resolve).catch(reject);
+        } else if (this.isDelete) {
+            this.handleDelete().then(resolve).catch(reject);
+        } else {
+            this.handleSelect().then(resolve).catch(reject);
+        }
+    }
+
+    async handleSelect() {
         const url = `${API_URL}/${this.table}.php?${this.params.toString()}`;
-        fetch(url, { headers: getHeaders() })
-            .then(async res => {
-                const data = await res.json();
-                if (!res.ok || data.error || !Array.isArray(data)) {
-                    throw new Error(data?.error || `HTTP ${res.status}`);
-                } else {
-                    const local = getLocalData(this.table);
-                    const serverIds = new Set(data.map((d: any) => d.id));
-                    const localOnly = local.filter((l: any) => !serverIds.has(l.id));
-                    const merged = [...data, ...localOnly];
-                    setLocalData(this.table, merged);
-                    const enrichedMerged = merged.map(item => enrichRelations(this.table, item));
-                    resolve({ data: this.isSingle ? (enrichedMerged[0] || null) : enrichedMerged, error: null });
-                }
-            })
-            .catch(() => {
-                let local = getLocalData(this.table);
-                const eqCol = Array.from(this.params.entries()).find(([k]) => k.endsWith('.eq'));
-                if (eqCol) {
-                    const [k, val] = eqCol;
-                    const colName = k.replace('.eq', '');
-                    local = local.filter((item: any) => String(item[colName]) === String(val));
-                }
-                const enrichedLocal = local.map(item => enrichRelations(this.table, item));
-                resolve({ data: this.isSingle ? (enrichedLocal[0] || null) : enrichedLocal, error: null });
+        try {
+            const res = await fetch(url, { headers: getHeaders() });
+            const data = await res.json();
+            if (res.ok && !data.error && Array.isArray(data)) {
+                const local = getLocalData(this.table);
+                const serverIds = new Set(data.map((d: any) => d.id));
+                const localOnly = local.filter((l: any) => !serverIds.has(l.id));
+                const merged = [...data, ...localOnly];
+                setLocalData(this.table, merged);
+                const enrichedMerged = merged.map(item => enrichRelations(this.table, item));
+                return { data: this.isSingle ? (enrichedMerged[0] || null) : enrichedMerged, error: null };
+            }
+        } catch (e) {}
+
+        let local = getLocalData(this.table);
+        const eqCol = Array.from(this.params.entries()).find(([k]) => k.endsWith('.eq'));
+        if (eqCol) {
+            const [k, val] = eqCol;
+            const colName = k.replace('.eq', '');
+            local = local.filter((item: any) => String(item[colName]) === String(val));
+        }
+        const enrichedLocal = local.map(item => enrichRelations(this.table, item));
+        return { data: this.isSingle ? (enrichedLocal[0] || null) : enrichedLocal, error: null };
+    }
+
+    async handleUpdate() {
+        const data = this.updateData;
+        const eqParam = Array.from(this.params.entries()).find(([k]) => k.endsWith('.eq'));
+        const targetId = eqParam ? eqParam[1] : (data?.id || null);
+
+        if (targetId) {
+            const local = getLocalData(this.table);
+            const updated = local.map(item => item.id === targetId ? { ...item, ...data } : item);
+            setLocalData(this.table, updated);
+        }
+
+        try {
+            const res = await fetch(`${API_URL}/${this.table}.php?${this.params.toString()}`, {
+                method: 'PUT',
+                headers: getHeaders(),
+                body: JSON.stringify(data)
             });
+            const result = await res.json();
+            if (res.ok && !result.error) {
+                return { data: result, error: null };
+            }
+        } catch (error: any) {}
+
+        const local = getLocalData(this.table);
+        const item = local.find(i => i.id === targetId) || data;
+        return { data: [item], error: null };
+    }
+
+    async handleDelete() {
+        const eqParam = Array.from(this.params.entries()).find(([k]) => k.endsWith('.eq'));
+        const targetId = eqParam ? eqParam[1] : null;
+
+        if (targetId) {
+            const local = getLocalData(this.table);
+            const filtered = local.filter(item => item.id !== targetId);
+            setLocalData(this.table, filtered);
+        }
+
+        try {
+            const res = await fetch(`${API_URL}/${this.table}.php?${this.params.toString()}`, {
+                method: 'DELETE',
+                headers: getHeaders()
+            });
+        } catch (error: any) {}
+
+        return { data: { success: true }, error: null };
     }
 
     async insert(data: any | any[]) {
@@ -2139,53 +2208,6 @@ class QueryBuilder {
         } catch (error: any) {}
 
         return { data: preparedItems, error: null };
-    }
-
-    async update(data: any) {
-        const eqParam = Array.from(this.params.entries()).find(([k]) => k.endsWith('.eq'));
-        const targetId = eqParam ? eqParam[1] : (data.id || null);
-
-        if (targetId) {
-            const local = getLocalData(this.table);
-            const updated = local.map(item => item.id === targetId ? { ...item, ...data } : item);
-            setLocalData(this.table, updated);
-        }
-
-        try {
-            const res = await fetch(`${API_URL}/${this.table}.php?${this.params.toString()}`, {
-                method: 'PUT',
-                headers: getHeaders(),
-                body: JSON.stringify(data)
-            });
-            const result = await res.json();
-            if (res.ok && !result.error) {
-                return { data: result, error: null };
-            }
-        } catch (error: any) {}
-
-        const local = getLocalData(this.table);
-        const item = local.find(i => i.id === targetId) || data;
-        return { data: [item], error: null };
-    }
-
-    async delete() {
-        const eqParam = Array.from(this.params.entries()).find(([k]) => k.endsWith('.eq'));
-        const targetId = eqParam ? eqParam[1] : null;
-
-        if (targetId) {
-            const local = getLocalData(this.table);
-            const filtered = local.filter(item => item.id !== targetId);
-            setLocalData(this.table, filtered);
-        }
-
-        try {
-            const res = await fetch(`${API_URL}/${this.table}.php?${this.params.toString()}`, {
-                method: 'DELETE',
-                headers: getHeaders()
-            });
-        } catch (error: any) {}
-
-        return { data: { success: true }, error: null };
     }
 }
 
