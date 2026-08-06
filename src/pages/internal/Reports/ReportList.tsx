@@ -10,7 +10,7 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
-import { Plus, Search, FileText } from "lucide-react";
+import { Plus, Search, FileText, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
@@ -60,6 +60,22 @@ export const ReportList = () => {
             setReports(data || []);
         }
         setLoading(false);
+    };
+
+    const handleDeleteReport = async (id: string, title: string) => {
+        if (!confirm(`Tem certeza que deseja excluir o relatório "${title}"?`)) return;
+
+        const { error } = await supabase.from("reports").delete().eq("id", id);
+        if (error) {
+            toast({
+                variant: "destructive",
+                title: "Erro ao excluir",
+                description: error.message,
+            });
+        } else {
+            toast({ title: "Relatório excluído com sucesso!" });
+            setReports(prev => prev.filter(r => r.id !== id));
+        }
     };
 
     useEffect(() => {
@@ -142,9 +158,20 @@ export const ReportList = () => {
                                     <TableCell>{getStatusBadge(report.status)}</TableCell>
                                     <TableCell>{new Date(report.created_at).toLocaleDateString('pt-BR')}</TableCell>
                                     <TableCell className="text-right">
-                                        <Link to={`/internal/reports/${report.id}`}>
-                                            <Button variant="ghost" size="sm">Editar</Button>
-                                        </Link>
+                                        <div className="flex items-center justify-end gap-1">
+                                            <Link to={`/internal/reports/${report.id}`}>
+                                                <Button variant="ghost" size="sm">Editar</Button>
+                                            </Link>
+                                            <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                                                onClick={() => handleDeleteReport(report.id, report.title)}
+                                                title="Excluir Relatório"
+                                            >
+                                                <Trash2 className="w-4 h-4" />
+                                            </Button>
+                                        </div>
                                     </TableCell>
                                 </TableRow>
                             ))

@@ -2097,20 +2097,23 @@ class QueryBuilder {
     }
 
     async handleSelect() {
-        const url = `${API_URL}/${this.table}.php?${this.params.toString()}`;
-        try {
-            const res = await fetch(url, { headers: getHeaders() });
-            const data = await res.json();
-            if (res.ok && !data.error && Array.isArray(data)) {
-                const local = getLocalData(this.table);
-                const serverIds = new Set(data.map((d: any) => d.id));
-                const localOnly = local.filter((l: any) => !serverIds.has(l.id));
-                const merged = [...data, ...localOnly];
-                setLocalData(this.table, merged);
-                const enrichedMerged = merged.map(item => enrichRelations(this.table, item));
-                return { data: this.isSingle ? (enrichedMerged[0] || null) : enrichedMerged, error: null };
-            }
-        } catch (e) {}
+        const headers = getHeaders();
+        if (headers.Authorization) {
+            const url = `${API_URL}/${this.table}.php?${this.params.toString()}`;
+            try {
+                const res = await fetch(url, { headers });
+                const data = await res.json();
+                if (res.ok && !data.error && Array.isArray(data)) {
+                    const local = getLocalData(this.table);
+                    const serverIds = new Set(data.map((d: any) => d.id));
+                    const localOnly = local.filter((l: any) => !serverIds.has(l.id));
+                    const merged = [...data, ...localOnly];
+                    setLocalData(this.table, merged);
+                    const enrichedMerged = merged.map(item => enrichRelations(this.table, item));
+                    return { data: this.isSingle ? (enrichedMerged[0] || null) : enrichedMerged, error: null };
+                }
+            } catch (e) {}
+        }
 
         let local = getLocalData(this.table);
         const eqCol = Array.from(this.params.entries()).find(([k]) => k.endsWith('.eq'));
@@ -2134,17 +2137,20 @@ class QueryBuilder {
             setLocalData(this.table, updated);
         }
 
-        try {
-            const res = await fetch(`${API_URL}/${this.table}.php?${this.params.toString()}`, {
-                method: 'PUT',
-                headers: getHeaders(),
-                body: JSON.stringify(data)
-            });
-            const result = await res.json();
-            if (res.ok && !result.error) {
-                return { data: result, error: null };
-            }
-        } catch (error: any) {}
+        const headers = getHeaders();
+        if (headers.Authorization) {
+            try {
+                const res = await fetch(`${API_URL}/${this.table}.php?${this.params.toString()}`, {
+                    method: 'PUT',
+                    headers,
+                    body: JSON.stringify(data)
+                });
+                const result = await res.json();
+                if (res.ok && !result.error) {
+                    return { data: result, error: null };
+                }
+            } catch (error: any) {}
+        }
 
         const local = getLocalData(this.table);
         const item = local.find(i => i.id === targetId) || data;
@@ -2161,12 +2167,15 @@ class QueryBuilder {
             setLocalData(this.table, filtered);
         }
 
-        try {
-            const res = await fetch(`${API_URL}/${this.table}.php?${this.params.toString()}`, {
-                method: 'DELETE',
-                headers: getHeaders()
-            });
-        } catch (error: any) {}
+        const headers = getHeaders();
+        if (headers.Authorization) {
+            try {
+                const res = await fetch(`${API_URL}/${this.table}.php?${this.params.toString()}`, {
+                    method: 'DELETE',
+                    headers
+                });
+            } catch (error: any) {}
+        }
 
         return { data: { success: true }, error: null };
     }

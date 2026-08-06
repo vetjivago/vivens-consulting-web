@@ -364,6 +364,20 @@ export const ReportEditor = () => {
         return <FileText className="h-4 w-4" />;
     };
 
+    const handleDeleteThisReport = async () => {
+        if (!id) return;
+        if (!confirm("Tem certeza que deseja excluir este relatório permanentemente?")) return;
+        setLoading(true);
+        const { error } = await supabase.from('reports').delete().eq('id', id);
+        if (!error) {
+            toast({ title: "Relatório excluído com sucesso!" });
+            navigate("/internal/reports");
+        } else {
+            toast({ variant: "destructive", title: "Erro ao excluir", description: error.message || "Tente novamente." });
+            setLoading(false);
+        }
+    };
+
     return (
         <div className="h-screen w-full flex flex-col bg-zinc-100 overflow-hidden text-zinc-900">
             {/* Hidden Input */}
@@ -378,6 +392,11 @@ export const ReportEditor = () => {
                     <span className="font-medium text-sm text-zinc-500">Editando Relatório</span>
                 </div>
                 <div className="flex items-center gap-2">
+                    {id && (
+                        <Button variant="ghost" size="sm" onClick={handleDeleteThisReport} disabled={loading} className="text-red-500 hover:text-red-700 hover:bg-red-50">
+                            <Trash2 className="mr-2 h-4 w-4" /> Excluir
+                        </Button>
+                    )}
                     <Button variant="outline" size="sm" onClick={downloadReport} disabled={loading} className="border-blue-200 text-blue-700 hover:bg-blue-50">
                         <Download className="mr-2 h-4 w-4" /> Baixar PDF
                     </Button>
