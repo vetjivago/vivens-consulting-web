@@ -42,7 +42,8 @@ const auth = {
 
         const allowedUsers: Record<string, string> = {
             'bruno@vivenslab.com': 'Bruno123',
-            'jivago@vivenslab.com': 'Lara2013!'
+            'jivago@vivenslab.com': 'Lara2013!',
+            'luisa@vivenslab.com': 'luisa123'
         };
 
         const cleanEmail = (email || '').toLowerCase().trim();

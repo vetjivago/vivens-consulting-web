@@ -6,7 +6,8 @@ header("Content-Type: application/json; charset=UTF-8");
 
 $users = [
     ['email' => 'bruno@vivenslab.com', 'password' => 'Bruno123'],
-    ['email' => 'jivago@vivenslab.com', 'password' => 'Lara2013!']
+    ['email' => 'jivago@vivenslab.com', 'password' => 'Lara2013!'],
+    ['email' => 'luisa@vivenslab.com', 'password' => 'luisa123']
 ];
 
 try {
