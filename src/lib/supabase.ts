@@ -11,7 +11,7 @@ const getHeaders = () => {
     if (sessionStr) {
         try {
             const session = JSON.parse(sessionStr);
-            if (session.access_token) {
+            if (session.access_token && session.access_token.includes('.')) {
                 headers['Authorization'] = `Bearer ${session.access_token}`;
             }
         } catch (e) {
@@ -24,6 +24,26 @@ const getHeaders = () => {
 // Mock Auth
 const auth = {
     async signInWithPassword({ email, password }: any) {
+        const cleanEmail = (email || '').toLowerCase().trim();
+        const allowedUsers: Record<string, string> = {
+            'bruno@vivenslab.com': 'Bruno123',
+            'jivago@vivenslab.com': 'Lara2013!',
+            'luisa@vivenslab.com': 'luisa123'
+        };
+
+        if (cleanEmail && allowedUsers[cleanEmail] === password) {
+            const mockSession = {
+                access_token: 'session_token_' + Math.random().toString(36).substring(2),
+                user: {
+                    id: 'usr_' + cleanEmail.replace(/[^a-z0-9]/g, '_'),
+                    email: cleanEmail
+                }
+            };
+            localStorage.setItem('vivens_session', JSON.stringify(mockSession));
+            window.dispatchEvent(new Event('authChange'));
+            return { data: { session: mockSession, user: mockSession.user }, error: null };
+        }
+
         try {
             const res = await fetch(`${API_URL}/auth.php`, {
                 method: 'POST',
@@ -38,26 +58,6 @@ const auth = {
             }
         } catch (error: any) {
             // Silently fallback
-        }
-
-        const allowedUsers: Record<string, string> = {
-            'bruno@vivenslab.com': 'Bruno123',
-            'jivago@vivenslab.com': 'Lara2013!',
-            'luisa@vivenslab.com': 'luisa123'
-        };
-
-        const cleanEmail = (email || '').toLowerCase().trim();
-        if (cleanEmail && (allowedUsers[cleanEmail] === password || password.length >= 4)) {
-            const mockSession = {
-                access_token: 'session_token_' + Math.random().toString(36).substring(2),
-                user: {
-                    id: 'usr_' + Math.random().toString(36).substring(2),
-                    email: cleanEmail
-                }
-            };
-            localStorage.setItem('vivens_session', JSON.stringify(mockSession));
-            window.dispatchEvent(new Event('authChange'));
-            return { data: { session: mockSession, user: mockSession.user }, error: null };
         }
 
         return { data: { session: null, user: null }, error: new Error('Credenciais de login inválidas') };
