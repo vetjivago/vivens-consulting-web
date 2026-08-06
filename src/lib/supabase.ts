@@ -126,6 +126,16 @@ const INITIAL_SEEDS: Record<string, any[]> = {
             document: "46230439000101",
             address: "JOAO BUTIGNOLI, S/N - RUBIAO JUNIOR, BOTUCATU/SP",
             created_at: "2026-01-21T23:19:12.090345+00:00"
+        },
+        {
+            id: "b10t3c-8102-4c22-990a-biotec000001",
+            name: "GRUPO BIOTEC",
+            fantasy_name: "GRUPO BIOTEC",
+            email: "contato@grupobiotec.com.br",
+            phone: "",
+            document: "",
+            address: "https://www.grupobiotec.com.br/",
+            created_at: "2026-08-06T12:00:00.000000+00:00"
         }
     ],
     projects: [

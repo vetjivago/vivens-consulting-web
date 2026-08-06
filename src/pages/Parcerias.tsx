@@ -69,6 +69,18 @@ const Parcerias = () => {
                                 </CardContent>
                             </Card>
                         </a>
+
+                        <a href="https://www.grupobiotec.com.br/" target="_blank" rel="noopener noreferrer" className="w-full cursor-pointer">
+                            <Card className="w-full h-48 hover:shadow-xl transition-all duration-300 group">
+                                <CardContent className="h-full bg-white p-6 flex items-center justify-center">
+                                    <img
+                                        src="/biotec-logo.png"
+                                        alt="Grupo Biotec"
+                                        className="max-h-full max-w-full object-contain filter group-hover:brightness-110 transition-all"
+                                    />
+                                </CardContent>
+                            </Card>
+                        </a>
                     </div>
                 </div>
             </section>

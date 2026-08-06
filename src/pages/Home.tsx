@@ -149,6 +149,9 @@ const Home = () => {
                   <div className="h-24 bg-white rounded-lg flex items-center justify-center p-4 border shadow-sm hover:shadow-md transition-all">
                     <img src="/unesc-logo.jpg" alt="UNESC" className="max-h-full max-w-full object-contain" />
                   </div>
+                  <a href="https://www.grupobiotec.com.br/" target="_blank" rel="noopener noreferrer" className="h-24 bg-white rounded-lg flex items-center justify-center p-4 border shadow-sm hover:shadow-md transition-all">
+                    <img src="/biotec-logo.png" alt="Grupo Biotec" className="max-h-full max-w-full object-contain" />
+                  </a>
                 </div>
               </div>
             </div>
