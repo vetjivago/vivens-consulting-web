@@ -134,6 +134,16 @@ const INITIAL_SEEDS: Record<string, any[]> = {
             document: "",
             address: "https://www.grupobiotec.com.br/",
             created_at: "2026-08-06T12:00:00.000000+00:00"
+        },
+        {
+            id: "ct-vacinas-client-001",
+            name: "CT VACINAS",
+            fantasy_name: "CT VACINAS",
+            email: "contato@ctvacinas.org.br",
+            phone: "",
+            document: "",
+            address: "BELO HORIZONTE/MG",
+            created_at: "2026-08-03T12:00:00.000000+00:00"
         }
     ],
     projects: [
@@ -154,6 +164,15 @@ const INITIAL_SEEDS: Record<string, any[]> = {
             start_date: "2026-01-21",
             created_at: "2026-01-21T23:21:05.774592+00:00",
             clients: { name: "FUNDACAO PARA O DESENVOLVIMENTO MEDICO E HOSPITALAR" }
+        },
+        {
+            id: "ct-vacinas-project-001",
+            client_id: "ct-vacinas-client-001",
+            title: "CT Vacinas",
+            status: "active",
+            start_date: "2026-08-03",
+            created_at: "2026-08-03T12:00:00.000000+00:00",
+            clients: { name: "CT VACINAS" }
         }
     ],
     reports: [
@@ -1888,20 +1907,39 @@ const INITIAL_SEEDS: Record<string, any[]> = {
                                 "name": "FUNDACAO PARA O DESENVOLVIMENTO MEDICO E HOSPITALAR"
                         }
                 }
+        },
+        {
+            id: "ct-vacinas-report-001",
+            project_id: "ct-vacinas-project-001",
+            title: "CT Vacinas - Planta Original",
+            type: "Consultoria",
+            status: "draft",
+            created_at: "2026-08-04T12:00:00.000Z",
+            projects: {
+                title: "CT Vacinas",
+                clients: { name: "CT VACINAS" }
+            },
+            content: []
         }
-]
+    ]
 };
 
 // LocalStorage Persistence Helpers
 const getLocalData = (table: string): any[] => {
+    const seed = INITIAL_SEEDS[table] || [];
     try {
         const item = localStorage.getItem(`vivens_db_${table}`);
         if (item) {
             const parsed = JSON.parse(item);
-            if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+            if (Array.isArray(parsed) && parsed.length > 0) {
+                const seedIds = new Set(seed.map((s: any) => s.id));
+                const customLocal = parsed.filter((p: any) => !seedIds.has(p.id));
+                const merged = [...seed, ...customLocal];
+                setLocalData(table, merged);
+                return merged;
+            }
         }
     } catch {}
-    const seed = INITIAL_SEEDS[table] || [];
     if (seed.length > 0) {
         setLocalData(table, seed);
     }
