@@ -6,10 +6,7 @@ const API_URL = import.meta.env.VITE_API_URL || 'https://mail.vivenslab.com/api'
 const getHeaders = () => {
     const sessionStr = localStorage.getItem('vivens_session');
     const headers: Record<string, string> = {
-        'Content-Type': 'application/json',
-        'Cache-Control': 'no-cache, no-store, must-revalidate',
-        'Pragma': 'no-cache',
-        'Expires': '0'
+        'Content-Type': 'application/json'
     };
     if (sessionStr) {
         try {

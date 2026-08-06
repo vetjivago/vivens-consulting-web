@@ -144,7 +144,10 @@ export const ReportEditor = () => {
                     setReportMeta({ title: data.title, type: data.type, project_id: data.project_id || "", client_name: "", project_title: "" });
                     setBlocks(typeof data.content === 'string' ? [{ id: 'legacy', type: 'text_section', data: { text: data.content } }] : data.content || []);
                     const proj = projects.find(p => p.id === data.project_id);
-                    if (proj) setReportMeta(prev => ({ ...prev, client_name: proj.client.name, project_title: proj.title }));
+                    if (proj) {
+                        const clientName = proj.client?.name || proj.clients?.name || "";
+                        setReportMeta(prev => ({ ...prev, client_name: clientName, project_title: proj.title || "" }));
+                    }
                     setDataLoaded(true); // Mark as loaded
                 }
                 setLoading(false);
