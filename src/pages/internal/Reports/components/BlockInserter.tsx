@@ -1,4 +1,3 @@
-
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -14,17 +13,19 @@ interface BlockInserterProps {
 
 export const BlockInserter = ({ onAddBlock }: BlockInserterProps) => {
     return (
-        <div className="group relative h-4 hover:h-8 flex items-center justify-center transition-all duration-200 my-2">
-            <div className="absolute inset-x-0 h-px bg-primary/20 opacity-0 group-hover:opacity-100 transition-opacity" />
+        <div className="relative h-8 flex items-center justify-center transition-all duration-200 my-3">
+            {/* Always Visible Line */}
+            <div className="absolute inset-x-0 h-px bg-primary/30" />
 
             <Popover>
                 <PopoverTrigger asChild>
                     <Button
                         size="sm"
                         variant="ghost"
-                        className="h-6 w-6 rounded-full bg-white border shadow-sm opacity-0 group-hover:opacity-100 transition-all z-10 p-0 hover:bg-primary hover:text-white"
+                        className="h-7 w-7 rounded-full bg-white border border-primary/40 text-primary shadow-md opacity-100 z-10 p-0 hover:bg-primary hover:text-white hover:scale-110 transition-all cursor-pointer"
+                        title="Adicionar Bloco"
                     >
-                        <Plus className="h-4 w-4" />
+                        <Plus className="h-4 w-4 stroke-[2.5]" />
                     </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-56 p-2" align="center">
