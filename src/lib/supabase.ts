@@ -2038,10 +2038,6 @@ class QueryBuilder {
         const url = `${API_URL}/${this.table}.php?${this.params.toString()}`;
         fetch(url, { headers: getHeaders() })
             .then(async res => {
-                if (res.status === 401) {
-                    localStorage.removeItem('vivens_session');
-                    window.dispatchEvent(new Event('authChange'));
-                }
                 const data = await res.json();
                 if (!res.ok || data.error || !Array.isArray(data)) {
                     throw new Error(data?.error || `HTTP ${res.status}`);
@@ -2083,10 +2079,6 @@ class QueryBuilder {
                 headers: getHeaders(),
                 body: JSON.stringify(data)
             });
-            if (res.status === 401) {
-                localStorage.removeItem('vivens_session');
-                window.dispatchEvent(new Event('authChange'));
-            }
             const result = await res.json();
             if (res.ok && Array.isArray(result) && result.length > 0) {
                 return { data: result, error: null };
@@ -2127,10 +2119,6 @@ class QueryBuilder {
                 headers: getHeaders(),
                 body: JSON.stringify(data)
             });
-            if (res.status === 401) {
-                localStorage.removeItem('vivens_session');
-                window.dispatchEvent(new Event('authChange'));
-            }
             const result = await res.json();
             if (res.ok && !result.error) {
                 return { data: result, error: null };
@@ -2157,10 +2145,6 @@ class QueryBuilder {
                 method: 'DELETE',
                 headers: getHeaders()
             });
-            if (res.status === 401) {
-                localStorage.removeItem('vivens_session');
-                window.dispatchEvent(new Event('authChange'));
-            }
         } catch (error: any) {}
 
         return { data: { success: true }, error: null };
