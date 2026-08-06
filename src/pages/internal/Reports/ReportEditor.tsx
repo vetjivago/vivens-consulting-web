@@ -130,10 +130,21 @@ export const ReportEditor = () => {
     useEffect(() => {
         const fetchProjects = async () => {
             const { data } = await supabase.from('projects').select('id, title, client:clients(name)');
-            setProjects(data || []);
+            const projs = data || [];
+            setProjects(projs);
+            if (!id && projs.length > 0) {
+                const p0 = projs[0];
+                const cName = p0.client?.name || p0.clients?.name || "";
+                setReportMeta(prev => ({
+                    ...prev,
+                    project_id: prev.project_id || p0.id,
+                    project_title: prev.project_title || p0.title,
+                    client_name: prev.client_name || cName
+                }));
+            }
         };
         fetchProjects();
-    }, []);
+    }, [id]);
 
     useEffect(() => {
         if (id && projects.length > 0) {
@@ -184,34 +195,42 @@ export const ReportEditor = () => {
     // Save Logic
     const saveReport = async (silent = false) => {
         if (loading) return; // Prevent double save
-        // Critical: Do not save if we are editing an existing report but data hasn't loaded yet.
         if (id && !dataLoaded) {
             if (!silent) console.warn("Attempted to save before data load.");
             return;
         }
 
         const currentMeta = reportMetaRef.current;
-        if (!currentMeta.title || !currentMeta.project_id) {
-            if (!silent) toast({ variant: "destructive", title: "Erro", description: "Preencha título e projeto." });
-            return;
-        }
+        const finalTitle = (currentMeta.title || "").trim() || `Novo Relatório ${new Date().toLocaleDateString('pt-BR')}`;
+        const finalProjectId = currentMeta.project_id || (projects[0]?.id || "");
+
         if (!silent) setLoading(true);
+
+        const newReportId = id || (typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : `rep_${Math.random().toString(36).substring(2)}`);
+
         const reportData = {
-            title: currentMeta.title,
-            type: currentMeta.type,
-            project_id: currentMeta.project_id,
+            id: newReportId,
+            title: finalTitle,
+            type: currentMeta.type || "Técnico",
+            project_id: finalProjectId,
             content: blocksRef.current,
             updated_at: new Date().toISOString(),
         };
 
-        const { error } = id
+        const res = id
             ? await supabase.from('reports').update(reportData).eq('id', id)
             : await supabase.from('reports').insert([reportData]);
 
         if (!silent) {
             setLoading(false);
-            if (!error) toast({ title: "Salvo com sucesso!" });
-            else toast({ variant: "destructive", title: "Erro ao salvar", description: error.message });
+            if (!res.error) {
+                toast({ title: "Salvo com sucesso!" });
+                if (!id) {
+                    navigate(`/internal/reports/${newReportId}`, { replace: true });
+                }
+            } else {
+                toast({ variant: "destructive", title: "Erro ao salvar", description: res.error.message || "Não foi possível salvar o relatório." });
+            }
         }
     };
 
