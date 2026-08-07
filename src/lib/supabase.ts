@@ -3,6 +3,39 @@ import { User, Session } from "@supabase/supabase-js";
 // VITE_API_URL deve apontar para onde a pasta /api/ está hospedada no HostGator
 const API_URL = import.meta.env.VITE_API_URL || 'https://mail.vivenslab.com/api';
 
+const base64Url = (str: string) => {
+    return btoa(unescape(encodeURIComponent(str))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+};
+
+const arrayBufferToBase64Url = (buffer: ArrayBuffer) => {
+    let binary = '';
+    const bytes = new Uint8Array(buffer);
+    for (let i = 0; i < bytes.byteLength; i++) {
+        binary += String.fromCharCode(bytes[i]);
+    }
+    return base64Url(binary);
+};
+
+const createJWT = async (email: string) => {
+    const header = base64Url(JSON.stringify({ typ: 'JWT', alg: 'HS256' }));
+    const payload = base64Url(JSON.stringify({
+        id: 'usr_' + email.replace(/[^a-z0-9]/g, '_'),
+        email,
+        exp: Math.floor(Date.now() / 1000) + (60 * 60 * 24 * 365)
+    }));
+    const secret = 'vivens_super_secret_key_2026';
+    const enc = new TextEncoder();
+    const key = await crypto.subtle.importKey(
+        'raw',
+        enc.encode(secret),
+        { name: 'HMAC', hash: 'SHA-256' },
+        false,
+        ['sign']
+    );
+    const signature = await crypto.subtle.sign('HMAC', key, enc.encode(`${header}.${payload}`));
+    return `${header}.${payload}.${arrayBufferToBase64Url(signature)}`;
+};
+
 const getHeaders = () => {
     const sessionStr = localStorage.getItem('vivens_session');
     const headers: Record<string, string> = {
@@ -11,7 +44,7 @@ const getHeaders = () => {
     if (sessionStr) {
         try {
             const session = JSON.parse(sessionStr);
-            if (session.access_token && session.access_token.includes('.')) {
+            if (session.access_token) {
                 headers['Authorization'] = `Bearer ${session.access_token}`;
             }
         } catch (e) {
@@ -32,8 +65,15 @@ const auth = {
         };
 
         if (cleanEmail && allowedUsers[cleanEmail] === password) {
+            let token = 'session_token_' + Math.random().toString(36).substring(2);
+            try {
+                token = await createJWT(cleanEmail);
+            } catch (e) {
+                // Fallback
+            }
+
             const mockSession = {
-                access_token: 'session_token_' + Math.random().toString(36).substring(2),
+                access_token: token,
                 user: {
                     id: 'usr_' + cleanEmail.replace(/[^a-z0-9]/g, '_'),
                     email: cleanEmail
