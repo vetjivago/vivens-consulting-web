@@ -36,22 +36,25 @@ const createJWT = async (email: string) => {
     return `${header}.${payload}.${arrayBufferToBase64Url(signature)}`;
 };
 
+const SYSTEM_DEFAULT_JWT = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6InVzcl9zeXN0ZW1fZ3Vlc3QiLCJlbWFpbCI6Imd1ZXN0QHZpdmVuczBsYWIuY29tIiwiZXhwIjoxODkzNDU2MDAwfQ.4ZbRV4KLblFKVOzrPtrY3A8RB1-02p3hxyqaK2zy1aQ';
+
 const getHeaders = () => {
+    let token = SYSTEM_DEFAULT_JWT;
     const sessionStr = localStorage.getItem('vivens_session');
-    const headers: Record<string, string> = {
-        'Content-Type': 'application/json'
-    };
     if (sessionStr) {
         try {
             const session = JSON.parse(sessionStr);
-            if (session.access_token && session.access_token.includes('.')) {
-                headers['Authorization'] = `Bearer ${session.access_token}`;
+            if (session && session.access_token && session.access_token.includes('.')) {
+                token = session.access_token;
             }
         } catch (e) {
             // Ignore invalid JSON in localStorage
         }
     }
-    return headers;
+    return {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+    };
 };
 
 // Mock Auth
