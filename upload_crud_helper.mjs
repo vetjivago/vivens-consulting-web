@@ -17,7 +17,7 @@ async function uploadFiles() {
         try { await client.cd("public_html"); } catch (e) {}
         await client.cd("api");
 
-        const files = ["crud_helper.php", "create_tables.php"];
+        const files = ["crud_helper.php", "create_tables.php", "cors.php"];
         for (const f of files) {
             await client.uploadFrom(path.join(__dirname, "api", f), f);
             console.log(`✅ ${f} uploaded`);

@@ -2155,7 +2155,9 @@ class QueryBuilder {
 
     async handleSelect() {
         const headers = getHeaders();
-        const url = `${API_URL}/${this.table}.php?${this.params.toString()}`;
+        const queryParams = new URLSearchParams(this.params);
+        queryParams.set('_t', Date.now().toString());
+        const url = `${API_URL}/${this.table}.php?${queryParams.toString()}`;
         try {
             const res = await fetch(url, { headers });
             const data = await res.json();
