@@ -135,6 +135,20 @@ function handle_crud($table, $pdo, $jwt_secret)
     }
     header("Content-Type: application/json; charset=UTF-8");
 
+    // PHP converts dots to underscores in $_GET keys (e.g. id.eq becomes id_eq).
+    // Parse QUERY_STRING manually to preserve dots in parameter names.
+    $rawQuery = $_SERVER['QUERY_STRING'] ?? '';
+    $queryParams = [];
+    foreach (explode('&', $rawQuery) as $part) {
+        if ($part === '') continue;
+        $eqPos = strpos($part, '=');
+        if ($eqPos === false) {
+            $queryParams[urldecode($part)] = '';
+        } else {
+            $queryParams[urldecode(substr($part, 0, $eqPos))] = urldecode(substr($part, $eqPos + 1));
+        }
+    }
+
     try {
         if ($method === 'GET') {
             $conditions = [];
@@ -150,7 +164,8 @@ function handle_crud($table, $pdo, $jwt_secret)
                 }
             }
 
-            foreach ($_GET as $key => $value) {
+
+            foreach ($queryParams as $key => $value) {
                 if ($key === 'select') {
                     $rawSelect = $value;
                     continue;
@@ -158,13 +173,24 @@ function handle_crud($table, $pdo, $jwt_secret)
                 if ($key === 'order' || $key === 'orderDesc' || $key === 'limit' || $key === 'single') {
                     continue;
                 }
-                if (str_ends_with($key, 'eq')) {
-                    $realKey = str_replace('.eq', '', $key);
+                if (str_ends_with($key, '.eq')) {
+                    $realKey = substr($key, 0, -3); // remove trailing '.eq'
                     $conditions[] = "`$realKey` = ?";
                     $params[] = $value;
-                } else {
-                    $conditions[] = "`$key` = ?";
+                } elseif (str_ends_with($key, '.neq')) {
+                    $realKey = substr($key, 0, -4);
+                    $conditions[] = "`$realKey` != ?";
                     $params[] = $value;
+                } elseif (str_ends_with($key, '.gt')) {
+                    $realKey = substr($key, 0, -3);
+                    $conditions[] = "`$realKey` > ?";
+                    $params[] = $value;
+                } elseif (str_ends_with($key, '.lt')) {
+                    $realKey = substr($key, 0, -3);
+                    $conditions[] = "`$realKey` < ?";
+                    $params[] = $value;
+                } else {
+                    // Skip unknown params
                 }
             }
 
@@ -247,7 +273,7 @@ function handle_crud($table, $pdo, $jwt_secret)
 
         } elseif ($method === 'PUT' || $method === 'PATCH') {
             $input = json_decode(file_get_contents('php://input'), true);
-            $id = $_GET['id.eq'] ?? $_GET['id'] ?? $input['id'] ?? null;
+            $id = $queryParams['id.eq'] ?? $queryParams['id'] ?? $input['id'] ?? null;
 
             if (!$id) {
                 http_response_code(400);
@@ -297,7 +323,7 @@ function handle_crud($table, $pdo, $jwt_secret)
             echo json_encode([$updated]);
 
         } elseif ($method === 'DELETE') {
-            $id = $_GET['id.eq'] ?? $_GET['id'] ?? null;
+            $id = $queryParams['id.eq'] ?? $queryParams['id'] ?? null;
             if (!$id) {
                 http_response_code(400);
                 echo json_encode(['error' => 'Missing ID for delete']);
