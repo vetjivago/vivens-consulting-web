@@ -17,7 +17,7 @@ import { PDFDocument } from 'pdf-lib';
 import { PDFTemplate } from "@/components/reports/PDFTemplate";
 import { useToast } from "@/components/ui/use-toast";
 import { ReportBlock, StructuredReportData } from "@/types/report";
-import { Save, ArrowLeft, Loader2, Eye, EyeOff, Star, Table, Camera, FileText, Heading1, File, GripVertical, Plus, Scissors, ArrowUp, ArrowDown, Trash2, X, Image as ImageIcon, Download, AlignLeft, AlignCenter, AlignRight, AlignJustify } from "lucide-react";
+import { Save, ArrowLeft, Loader2, Eye, EyeOff, Star, Table, Camera, FileText, Heading1, File, GripVertical, Plus, Scissors, ArrowUp, ArrowDown, Trash2, X, Image as ImageIcon, Download, AlignLeft, AlignCenter, AlignRight, AlignJustify, AlertTriangle } from "lucide-react";
 
 // New Components
 import { ReportBlockWrapper } from "./components/ReportBlockWrapper";
@@ -719,61 +719,122 @@ export const ReportEditor = () => {
                                                                             />
                                                                         </div>
                                                                     ) : (
-                                                                        <>
-                                                                            <div className="col-span-1 pt-1">
-                                                                                <Input
-                                                                                    className="h-8 p-1 text-sm font-mono border-none shadow-none focus-visible:ring-0 text-center"
-                                                                                    value={item.itemNumber}
-                                                                                    onChange={(e) => {
-                                                                                        const newItems = [...block.data.items];
-                                                                                        newItems[idx].itemNumber = e.target.value;
-                                                                                        updateBlock(block.id, { items: newItems });
-                                                                                    }}
-                                                                                />
-                                                                            </div>
-                                                                            <div className="col-span-11 space-y-2">
-                                                                                <Textarea className="min-h-[20px] h-auto resize-none border-none shadow-none p-0 text-sm focus-visible:ring-0"
-                                                                                    value={item.description}
-                                                                                    onChange={(e) => {
-                                                                                        const newItems = [...block.data.items];
-                                                                                        newItems[idx].description = e.target.value;
-                                                                                        updateBlock(block.id, { items: newItems });
-                                                                                    }}
-                                                                                />
-                                                                                <div className="flex gap-2 items-center flex-wrap">
-                                                                                    <Select
-                                                                                        value={item.classification}
-                                                                                        onValueChange={(val) => {
-                                                                                            const newItems = [...block.data.items];
-                                                                                            newItems[idx].classification = val as any;
-                                                                                            updateBlock(block.id, { items: newItems });
-                                                                                        }}
-                                                                                    >
-                                                                                        <SelectTrigger className="h-6 w-[110px] text-[10px] border-zinc-200 bg-zinc-50"><SelectValue /></SelectTrigger>
-                                                                                        <SelectContent>
-                                                                                            <SelectItem value="Obrigatório">Obrigatório</SelectItem>
-                                                                                            <SelectItem value="Recomendado">Recomendado</SelectItem>
-                                                                                        </SelectContent>
-                                                                                    </Select>
-                                                                                    <div className="h-4 w-px bg-zinc-200 mx-1"></div>
-                                                                                    {['Atende', 'Não Atende', 'Parcial', 'N/A', 'Não Verificado', 'Crítico', 'Alta Prioridade'].map(status => (
-                                                                                        <button
-                                                                                            key={status}
-                                                                                            onClick={() => {
-                                                                                                const newItems = [...block.data.items];
-                                                                                                // Map shorthand to full status
-                                                                                                const map: any = { 'Parcial': 'Atende em Partes', 'N/A': 'Não se aplica' };
-                                                                                                newItems[idx].status = map[status] || status;
-                                                                                                updateBlock(block.id, { items: newItems });
-                                                                                            }}
-                                                                                            className={`text-[10px] px-2 py-1 rounded-full border ${item.status === (status === 'Parcial' ? 'Atende em Partes' : status === 'N/A' ? 'Não se aplica' : status) ? 'bg-zinc-800 text-white border-zinc-800' : 'bg-white text-zinc-500 hover:border-zinc-400'}`}
-                                                                                        >
-                                                                                            {status}
-                                                                                        </button>
-                                                                                    ))}
-                                                                                </div>
-                                                                            </div>
-                                                                        </>
+                                                                         <div className="col-span-12 space-y-3">
+                                                                             <div className="grid grid-cols-12 gap-2 items-start">
+                                                                                 <div className="col-span-1 pt-1">
+                                                                                     <Input
+                                                                                         className="h-8 p-1 text-sm font-mono border-none shadow-none focus-visible:ring-0 text-center font-bold text-zinc-700"
+                                                                                         value={item.itemNumber}
+                                                                                         onChange={(e) => {
+                                                                                             const newItems = [...block.data.items];
+                                                                                             newItems[idx].itemNumber = e.target.value;
+                                                                                             updateBlock(block.id, { items: newItems });
+                                                                                         }}
+                                                                                     />
+                                                                                 </div>
+                                                                                 <div className="col-span-11 space-y-2">
+                                                                                     <Textarea className="min-h-[20px] h-auto resize-none border-none shadow-none p-0 text-sm focus-visible:ring-0 font-medium"
+                                                                                         value={item.description}
+                                                                                         onChange={(e) => {
+                                                                                             const newItems = [...block.data.items];
+                                                                                             newItems[idx].description = e.target.value;
+                                                                                             updateBlock(block.id, { items: newItems });
+                                                                                         }}
+                                                                                     />
+
+                                                                                     {/* Controls Row */}
+                                                                                     <div className="flex gap-2 items-center flex-wrap pt-1">
+                                                                                         <Select
+                                                                                             value={item.classification || "Obrigatório"}
+                                                                                             onValueChange={(val) => {
+                                                                                                 const newItems = [...block.data.items];
+                                                                                                 newItems[idx].classification = val as any;
+                                                                                                 updateBlock(block.id, { items: newItems });
+                                                                                             }}
+                                                                                         >
+                                                                                             <SelectTrigger className="h-6 w-[110px] text-[10px] border-zinc-200 bg-zinc-50"><SelectValue /></SelectTrigger>
+                                                                                             <SelectContent>
+                                                                                                 <SelectItem value="Obrigatório">Obrigatório</SelectItem>
+                                                                                                 <SelectItem value="Recomendado">Recomendado</SelectItem>
+                                                                                             </SelectContent>
+                                                                                         </Select>
+
+                                                                                         <div className="h-4 w-px bg-zinc-200 mx-1"></div>
+
+                                                                                         {/* Status Buttons (Conformidade) */}
+                                                                                         <span className="text-[10px] font-semibold text-zinc-400 uppercase tracking-wider">Status:</span>
+                                                                                         {[
+                                                                                             { label: 'Atende', value: 'Atende', bg: 'bg-emerald-600 text-white border-emerald-600' },
+                                                                                             { label: 'Não Atende', value: 'Não Atende', bg: 'bg-red-600 text-white border-red-600' },
+                                                                                             { label: 'Parcial', value: 'Atende em Partes', bg: 'bg-amber-500 text-white border-amber-500' },
+                                                                                             { label: 'N/A', value: 'Não se aplica', bg: 'bg-zinc-700 text-white border-zinc-700' },
+                                                                                             { label: 'Não Verificado', value: 'Não Verificado', bg: 'bg-purple-600 text-white border-purple-600' }
+                                                                                         ].map(st => (
+                                                                                             <button
+                                                                                                 key={st.value}
+                                                                                                 type="button"
+                                                                                                 onClick={() => {
+                                                                                                     const newItems = [...block.data.items];
+                                                                                                     newItems[idx].status = st.value;
+                                                                                                     updateBlock(block.id, { items: newItems });
+                                                                                                 }}
+                                                                                                 className={`text-[10px] px-2 py-0.5 rounded-full border transition-all ${item.status === st.value ? `${st.bg} font-semibold shadow-sm` : 'bg-white text-zinc-600 hover:border-zinc-300'}`}
+                                                                                             >
+                                                                                                 {st.label}
+                                                                                             </button>
+                                                                                         ))}
+                                                                                     </div>
+
+                                                                                     {/* Gravidade/Prioridade Row (Exibido quando Não Atende ou Parcial) */}
+                                                                                     {(item.status === 'Não Atende' || item.status === 'Atende em Partes' || item.severity) && (
+                                                                                         <div className="flex gap-2 items-center flex-wrap pt-1 bg-zinc-50/80 p-1.5 rounded border border-zinc-100 mt-1">
+                                                                                             <span className="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider">Gravidade:</span>
+                                                                                             {[
+                                                                                                 { label: 'Normal', value: 'Normal', bg: 'bg-zinc-600 text-white' },
+                                                                                                 { label: 'Crítico 🚨', value: 'Crítico', bg: 'bg-red-700 text-white font-bold' },
+                                                                                                 { label: 'Alta Prioridade ⚠️', value: 'Alta Prioridade', bg: 'bg-orange-600 text-white font-bold' },
+                                                                                                 { label: 'Média Prioridade', value: 'Média Prioridade', bg: 'bg-amber-600 text-white' }
+                                                                                             ].map(sev => (
+                                                                                                 <button
+                                                                                                     key={sev.value}
+                                                                                                     type="button"
+                                                                                                     onClick={() => {
+                                                                                                         const newItems = [...block.data.items];
+                                                                                                         newItems[idx].severity = sev.value;
+                                                                                                         updateBlock(block.id, { items: newItems });
+                                                                                                     }}
+                                                                                                     className={`text-[10px] px-2 py-0.5 rounded-full border transition-all ${(item.severity || 'Normal') === sev.value ? `${sev.bg} shadow-sm border-transparent` : 'bg-white text-zinc-500 hover:border-zinc-300'}`}
+                                                                                                 >
+                                                                                                     {sev.label}
+                                                                                                 </button>
+                                                                                             ))}
+                                                                                         </div>
+                                                                                     )}
+                                                                                 </div>
+                                                                             </div>
+
+                                                                             {/* Textbox para Observações / Não Conformidade (Aparece se Não Atende, Parcial, ou Gravidade for Crítico/Alta) */}
+                                                                             {(item.status === 'Não Atende' || item.status === 'Atende em Partes' || item.severity === 'Crítico' || item.severity === 'Alta Prioridade' || item.observation) && (
+                                                                                 <div className="mt-2 pl-10 pr-2">
+                                                                                     <div className="p-2.5 bg-red-50/70 border border-red-200 rounded-md space-y-1">
+                                                                                         <label className="text-[11px] font-bold text-red-800 flex items-center gap-1.5">
+                                                                                             <AlertTriangle className="h-3.5 w-3.5 text-red-600" />
+                                                                                             Detalhamento da Não Conformidade / Observação:
+                                                                                         </label>
+                                                                                         <Textarea
+                                                                                             className="min-h-[60px] bg-white border-red-200 focus-visible:ring-red-400 text-xs resize-y"
+                                                                                             placeholder="Descreva aqui o motivo do não atendimento, justificativa ou ação recomendada..."
+                                                                                             value={item.observation || ""}
+                                                                                             onChange={(e) => {
+                                                                                                 const newItems = [...block.data.items];
+                                                                                                 newItems[idx].observation = e.target.value;
+                                                                                                 updateBlock(block.id, { items: newItems });
+                                                                                             }}
+                                                                                         />
+                                                                                     </div>
+                                                                                 </div>
+                                                                             )}
+                                                                         </div>
                                                                     )}
                                                                 </div>
                                                             ))}

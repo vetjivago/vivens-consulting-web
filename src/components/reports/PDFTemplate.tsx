@@ -214,12 +214,11 @@ const styles = StyleSheet.create({
         color: "#9CA3AF",
         fontSize: 9,
         borderTopWidth: 1,
-        borderTopColor: "#E5E7EB",
         paddingTop: 10,
     },
 });
 
-const StatusBadge = ({ status }: { status: ComplianceStatus }) => {
+const StatusBadge = ({ status, severity }: { status: ComplianceStatus; severity?: string }) => {
     let bg = "#F3F4F6";
     let color = "#374151";
 
@@ -232,8 +231,15 @@ const StatusBadge = ({ status }: { status: ComplianceStatus }) => {
     if (status === "Não Verificado") { bg = "#F3E8FF"; color = "#6B21A8"; }
 
     return (
-        <View style={[styles.statusBadge, { backgroundColor: bg }]}>
-            <Text style={{ color: color }}>{status}</Text>
+        <View style={{ flexDirection: 'column', gap: 2, alignItems: 'flex-end' }}>
+            <View style={[styles.statusBadge, { backgroundColor: bg }]}>
+                <Text style={{ color: color }}>{status}</Text>
+            </View>
+            {severity && severity !== 'Normal' && (
+                <View style={[styles.statusBadge, { backgroundColor: severity === 'Crítico' ? '#7F1D1D' : severity === 'Alta Prioridade' ? '#C2410C' : '#D97706' }]}>
+                    <Text style={{ color: '#FFFFFF' }}>{severity}</Text>
+                </View>
+            )}
         </View>
     );
 };
@@ -251,51 +257,34 @@ export const PDFTemplate = ({ data }: { data: StructuredReportData }) => (
                 </View>
             </View>
 
-            {/* Title & Info */}
-            <Text style={styles.title}>{data.title}</Text>
-            <View style={styles.metaGrid}>
-                <View style={styles.metaItem}>
-                    <Text style={styles.label}>Cliente</Text>
-                    <Text style={styles.value}>{data.client}</Text>
-                </View>
-                <View style={styles.metaItem}>
-                    <Text style={styles.label}>Projeto</Text>
-                    <Text style={styles.value}>{data.project}</Text>
-                </View>
-            </View>
+            {/* Document Title */}
+            <Text style={styles.documentTitle}>{data.title}</Text>
 
-            {/* Render Blocks */}
-            {data.blocks && data.blocks.map((block, index) => {
+            {/* Content Blocks */}
+            {data.blocks?.map((block) => {
+                if (block.type === 'page_break') {
+                    return <PageBreak key={block.id} />;
+                }
 
-                // 1. Executive Summary
-                if (block.type === 'executive_summary') {
+                if (block.type === 'section_header') {
                     return (
-                        <View key={block.id} style={styles.execSummary}>
-                            <Text style={[styles.title, { fontSize: 16, marginBottom: 10 }]}>Resumo Executivo</Text>
-                            <Text style={styles.value}>Imagens Analisadas: {block.data.imagesAnalyzed}</Text>
-                            <Text style={styles.value}>Pontos Críticos: {block.data.criticalImages}</Text>
-                            <Text style={[styles.value, { fontWeight: 'bold', marginTop: 5 }]}>Situação Geral: {block.data.generalStatus}</Text>
+                        <View key={block.id} style={styles.sectionHeader} break={false}>
+                            <Text style={styles.sectionTitle}>{block.data.title}</Text>
                         </View>
                     );
                 }
 
-                // 5. Section Header
-                if (block.type === 'section_header') {
-                    return (
-                        <Text key={block.id} style={styles.sectionTitle} break={false}>
-                            {block.data.title}
-                        </Text>
-                    );
-                }
-
-                // 2. Compliance Table
                 if (block.type === 'compliance_table') {
                     return (
-                        <View key={block.id}>
-                            <Text style={[styles.title, { fontSize: 14, textAlign: 'left', marginTop: 10 }]}>{block.data.title}</Text>
-                            <View style={styles.tableContainer}>
-                                {/* Table Header */}
-                                <View style={styles.tableHeader}>
+                        <View key={block.id} style={styles.tableBlock} break={false}>
+                            {block.data.title && (
+                                <Text style={[styles.title, { fontSize: 12, marginBottom: 8 }]}>
+                                    {block.data.title}
+                                </Text>
+                            )}
+                            <View style={styles.table}>
+                                {/* Header */}
+                                <View style={styles.tableRowHeader}>
                                     <View style={styles.colItem}><Text style={styles.headerTextTable}>Item</Text></View>
                                     <View style={styles.colDesc}><Text style={styles.headerTextTable}>Descrição (RN57)</Text></View>
                                     <View style={styles.colClass}><Text style={styles.headerTextTable}>Classificação</Text></View>
@@ -315,13 +304,22 @@ export const PDFTemplate = ({ data }: { data: StructuredReportData }) => (
                                         );
                                     }
                                     return (
-                                        <View key={i} style={styles.tableRow}>
-                                            <View style={styles.colItem}><Text style={styles.tabletext}>{item.itemNumber}</Text></View>
-                                            <View style={styles.colDesc}><Text style={styles.tabletext}>{item.description}</Text></View>
-                                            <View style={styles.colClass}><Text style={styles.tabletext}>{item.classification}</Text></View>
-                                            <View style={styles.colStatus}>
-                                                <StatusBadge status={item.status} />
+                                        <View key={i} style={{ flexDirection: 'column' }}>
+                                            <View style={styles.tableRow}>
+                                                <View style={styles.colItem}><Text style={styles.tabletext}>{item.itemNumber}</Text></View>
+                                                <View style={styles.colDesc}><Text style={styles.tabletext}>{item.description}</Text></View>
+                                                <View style={styles.colClass}><Text style={styles.tabletext}>{item.classification}</Text></View>
+                                                <View style={styles.colStatus}>
+                                                    <StatusBadge status={item.status} severity={item.severity} />
+                                                </View>
                                             </View>
+                                            {item.observation ? (
+                                                <View style={{ paddingLeft: 25, paddingRight: 10, paddingTop: 4, paddingBottom: 6, backgroundColor: '#FEF2F2', borderBottomWidth: 1, borderBottomColor: '#FCA5A5' }}>
+                                                    <Text style={{ fontSize: 9, color: '#991B1B', fontWeight: 'bold' }}>
+                                                        Obs / Não Conformidade: {item.observation}
+                                                    </Text>
+                                                </View>
+                                            ) : null}
                                         </View>
                                     );
                                 })}
