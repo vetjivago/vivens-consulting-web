@@ -4,9 +4,8 @@ import { fileURLToPath } from "url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-async function uploadFile() {
+async function uploadFiles() {
     const client = new ftp.Client();
-    client.ftp.verbose = true;
     try {
         await client.access({
             host: "ftp.labscienceacademy.com",
@@ -15,17 +14,19 @@ async function uploadFile() {
             secure: false
         });
 
-        console.log("Connected. Uploading crud_helper.php...");
-        
-        try { await client.cd("public_html"); } catch (e) { console.log("Skipping public_html cd"); }
+        try { await client.cd("public_html"); } catch (e) {}
         await client.cd("api");
 
-        await client.uploadFrom(path.join(__dirname, "api/crud_helper.php"), "crud_helper.php");
-        console.log("✅ crud_helper.php uploaded successfully!");
+        const files = ["crud_helper.php", "create_tables.php"];
+        for (const f of files) {
+            await client.uploadFrom(path.join(__dirname, "api", f), f);
+            console.log(`✅ ${f} uploaded`);
+        }
+        console.log("Done!");
     } catch (err) {
         console.error("FTP Error:", err);
     }
     client.close();
 }
 
-uploadFile();
+uploadFiles();
