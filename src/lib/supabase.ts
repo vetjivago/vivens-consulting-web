@@ -44,7 +44,7 @@ const getHeaders = () => {
     if (sessionStr) {
         try {
             const session = JSON.parse(sessionStr);
-            if (session.access_token) {
+            if (session.access_token && session.access_token.includes('.')) {
                 headers['Authorization'] = `Bearer ${session.access_token}`;
             }
         } catch (e) {
@@ -111,7 +111,16 @@ const auth = {
         const sessionStr = localStorage.getItem('vivens_session');
         if (sessionStr) {
             try {
-                return { data: { session: JSON.parse(sessionStr) } };
+                const session = JSON.parse(sessionStr);
+                if (session && session.user && session.user.email && (!session.access_token || !session.access_token.includes('.'))) {
+                    try {
+                        session.access_token = await createJWT(session.user.email);
+                        localStorage.setItem('vivens_session', JSON.stringify(session));
+                    } catch (e) {
+                        // Ignore
+                    }
+                }
+                return { data: { session } };
             } catch (e) {
                 return { data: { session: null } };
             }
