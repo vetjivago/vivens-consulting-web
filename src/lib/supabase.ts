@@ -184,6 +184,16 @@ const INITIAL_SEEDS: Record<string, any[]> = {
             document: "",
             address: "BELO HORIZONTE/MG",
             created_at: "2026-08-03T12:00:00.000000+00:00"
+        },
+        {
+            id: "ufmg-client-002",
+            name: "UNIVERSIDADE FEDERAL DE MINAS GERAIS",
+            fantasy_name: "UNIVERSIDADE FEDERAL DE MINAS GERAIS",
+            email: "contato@ufmg.br",
+            phone: "",
+            document: "",
+            address: "BELO HORIZONTE/MG",
+            created_at: "2026-08-04T12:00:00.000000+00:00"
         }
     ],
     projects: [
@@ -217,21 +227,11 @@ const INITIAL_SEEDS: Record<string, any[]> = {
     ],
     reports: [
         {
-                "id": "989b7a2e-9a4a-437e-83d1-50f8312e0090",
-                "project_id": "d4f5a8e1-1f50-46d4-894e-d44fdd29463e",
-                "title": "UNIDADE DE PESQUISA EXPERIMENTAL-UNIPEX UNESP-BOTUCATU  UPEA 1",
-                "type": "Consultoria",
-                "content": [
-                        {
-                                "id": "e12ee792-176c-4017-a80a-d1286fca9164",
-                                "data": {
-                                        "generalStatus": "Múltiplas não‑conformidades críticas",
-                                        "criticalImages": 5,
-                                        "evaluationDate": "29/01/2026",
-                                        "imagesAnalyzed": 125
-                                },
-                                "type": "executive_summary"
-                        },
+            id: "989b7a2e-9a4a-437e-83d1-50f8312e0090",
+            project_id: "d4f5a8e1-1f50-46d4-894e-d44fdd29463e",
+            title: "UNIDADE DE PESQUISA EXPERIMENTAL-UNIPEX UNESP-BOTUCATU UPEA 1",
+            type: "Consultoria",
+            content: [
                         {
                                 "id": "4dc2661f-36ec-4bb2-a74b-30241ee0082d",
                                 "data": {
@@ -1958,6 +1958,19 @@ const INITIAL_SEEDS: Record<string, any[]> = {
             projects: {
                 title: "CT Vacinas",
                 clients: { name: "CT VACINAS" }
+            },
+            content: []
+        },
+        {
+            id: "ct-vacinas-report-ufmg-002",
+            project_id: "ct-vacinas-project-001",
+            title: "CT Vacinas - Planta Original",
+            type: "Consultoria",
+            status: "draft",
+            created_at: "2026-08-04T12:00:00.000Z",
+            projects: {
+                title: "CT Vacinas",
+                clients: { name: "UNIVERSIDADE FEDERAL DE MINAS GERAIS" }
             },
             content: []
         }
