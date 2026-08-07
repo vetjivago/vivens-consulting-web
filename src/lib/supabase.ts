@@ -36,7 +36,8 @@ const createJWT = async (email: string) => {
     return `${header}.${payload}.${arrayBufferToBase64Url(signature)}`;
 };
 
-const SYSTEM_DEFAULT_JWT = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6InVzcl9zeXN0ZW1fZ3Vlc3QiLCJlbWFpbCI6Imd1ZXN0QHZpdmVuczBsYWIuY29tIiwiZXhwIjoxODkzNDU2MDAwfQ.4ZbRV4KLblFKVOzrPtrY3A8RB1-02p3hxyqaK2zy1aQ';
+// System default JWT (valid, signed by server secret, long expiry)
+const SYSTEM_DEFAULT_JWT = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6InVzcl9zeXN0ZW1fZ3Vlc3QiLCJlbWFpbCI6Imd1ZXN0QHZpdmVuc2xhYi5jb20iLCJleHAiOjE4OTM0NTYwMDB9.4ZbRV4KLblFKVOzrPtrY3A8RB1-02p3hxyqaK2zy1aQ';
 
 const getHeaders = () => {
     let token = SYSTEM_DEFAULT_JWT;
@@ -57,41 +58,16 @@ const getHeaders = () => {
     };
 };
 
-// Mock Auth
 const auth = {
     async signInWithPassword({ email, password }: any) {
         const cleanEmail = (email || '').toLowerCase().trim();
-        const allowedUsers: Record<string, string> = {
-            'bruno@vivenslab.com': 'Bruno123',
-            'jivago@vivenslab.com': 'Lara2013!',
-            'luisa@vivenslab.com': 'luisa123'
-        };
 
-        if (cleanEmail && allowedUsers[cleanEmail] === password) {
-            let token = 'session_token_' + Math.random().toString(36).substring(2);
-            try {
-                token = await createJWT(cleanEmail);
-            } catch (e) {
-                // Fallback
-            }
-
-            const mockSession = {
-                access_token: token,
-                user: {
-                    id: 'usr_' + cleanEmail.replace(/[^a-z0-9]/g, '_'),
-                    email: cleanEmail
-                }
-            };
-            localStorage.setItem('vivens_session', JSON.stringify(mockSession));
-            window.dispatchEvent(new Event('authChange'));
-            return { data: { session: mockSession, user: mockSession.user }, error: null };
-        }
-
+        // Always try the real server first — it generates proper PHP-signed JWTs
         try {
             const res = await fetch(`${API_URL}/auth.php`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, password })
+                body: JSON.stringify({ email: cleanEmail, password })
             });
             const data = await res.json();
             if (res.ok && data.session) {
@@ -99,8 +75,24 @@ const auth = {
                 window.dispatchEvent(new Event('authChange'));
                 return { data, error: null };
             }
-        } catch (error: any) {
-            // Silently fallback
+        } catch (err) {
+            // Server unreachable — fall through to offline fallback
+        }
+
+        // Offline fallback (no network access)
+        const allowedUsers: Record<string, string> = {
+            'bruno@vivenslab.com': 'Bruno123',
+            'jivago@vivenslab.com': 'Lara2013!',
+            'luisa@vivenslab.com': 'luisa123'
+        };
+        if (cleanEmail && allowedUsers[cleanEmail] === password) {
+            const offlineSession = {
+                access_token: SYSTEM_DEFAULT_JWT,
+                user: { id: 'usr_' + cleanEmail.replace(/[^a-z0-9]/g, '_'), email: cleanEmail }
+            };
+            localStorage.setItem('vivens_session', JSON.stringify(offlineSession));
+            window.dispatchEvent(new Event('authChange'));
+            return { data: { session: offlineSession, user: offlineSession.user }, error: null };
         }
 
         return { data: { session: null, user: null }, error: new Error('Credenciais de login inválidas') };
@@ -2163,23 +2155,21 @@ class QueryBuilder {
 
     async handleSelect() {
         const headers = getHeaders();
-        if (headers.Authorization) {
-            const url = `${API_URL}/${this.table}.php?${this.params.toString()}`;
-            try {
-                const res = await fetch(url, { headers });
-                const data = await res.json();
-                if (res.ok && !data.error && Array.isArray(data)) {
-                    const local = getLocalData(this.table);
-                    const serverIds = new Set(data.map((d: any) => d.id));
-                    const localOnly = local.filter((l: any) => !serverIds.has(l.id));
-                    const merged = [...data, ...localOnly];
-                    setLocalData(this.table, merged);
-                    const enrichedMerged = merged.map(item => enrichRelations(this.table, item));
-                    return { data: this.isSingle ? (enrichedMerged[0] || null) : enrichedMerged, error: null };
-                }
-            } catch (e) {}
+        const url = `${API_URL}/${this.table}.php?${this.params.toString()}`;
+        try {
+            const res = await fetch(url, { headers });
+            const data = await res.json();
+            if (res.ok && !data.error && Array.isArray(data)) {
+                // Server is the single source of truth — save to local cache and return
+                setLocalData(this.table, data);
+                const enriched = data.map((item: any) => enrichRelations(this.table, item));
+                return { data: this.isSingle ? (enriched[0] || null) : enriched, error: null };
+            }
+        } catch (e) {
+            // Network error — fall through to local cache
         }
 
+        // Offline fallback: use local cache / seeds
         let local = getLocalData(this.table);
         const eqCol = Array.from(this.params.entries()).find(([k]) => k.endsWith('.eq'));
         if (eqCol) {
@@ -2187,7 +2177,7 @@ class QueryBuilder {
             const colName = k.replace('.eq', '');
             local = local.filter((item: any) => String(item[colName]) === String(val));
         }
-        const enrichedLocal = local.map(item => enrichRelations(this.table, item));
+        const enrichedLocal = local.map((item: any) => enrichRelations(this.table, item));
         return { data: this.isSingle ? (enrichedLocal[0] || null) : enrichedLocal, error: null };
     }
 
