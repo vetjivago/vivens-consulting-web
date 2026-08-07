@@ -289,7 +289,8 @@ function handle_crud($table, $pdo, $jwt_secret)
                 foreach ($input as $k => $v) {
                     if (in_array($k, $validCols)) {
                         if (is_array($v) || is_object($v)) {
-                            $v = json_encode($v, JSON_UNESCAPED_UNICODE);
+                            $encoded = json_encode($v, JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE);
+                            $v = ($encoded !== false) ? $encoded : json_encode([]);
                         }
                         $filteredInput[$k] = $v;
                     }
@@ -298,7 +299,8 @@ function handle_crud($table, $pdo, $jwt_secret)
             } else {
                 foreach ($input as $k => $v) {
                     if (is_array($v) || is_object($v)) {
-                        $input[$k] = json_encode($v, JSON_UNESCAPED_UNICODE);
+                        $encoded = json_encode($v, JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE);
+                        $input[$k] = ($encoded !== false) ? $encoded : json_encode([]);
                     }
                 }
             }

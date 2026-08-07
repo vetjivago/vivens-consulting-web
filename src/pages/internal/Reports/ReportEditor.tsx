@@ -213,8 +213,8 @@ export const ReportEditor = () => {
             title: finalTitle,
             type: currentMeta.type || "Técnico",
             project_id: finalProjectId,
-            content: blocksRef.current,
-            updated_at: new Date().toISOString(),
+            content: JSON.stringify(blocksRef.current),
+            updated_at: new Date().toISOString().slice(0, 19).replace('T', ' '),
         };
 
         const res = id

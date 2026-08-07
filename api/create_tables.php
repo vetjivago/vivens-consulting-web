@@ -87,10 +87,22 @@ try {
           `type` VARCHAR(50),
           `status` VARCHAR(50) DEFAULT 'draft',
           `content` LONGTEXT,
+          `images` LONGTEXT,
+          `pdf_url` TEXT,
           `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
           `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
     ");
+
+    // Ensure extra columns exist if reports table was created before
+    $reportExtraCols = ['images' => 'LONGTEXT', 'pdf_url' => 'TEXT'];
+    $stmtR = $pdo->query("SHOW COLUMNS FROM `reports`");
+    $existingR = $stmtR->fetchAll(PDO::FETCH_COLUMN);
+    foreach ($reportExtraCols as $col => $type) {
+        if (!in_array($col, $existingR)) {
+            $pdo->exec("ALTER TABLE `reports` ADD COLUMN `$col` $type");
+        }
+    }
 
     // 5. Invoices table
     $pdo->exec("
