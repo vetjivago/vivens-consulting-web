@@ -153,7 +153,28 @@ export const ReportEditor = () => {
                 const { data } = await supabase.from('reports').select('*').eq('id', id).single();
                 if (data) {
                     setReportMeta({ title: data.title, type: data.type, project_id: data.project_id || "", client_name: "", project_title: "" });
-                    setBlocks(typeof data.content === 'string' ? [{ id: 'legacy', type: 'text_section', data: { text: data.content } }] : data.content || []);
+                    
+                    let parsedBlocks = [];
+                    if (typeof data.content === 'string') {
+                        try {
+                            const trimmed = data.content.trim();
+                            if (trimmed.startsWith('[') || trimmed.startsWith('{')) {
+                                parsedBlocks = JSON.parse(trimmed);
+                                // Handle potential double serialization
+                                if (typeof parsedBlocks === 'string') {
+                                    parsedBlocks = JSON.parse(parsedBlocks);
+                                }
+                            } else {
+                                parsedBlocks = [{ id: 'legacy', type: 'text_section', data: { text: data.content } }];
+                            }
+                        } catch (e) {
+                            parsedBlocks = [{ id: 'legacy', type: 'text_section', data: { text: data.content } }];
+                        }
+                    } else {
+                        parsedBlocks = data.content || [];
+                    }
+                    setBlocks(parsedBlocks);
+
                     const proj = projects.find(p => p.id === data.project_id);
                     if (proj) {
                         const clientName = proj.client?.name || proj.clients?.name || "";
@@ -180,10 +201,13 @@ export const ReportEditor = () => {
                     },
                     {
                         id: crypto.randomUUID(),
-                        type: 'compliance_table',
+                        type: 'rn57_evaluation',
                         data: {
-                            title: "TABELA AUXILIAR - CRITÉRIO MÍNIMOS PARA CRIAÇÃO, MANUTENÇÃO E EXPERIMENTAÇÃO DE ROEDORES E LAGOMORFOS (RN 57)",
-                            items: RN57_TEMPLATE_ITEMS.map(i => ({ ...i, id: crypto.randomUUID() }))
+                            category: 'Infraestrutura e Equipamentos',
+                            title: 'RN57 Item 1',
+                            status: 'Conforme',
+                            severity: 'Leve',
+                            description: ''
                         }
                     }
                 ]);
@@ -213,7 +237,7 @@ export const ReportEditor = () => {
             title: finalTitle,
             type: currentMeta.type || "Técnico",
             project_id: finalProjectId,
-            content: JSON.stringify(blocksRef.current),
+            content: blocksRef.current,
             updated_at: new Date().toISOString().slice(0, 19).replace('T', ' '),
         };
 
