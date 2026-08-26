@@ -40,18 +40,6 @@ const Equipe = () => {
       }
     },
     {
-      name: "Jivago Rôlo",
-      role: "CSO - Diretor Científico",
-      image: "/jivago-rolo.jpg",
-      bio: "Médico-veterinário e cientista com mestrado e doutorado em Biologia Animal, certificado como FELASA SPECIALIST D. Atua na interface estratégica entre bem-estar animal, ética em pesquisa e desenho experimental aplicado à biomedicina, com foco em inovação e conformidade. Lidera projetos de gestão e modernização de biotérios acadêmicos e industriais, implementando rotinas rigorosas de biossegurança e infraestrutura de ponta. Sua atuação busca harmonizar a excelência científica com os mais elevados padrões de cuidado animal, promovendo eficiência operacional, redução de variáveis e robustez nos resultados. Dedica-se à consultoria especializada para o aprimoramento contínuo de instalações e processos em instituições de pesquisa.",
-      ownership: "Sócio Proprietário",
-      contact: {
-        email: "jivagorolo@gmail.com",
-        linkedin: "https://www.linkedin.com/in/jivago-rolo",
-        lattes: "http://lattes.cnpq.br/0401207763557481"
-      }
-    },
-    {
       name: "Marta Speck",
       role: "COO - Diretora de Operações",
       image: "/marta-speck.jpg",
@@ -142,7 +130,13 @@ const Equipe = () => {
       <section className="py-16">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-bold mb-12 text-primary border-b pb-2 text-center">Sócios</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className={`grid grid-cols-1 gap-8 ${
+            team.length === 2 
+              ? "md:grid-cols-2 max-w-4xl mx-auto" 
+              : team.length === 1 
+                ? "md:grid-cols-1 max-w-md mx-auto" 
+                : "md:grid-cols-3"
+          }`}>
             {team.map((member, index) => (
               <Card key={index} className="h-full hover:shadow-lg transition-shadow">
                 <CardContent className="p-6 flex flex-col items-center text-center">
