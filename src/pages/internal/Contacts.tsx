@@ -22,9 +22,9 @@ export default function Contacts() {
     try {
       // Mock since contacts table might not exist in seeds yet
       setContacts([
-        { id: '1', name: 'Carlos Santos', company: 'Empresa A', role: 'Diretor', email: 'carlos@empresaA.com', phone: '11999999999', type: 'Decisor', influence: 'Alta' },
-        { id: '2', name: 'Ana Lima', company: 'Empresa B', role: 'Gerente TI', email: 'ana@empresaB.com', phone: '11888888888', type: 'Influenciador', influence: 'Média' },
-        { id: '3', name: 'Roberto Alves', company: 'Empresa A', role: 'Analista', email: 'roberto@empresaA.com', phone: '11777777777', type: 'Técnico', influence: 'Baixa' }
+        { id: '1', name: 'Prof. Dr. Ricardo Mendes', company: 'UNESC', role: 'Coordenador CEUA', email: 'ricardo@unesc.net', phone: '48999999999', type: 'Decisor', influence: 'Alta' },
+        { id: '2', name: 'Marta Speck', company: 'Vivens', role: 'Consultora', email: 'marta@vivenslab.com', phone: '11888888888', type: 'Técnico', influence: 'Média' },
+        { id: '3', name: 'Dr. João Silva', company: 'UNESP', role: 'Pesquisador', email: 'joao.silva@unesp.br', phone: '11777777777', type: 'Técnico', influence: 'Baixa' }
       ]);
     } catch (error) {
       console.error(error);

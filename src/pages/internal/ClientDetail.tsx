@@ -101,7 +101,7 @@ export default function ClientDetail() {
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div><span className="text-muted-foreground block mb-1">CNPJ/CPF</span><span className="font-medium">{client.document || '-'}</span></div>
-                  <div><span className="text-muted-foreground block mb-1">Responsável</span><span className="font-medium">João Silva</span></div>
+                  <div><span className="text-muted-foreground block mb-1">Responsável</span><span className="font-medium">Jivago Rolo</span></div>
                   <div><span className="text-muted-foreground block mb-1">Origem</span><span className="font-medium">Indicação</span></div>
                   <div><span className="text-muted-foreground block mb-1">Data Cadastro</span><span className="font-medium">10/01/2023</span></div>
                 </div>

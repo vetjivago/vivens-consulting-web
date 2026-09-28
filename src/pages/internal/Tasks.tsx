@@ -18,9 +18,9 @@ export default function Tasks() {
   useEffect(() => {
     // Mock load
     setTasks([
-      { id: 1, title: 'Revisar Contrato', project: 'Implantação ERP', responsible: 'João Silva', priority: 'alta', status: 'pendente', dueDate: '2026-10-05' },
-      { id: 2, title: 'Atualizar Layout', project: 'Website Institucional', responsible: 'Maria Souza', priority: 'normal', status: 'em_andamento', dueDate: '2026-10-10' },
-      { id: 3, title: 'Reunião de Alinhamento', project: 'Consultoria RH', responsible: 'Ana Paula', priority: 'urgente', status: 'concluido', dueDate: '2026-09-20' },
+      { id: 1, title: 'Revisar Contrato UNESC', project: 'Consultoria UNESC', responsible: 'Jivago Rolo', priority: 'alta', status: 'pendente', dueDate: '2026-10-05' },
+      { id: 2, title: 'Elaborar Relatório RN57', project: 'Consultoria UNESP Botucatu', responsible: 'Luisa Braga', priority: 'normal', status: 'em_andamento', dueDate: '2026-10-10' },
+      { id: 3, title: 'Reunião de Alinhamento CT Vacinas', project: 'CT Vacinas', responsible: 'Marta Speck', priority: 'urgente', status: 'concluido', dueDate: '2026-09-20' },
     ]);
   }, []);
 

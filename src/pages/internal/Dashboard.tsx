@@ -74,8 +74,8 @@ export default function Dashboard() {
         ],
         projetosRecentes: activeProjects.slice(0, 5),
         recentActivity: [
-          { time: new Date().toISOString(), user: 'João', action: 'Atualizou status da oportunidade', entity: 'Projeto Beta' },
-          { time: new Date(Date.now() - 3600000).toISOString(), user: 'Maria', action: 'Criou nova proposta', entity: 'Cliente Alpha' },
+          { time: new Date().toISOString(), user: 'Jivago Rolo', action: 'Atualizou status da oportunidade', entity: 'CT Vacinas' },
+          { time: new Date(Date.now() - 3600000).toISOString(), user: 'Luisa Braga', action: 'Criou nova proposta', entity: 'UFMG' },
         ]
       });
     } catch (error) {

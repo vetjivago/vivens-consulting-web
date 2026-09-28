@@ -174,13 +174,13 @@ export default function ProjectDetail() {
                 <TableBody>
                   <TableRow>
                     <TableCell>Definir Escopo</TableCell>
-                    <TableCell>João Silva</TableCell>
+                    <TableCell>Jivago Rolo</TableCell>
                     <TableCell><Badge>Concluído</Badge></TableCell>
                     <TableCell>10/10/2026</TableCell>
                   </TableRow>
                   <TableRow>
                     <TableCell>Desenvolvimento Frontend</TableCell>
-                    <TableCell>Maria Souza</TableCell>
+                    <TableCell>Marta Speck</TableCell>
                     <TableCell><Badge variant="outline">Em Execução</Badge></TableCell>
                     <TableCell>25/10/2026</TableCell>
                   </TableRow>

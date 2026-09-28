@@ -13,8 +13,8 @@ import { useToast } from '@/hooks/use-toast';
 export default function Meetings() {
   const [view, setView] = useState<'calendar' | 'list'>('list');
   const [meetings, setMeetings] = useState([
-    { id: 1, title: 'Apresentação de Proposta', client: 'Acme Corp', date: '2026-10-01', time: '14:00', responsible: 'João Silva' },
-    { id: 2, 'title': 'Revisão Semanal', project: 'ERP Interno', date: '2026-10-02', time: '09:00', responsible: 'Maria Souza' },
+    { id: 1, title: 'Apresentação de Proposta', client: 'UFMG', date: '2026-10-01', time: '14:00', responsible: 'Jivago Rolo' },
+    { id: 2, title: 'Revisão Semanal', project: 'CT Vacinas', date: '2026-10-02', time: '09:00', responsible: 'Bruno Braga' },
   ]);
 
   return (

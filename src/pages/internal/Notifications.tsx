@@ -38,7 +38,7 @@ export default function Notifications() {
       const { data } = await supabase.from('notifications').select('*').order('created_at', { ascending: false });
       setNotifications(data || [
         { id: '1', type: 'tarefa', title: 'Tarefa Vencida', message: 'Revisar escopo do projeto', created_at: new Date().toISOString(), read: false },
-        { id: '2', type: 'mencao', title: 'Você foi mencionado', message: 'João mencionou você em Cliente Alpha', created_at: new Date(Date.now() - 86400000).toISOString(), read: false },
+        { id: '2', type: 'mencao', title: 'Você foi mencionado', message: 'Jivago Rolo mencionou você em CT Vacinas', created_at: new Date(Date.now() - 86400000).toISOString(), read: false },
         { id: '3', type: 'projeto', title: 'Projeto Concluído', message: 'Implementação CRM finalizada', created_at: new Date(Date.now() - 500000000).toISOString(), read: true },
       ]);
     } catch (error) {
