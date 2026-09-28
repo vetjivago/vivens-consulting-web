@@ -1978,7 +1978,35 @@ const INITIAL_SEEDS: Record<string, any[]> = {
             },
             content: []
         }
-    ]
+    ],
+    contacts: [],
+    leads: [],
+    opportunities: [],
+    opportunity_activities: [],
+    proposals: [],
+    proposal_versions: [],
+    tasks: [],
+    task_dependencies: [],
+    meetings: [],
+    meeting_decisions: [],
+    suppliers: [],
+    supplier_quotes: [],
+    partners: [],
+    commercial_participations: [],
+    commissions: [],
+    contracts: [],
+    revenues: [],
+    expenses: [],
+    documents: [],
+    document_versions: [],
+    communications: [],
+    notifications: [],
+    approvals: [],
+    audit_logs: [],
+    knowledge_articles: [],
+    comments: [],
+    tags: [],
+    lessons_learned: []
 };
 
 // LocalStorage Persistence Helpers
