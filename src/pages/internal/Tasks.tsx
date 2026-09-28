@@ -7,22 +7,60 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Plus, Search, Filter } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Plus, Search, Filter, Loader2 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { useToast } from '@/hooks/use-toast';
 
 export default function Tasks() {
   const [tasks, setTasks] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [newTaskTitle, setNewTaskTitle] = useState('');
   const { toast } = useToast();
 
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      const { data, error } = await supabase.from('tasks').select('*');
+      if (error) throw error;
+      setTasks(data || []);
+    } catch (error) {
+      console.error(error);
+      toast({ title: 'Erro', description: 'Não foi possível carregar as tarefas.', variant: 'destructive' });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    // Mock load
-    setTasks([
-      { id: 1, title: 'Revisar Contrato UNESC', project: 'Consultoria UNESC', responsible: 'Jivago Rolo', priority: 'alta', status: 'pendente', dueDate: '2026-10-05' },
-      { id: 2, title: 'Elaborar Relatório RN57', project: 'Consultoria UNESP Botucatu', responsible: 'Luisa Braga', priority: 'normal', status: 'em_andamento', dueDate: '2026-10-10' },
-      { id: 3, title: 'Reunião de Alinhamento CT Vacinas', project: 'CT Vacinas', responsible: 'Marta Speck', priority: 'urgente', status: 'concluido', dueDate: '2026-09-20' },
-    ]);
+    fetchData();
   }, []);
+
+  const handleCreateTask = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const { error } = await supabase.from('tasks').insert([{ title: newTaskTitle, status: 'pendente', priority: 'normal' }]);
+      if (error) throw error;
+      toast({ title: 'Sucesso', description: 'Tarefa criada com sucesso.' });
+      setNewTaskTitle('');
+      setIsDialogOpen(false);
+      fetchData();
+    } catch (error) {
+      toast({ title: 'Erro', description: 'Erro ao criar tarefa.', variant: 'destructive' });
+    }
+  };
+
+  const updateTaskStatus = async (id: number, newStatus: string) => {
+    try {
+      const { error } = await supabase.from('tasks').update({ status: newStatus }).eq('id', id);
+      if (error) throw error;
+      toast({ title: 'Sucesso', description: 'Status da tarefa atualizado.' });
+      fetchData();
+    } catch (error) {
+      toast({ title: 'Erro', description: 'Erro ao atualizar status.', variant: 'destructive' });
+    }
+  };
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
@@ -48,7 +86,23 @@ export default function Tasks() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold tracking-tight">Tarefas</h1>
-        <Button><Plus className="mr-2 h-4 w-4"/> Nova Tarefa</Button>
+        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+          <DialogTrigger asChild>
+            <Button><Plus className="mr-2 h-4 w-4"/> Nova Tarefa</Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Nova Tarefa</DialogTitle>
+            </DialogHeader>
+            <form onSubmit={handleCreateTask} className="space-y-4">
+              <div>
+                <label className="text-sm font-medium">Título</label>
+                <Input value={newTaskTitle} onChange={e => setNewTaskTitle(e.target.value)} required />
+              </div>
+              <Button type="submit">Salvar</Button>
+            </form>
+          </DialogContent>
+        </Dialog>
       </div>
 
       <Tabs defaultValue="minhas">
@@ -84,26 +138,44 @@ export default function Tasks() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {tasks.map(task => (
-                    <TableRow key={task.id} className="cursor-pointer hover:bg-muted/50">
-                      <TableCell className="font-medium">{task.title}</TableCell>
-                      <TableCell>{task.project}</TableCell>
-                      <TableCell>{task.responsible}</TableCell>
-                      <TableCell>
-                        <Badge className={`${getPriorityColor(task.priority)} text-white border-none`}>
-                          {task.priority.toUpperCase()}
-                        </Badge>
+                  {loading ? (
+                    <TableRow>
+                      <TableCell colSpan={6} className="text-center py-8">
+                        <Loader2 className="h-6 w-6 animate-spin mx-auto text-muted-foreground" />
                       </TableCell>
-                      <TableCell>{getStatusBadge(task.status)}</TableCell>
-                      <TableCell>{task.dueDate}</TableCell>
                     </TableRow>
-                  ))}
-                  {tasks.length === 0 && (
+                  ) : tasks.length === 0 ? (
                     <TableRow>
                       <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
                         Nenhuma tarefa encontrada.
                       </TableCell>
                     </TableRow>
+                  ) : (
+                    tasks.map(task => (
+                      <TableRow key={task.id} className="cursor-pointer hover:bg-muted/50">
+                        <TableCell className="font-medium">{task.title}</TableCell>
+                        <TableCell>{task.project}</TableCell>
+                        <TableCell>{task.responsible}</TableCell>
+                        <TableCell>
+                          <Badge className={`${getPriorityColor(task.priority)} text-white border-none`}>
+                            {(task.priority || 'normal').toUpperCase()}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <select 
+                            className="text-sm bg-transparent border rounded p-1"
+                            value={task.status || 'pendente'} 
+                            onChange={(e) => updateTaskStatus(task.id, e.target.value)}
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <option value="pendente">Pendente</option>
+                            <option value="em_andamento">Em Andamento</option>
+                            <option value="concluido">Concluído</option>
+                          </select>
+                        </TableCell>
+                        <TableCell>{task.dueDate}</TableCell>
+                      </TableRow>
+                    ))
                   )}
                 </TableBody>
               </Table>

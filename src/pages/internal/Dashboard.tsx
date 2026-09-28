@@ -20,10 +20,12 @@ import {
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { useToast } from '@/components/ui/use-toast';
 
 export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<any>({});
+  const { toast } = useToast();
 
   useEffect(() => {
     fetchDashboardData();
@@ -32,19 +34,44 @@ export default function Dashboard() {
   const fetchDashboardData = async () => {
     setLoading(true);
     try {
-      // Mocked aggregations that would come from various tables
-      const { data: opportunities } = await supabase.from('opportunities').select('*');
-      const { data: projects } = await supabase.from('projects').select('*');
-      const { data: tasks } = await supabase.from('tasks').select('*');
+      const { data: opportunities, error: oppsError } = await supabase.from('opportunities').select('*');
+      const { data: projects, error: projectsError } = await supabase.from('projects').select('*');
+      const { data: tasks, error: tasksError } = await supabase.from('tasks').select('*');
+      const { data: revenues, error: revError } = await supabase.from('revenues').select('*');
       
-      // Compute stats
+      if (oppsError) throw oppsError;
+      if (projectsError) throw projectsError;
+      if (tasksError) throw tasksError;
+      if (revError) throw revError;
+      
       const oppsCount = opportunities?.length || 0;
       const pipelineValue = (opportunities || []).reduce((acc, curr) => acc + (curr.value || 0), 0);
       
       const activeProjects = (projects || []).filter(p => p.status !== 'completed');
-      const overdueProjects = activeProjects.filter(p => new Date(p.end_date) < new Date()).length;
+      const overdueProjects = activeProjects.filter(p => p.end_date && new Date(p.end_date) < new Date()).length;
       
-      const overdueTasks = (tasks || []).filter(t => t.status !== 'completed' && new Date(t.due_date) < new Date()).length;
+      const overdueTasks = (tasks || []).filter(t => t.status !== 'completed' && t.due_date && new Date(t.due_date) < new Date()).length;
+
+      // Filter revenues for the current month
+      const currentMonth = new Date().getMonth();
+      const currentYear = new Date().getFullYear();
+      const receitaMes = (revenues || []).filter(r => {
+        if (!r.date) return false;
+        const d = new Date(r.date);
+        return d.getMonth() === currentMonth && d.getFullYear() === currentYear && r.status === 'pago';
+      }).reduce((acc, curr) => acc + (curr.value || 0), 0);
+
+      const aReceber = (revenues || []).filter(r => r.status !== 'pago').reduce((acc, curr) => acc + (curr.value || 0), 0);
+      const valorContratado = (projects || []).reduce((acc, p) => acc + (p.value || 0), 0);
+
+      // Group pipeline data by phase/status
+      const pipelineGroups = (opportunities || []).reduce((acc: any, curr: any) => {
+        const status = curr.status || 'Outros';
+        acc[status] = (acc[status] || 0) + (curr.value || 0);
+        return acc;
+      }, {});
+
+      const pipelineData = Object.entries(pipelineGroups).map(([name, value]) => ({ name, value }));
 
       setData({
         oppsCount,
@@ -52,34 +79,28 @@ export default function Dashboard() {
         activeProjectsCount: activeProjects.length,
         overdueProjects,
         overdueTasks,
-        receitaMes: 45000,
+        receitaMes,
         pipelineTotal: pipelineValue,
-        pipelinePonderado: pipelineValue * 0.6, // Mock
-        pipelineData: [
-          { name: 'Prospecção', value: 10000 },
-          { name: 'Qualificação', value: 20000 },
-          { name: 'Proposta', value: 50000 },
-          { name: 'Negociação', value: 30000 },
+        pipelinePonderado: pipelineValue * 0.6,
+        pipelineData: pipelineData.length > 0 ? pipelineData : [
+          { name: 'Nenhum', value: 0 }
         ],
         alerts: [
-          { type: 'danger', icon: AlertCircle, text: `${overdueTasks} tarefas vencidas`, link: '/internal/tasks' },
-          { type: 'warning', icon: Clock, text: '3 oportunidades sem follow-up há mais de 7 dias', link: '/internal/opportunities' },
-          { type: 'warning', icon: FileText, text: '2 propostas enviadas aguardando retorno', link: '/internal/proposals' },
-          { type: 'info', icon: FolderOpen, text: '1 projeto aguardando cliente', link: '/internal/projects' },
+          ...(overdueTasks > 0 ? [{ type: 'danger', icon: AlertCircle, text: `${overdueTasks} tarefas vencidas`, link: '/internal/tasks' }] : []),
+          { type: 'info', icon: FolderOpen, text: `${activeProjects.length} projetos ativos`, link: '/internal/projects' },
         ],
-        agenda: [
-          { time: '10:00', title: 'Reunião Kickoff Cliente A', type: 'Reunião' },
-          { time: '14:30', title: 'Follow-up Proposta XYZ', type: 'Follow-up' },
-          { time: '17:00', title: 'Entrega Relatório Final', type: 'Prazo' },
-        ],
+        agenda: [], // Could be fetched from a calendar table if available
         projetosRecentes: activeProjects.slice(0, 5),
-        recentActivity: [
-          { time: new Date().toISOString(), user: 'Jivago Rolo', action: 'Atualizou status da oportunidade', entity: 'CT Vacinas' },
-          { time: new Date(Date.now() - 3600000).toISOString(), user: 'Luisa Braga', action: 'Criou nova proposta', entity: 'UFMG' },
-        ]
+        recentActivity: [],
+        valorContratado,
+        aReceber
       });
-    } catch (error) {
-      console.error("Error fetching dashboard data:", error);
+    } catch (error: any) {
+      toast({
+        title: "Erro ao carregar dashboard",
+        description: error.message,
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
     }
@@ -103,9 +124,9 @@ export default function Dashboard() {
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{data.oppsCount}</div>
+            <div className="text-2xl font-bold">{data.oppsCount || 0}</div>
             <p className="text-xs text-muted-foreground">
-              R$ {data.pipelineValue?.toLocaleString('pt-BR')} no pipeline
+              R$ {data.pipelineValue?.toLocaleString('pt-BR') || 0} no pipeline
             </p>
           </CardContent>
         </Card>
@@ -115,7 +136,7 @@ export default function Dashboard() {
             <FolderOpen className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{data.activeProjectsCount}</div>
+            <div className="text-2xl font-bold">{data.activeProjectsCount || 0}</div>
             {data.overdueProjects > 0 ? (
               <p className="text-xs text-red-500 font-medium">{data.overdueProjects} atrasado(s)</p>
             ) : (
@@ -130,7 +151,7 @@ export default function Dashboard() {
           </CardHeader>
           <CardContent>
             <div className={`text-2xl font-bold ${data.overdueTasks > 0 ? 'text-red-600' : ''}`}>
-              {data.overdueTasks}
+              {data.overdueTasks || 0}
             </div>
             <p className="text-xs text-muted-foreground">Ação necessária</p>
           </CardContent>
@@ -141,8 +162,8 @@ export default function Dashboard() {
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">R$ {data.receitaMes?.toLocaleString('pt-BR')}</div>
-            <p className="text-xs text-muted-foreground">+12% em relação ao mês anterior</p>
+            <div className="text-2xl font-bold">R$ {data.receitaMes?.toLocaleString('pt-BR') || 0}</div>
+            <p className="text-xs text-muted-foreground">-</p>
           </CardContent>
         </Card>
       </div>
@@ -176,8 +197,8 @@ export default function Dashboard() {
           <CardHeader>
             <CardTitle>Pipeline Resumo</CardTitle>
             <CardDescription>
-              Total: R$ {data.pipelineTotal?.toLocaleString('pt-BR')} | 
-              Ponderado: R$ {data.pipelinePonderado?.toLocaleString('pt-BR')}
+              Total: R$ {data.pipelineTotal?.toLocaleString('pt-BR') || 0} | 
+              Ponderado: R$ {data.pipelinePonderado?.toLocaleString('pt-BR') || 0}
             </CardDescription>
           </CardHeader>
           <CardContent className="h-[250px]">
@@ -230,12 +251,14 @@ export default function Dashboard() {
               {data.projetosRecentes?.map((project: any) => (
                 <div key={project.id} className="flex items-center justify-between p-2 hover:bg-muted/50 rounded-md">
                   <div>
-                    <p className="font-medium">{project.title}</p>
-                    <p className="text-sm text-muted-foreground">Cliente A</p>
+                    <p className="font-medium">{project.title || project.name}</p>
                   </div>
                   <Badge>{project.status || 'Ativo'}</Badge>
                 </div>
               ))}
+              {(!data.projetosRecentes || data.projetosRecentes.length === 0) && (
+                <p className="text-sm text-muted-foreground">Nenhum projeto recente</p>
+              )}
             </div>
           </CardContent>
         </Card>
@@ -262,6 +285,9 @@ export default function Dashboard() {
                   </div>
                 </div>
               ))}
+              {(!data.recentActivity || data.recentActivity.length === 0) && (
+                <p className="text-sm text-muted-foreground pl-12">Nenhuma atividade recente</p>
+              )}
             </div>
           </CardContent>
         </Card>
@@ -271,10 +297,10 @@ export default function Dashboard() {
       <div className="grid gap-4 md:grid-cols-3">
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Valor Contratado (Mês)</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">Valor Contratado Total</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">R$ 120.500</div>
+            <div className="text-2xl font-bold">R$ {data.valorContratado?.toLocaleString('pt-BR') || 0}</div>
           </CardContent>
         </Card>
         <Card>
@@ -282,7 +308,7 @@ export default function Dashboard() {
             <CardTitle className="text-sm font-medium text-muted-foreground">A Receber</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">R$ 45.200</div>
+            <div className="text-2xl font-bold">R$ {data.aReceber?.toLocaleString('pt-BR') || 0}</div>
           </CardContent>
         </Card>
         <Card>
@@ -290,7 +316,7 @@ export default function Dashboard() {
             <CardTitle className="text-sm font-medium text-muted-foreground">Margem Média</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">42%</div>
+            <div className="text-2xl font-bold">-</div>
           </CardContent>
         </Card>
       </div>

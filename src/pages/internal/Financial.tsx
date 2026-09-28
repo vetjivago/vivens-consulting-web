@@ -11,6 +11,8 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { useToast } from '@/components/ui/use-toast';
+import { format } from 'date-fns';
 
 // Chart components can be mocked for now if Recharts is missing, but assuming Recharts is installed
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
@@ -21,29 +23,91 @@ const formatCurrency = (value: number) => {
 
 export default function Financial() {
   const [loading, setLoading] = useState(true);
+  const [monthlyData, setMonthlyData] = useState<any[]>([]);
+  const [pieData, setPieData] = useState<any[]>([]);
+  const [valorContratado, setValorContratado] = useState(0);
+  const [valorRecebido, setValorRecebido] = useState(0);
+  const [contasReceber, setContasReceber] = useState(0);
+  const [contasPagar, setContasPagar] = useState(0);
+  const [recebimentos, setRecebimentos] = useState<any[]>([]);
 
-  // Mock data for charts
-  const monthlyData = [
-    { name: 'Abr', receita: 40000, custos: 24000 },
-    { name: 'Mai', receita: 30000, custos: 13980 },
-    { name: 'Jun', receita: 20000, custos: 9800 },
-    { name: 'Jul', receita: 27800, custos: 3908 },
-    { name: 'Ago', receita: 18900, custos: 4800 },
-    { name: 'Set', receita: 23900, custos: 3800 },
-  ];
+  const { toast } = useToast();
 
-  const pieData = [
-    { name: 'Fornecedores', value: 400 },
-    { name: 'Serviços', value: 300 },
-    { name: 'Impostos', value: 300 },
-    { name: 'Outros', value: 200 },
-  ];
   const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
 
   useEffect(() => {
-    // Mock fetch
-    setTimeout(() => setLoading(false), 500);
+    fetchData();
   }, []);
+
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      const { data: revs, error: revError } = await supabase.from('revenues').select('*');
+      const { data: exps, error: expError } = await supabase.from('expenses').select('*');
+      const { data: projs, error: projsError } = await supabase.from('projects').select('*');
+      
+      if (revError) throw revError;
+      if (expError) throw expError;
+      if (projsError) throw projsError;
+
+      const revenues = revs || [];
+      const expenses = exps || [];
+      const projects = projs || [];
+
+      // Calculate totals
+      const contratado = projects.reduce((acc, p) => acc + (p.value || 0), 0);
+      setValorContratado(contratado);
+      
+      const recebido = revenues.filter(r => r.status === 'pago').reduce((acc, r) => acc + (r.value || 0), 0);
+      setValorRecebido(recebido);
+      
+      const aReceber = revenues.filter(r => r.status !== 'pago').reduce((acc, r) => acc + (r.value || 0), 0);
+      setContasReceber(aReceber);
+      
+      const aPagar = expenses.filter(e => e.status !== 'pago').reduce((acc, e) => acc + (e.value || 0), 0);
+      setContasPagar(aPagar);
+      
+      setRecebimentos(revenues);
+      
+      // Calculate pie data
+      const expensesByCategory = expenses.reduce((acc, exp) => {
+        const cat = exp.category || 'Outros';
+        acc[cat] = (acc[cat] || 0) + (exp.value || 0);
+        return acc;
+      }, {} as Record<string, number>);
+      
+      setPieData(Object.entries(expensesByCategory).map(([name, value]) => ({ name, value })));
+      
+      // Group revenues and expenses by month
+      const monthlyMap: Record<string, { receita: number, custos: number }> = {};
+      
+      revenues.forEach(r => {
+        if (!r.date) return;
+        const month = format(new Date(r.date), 'MMM');
+        if (!monthlyMap[month]) monthlyMap[month] = { receita: 0, custos: 0 };
+        monthlyMap[month].receita += (r.value || 0);
+      });
+      
+      expenses.forEach(e => {
+        if (!e.date) return;
+        const month = format(new Date(e.date), 'MMM');
+        if (!monthlyMap[month]) monthlyMap[month] = { receita: 0, custos: 0 };
+        monthlyMap[month].custos += (e.value || 0);
+      });
+      
+      setMonthlyData(Object.entries(monthlyMap).map(([name, data]) => ({ name, ...data })));
+
+    } catch (error: any) {
+      toast({
+        title: "Erro",
+        description: "Falha ao carregar dados financeiros.",
+        variant: "destructive",
+      });
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="p-6 space-y-6">
@@ -58,7 +122,7 @@ export default function Financial() {
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{formatCurrency(1250000)}</div>
+            <div className="text-2xl font-bold">{formatCurrency(valorContratado)}</div>
           </CardContent>
         </Card>
         <Card>
@@ -67,7 +131,7 @@ export default function Financial() {
             <Wallet className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{formatCurrency(850000)}</div>
+            <div className="text-2xl font-bold">{formatCurrency(valorRecebido)}</div>
           </CardContent>
         </Card>
         <Card>
@@ -76,7 +140,7 @@ export default function Financial() {
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{formatCurrency(150000)}</div>
+            <div className="text-2xl font-bold">{formatCurrency(contasReceber)}</div>
           </CardContent>
         </Card>
         <Card>
@@ -85,7 +149,7 @@ export default function Financial() {
             <TrendingDown className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{formatCurrency(45000)}</div>
+            <div className="text-2xl font-bold">{formatCurrency(contasPagar)}</div>
           </CardContent>
         </Card>
       </div>
@@ -136,17 +200,33 @@ export default function Financial() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Projeto</TableHead>
-                <TableHead>Cliente</TableHead>
+                <TableHead>Descrição</TableHead>
                 <TableHead>Valor</TableHead>
-                <TableHead>Vencimento</TableHead>
+                <TableHead>Data</TableHead>
                 <TableHead>Status</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              <TableRow>
-                <TableCell colSpan={5} className="text-center py-4 text-muted-foreground">Nenhum dado cadastrado.</TableCell>
-              </TableRow>
+              {loading ? (
+                <TableRow>
+                  <TableCell colSpan={4} className="text-center py-4 text-muted-foreground">Carregando...</TableCell>
+                </TableRow>
+              ) : recebimentos.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={4} className="text-center py-4 text-muted-foreground">Nenhum dado cadastrado.</TableCell>
+                </TableRow>
+              ) : (
+                recebimentos.map(r => (
+                  <TableRow key={r.id}>
+                    <TableCell>{r.description || '-'}</TableCell>
+                    <TableCell>{formatCurrency(r.value || 0)}</TableCell>
+                    <TableCell>{r.date ? format(new Date(r.date), 'dd/MM/yyyy') : '-'}</TableCell>
+                    <TableCell>
+                      <Badge variant="secondary">{r.status || 'Pendente'}</Badge>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
             </TableBody>
           </Table>
         </div>

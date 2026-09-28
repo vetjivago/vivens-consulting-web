@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { Input } from '@/components/ui/input';
 import { 
   Tabs, TabsContent, TabsList, TabsTrigger 
 } from '@/components/ui/tabs';
@@ -159,7 +160,35 @@ export default function ProjectDetail() {
                 <CardTitle>Tarefas do Projeto</CardTitle>
                 <CardDescription>Lista completa de tarefas e seus status.</CardDescription>
               </div>
-              <Button><Plus className="mr-2 h-4 w-4"/> Nova Tarefa</Button>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button><Plus className="mr-2 h-4 w-4"/> Nova Tarefa</Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Nova Tarefa</DialogTitle>
+                  </DialogHeader>
+                  <form onSubmit={async (e) => {
+                    e.preventDefault();
+                    const formData = new FormData(e.target as HTMLFormElement);
+                    const title = formData.get('title') as string;
+                    try {
+                      const { error } = await supabase.from('tasks').insert([{ title, project_id: id, status: 'pendente', priority: 'normal' }]);
+                      if (error) throw error;
+                      toast({ title: 'Sucesso', description: 'Tarefa criada.' });
+                      fetchData();
+                    } catch (err) {
+                      toast({ title: 'Erro', description: 'Erro ao criar tarefa.', variant: 'destructive' });
+                    }
+                  }} className="space-y-4">
+                    <div>
+                      <label className="text-sm font-medium">Título</label>
+                      <Input name="title" required />
+                    </div>
+                    <Button type="submit">Salvar</Button>
+                  </form>
+                </DialogContent>
+              </Dialog>
             </CardHeader>
             <CardContent>
               <Table>
@@ -172,18 +201,38 @@ export default function ProjectDetail() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  <TableRow>
-                    <TableCell>Definir Escopo</TableCell>
-                    <TableCell>Jivago Rolo</TableCell>
-                    <TableCell><Badge>Concluído</Badge></TableCell>
-                    <TableCell>10/10/2026</TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell>Desenvolvimento Frontend</TableCell>
-                    <TableCell>Marta Speck</TableCell>
-                    <TableCell><Badge variant="outline">Em Execução</Badge></TableCell>
-                    <TableCell>25/10/2026</TableCell>
-                  </TableRow>
+                  {tasks.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={4} className="text-center py-4 text-muted-foreground">Nenhuma tarefa encontrada.</TableCell>
+                    </TableRow>
+                  ) : tasks.map(task => (
+                    <TableRow key={task.id}>
+                      <TableCell>{task.title}</TableCell>
+                      <TableCell>{task.responsible || 'N/A'}</TableCell>
+                      <TableCell>
+                        <select 
+                          className="text-sm bg-transparent border rounded p-1"
+                          value={task.status || 'pendente'} 
+                          onChange={async (e) => {
+                            const newStatus = e.target.value;
+                            try {
+                              const { error } = await supabase.from('tasks').update({ status: newStatus }).eq('id', task.id);
+                              if (error) throw error;
+                              toast({ title: 'Sucesso', description: 'Status atualizado.' });
+                              fetchData();
+                            } catch (err) {
+                              toast({ title: 'Erro', description: 'Erro ao atualizar status.', variant: 'destructive' });
+                            }
+                          }}
+                        >
+                          <option value="pendente">Pendente</option>
+                          <option value="em_andamento">Em Andamento</option>
+                          <option value="concluido">Concluído</option>
+                        </select>
+                      </TableCell>
+                      <TableCell>{task.dueDate || 'N/A'}</TableCell>
+                    </TableRow>
+                  ))}
                 </TableBody>
               </Table>
             </CardContent>

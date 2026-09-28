@@ -6,12 +6,18 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Search, Plus, User, Mail, Phone, Filter } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { useToast } from "@/hooks/use-toast";
 
 export default function Contacts() {
+  const { toast } = useToast();
   const [contacts, setContacts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [formData, setFormData] = useState<any>({
+    type: 'Decisor',
+    influence: 'Alta'
+  });
 
   useEffect(() => {
     fetchContacts();
@@ -20,16 +26,28 @@ export default function Contacts() {
   const fetchContacts = async () => {
     setLoading(true);
     try {
-      // Mock since contacts table might not exist in seeds yet
-      setContacts([
-        { id: '1', name: 'Prof. Dr. Ricardo Mendes', company: 'UNESC', role: 'Coordenador CEUA', email: 'ricardo@unesc.net', phone: '48999999999', type: 'Decisor', influence: 'Alta' },
-        { id: '2', name: 'Marta Speck', company: 'Vivens', role: 'Consultora', email: 'marta@vivenslab.com', phone: '11888888888', type: 'Técnico', influence: 'Média' },
-        { id: '3', name: 'Dr. João Silva', company: 'UNESP', role: 'Pesquisador', email: 'joao.silva@unesp.br', phone: '11777777777', type: 'Técnico', influence: 'Baixa' }
-      ]);
+      const { data, error } = await supabase.from('contacts').select('*');
+      if (error) throw error;
+      setContacts(data || []);
     } catch (error) {
       console.error(error);
+      toast({ title: 'Erro', description: 'Erro ao carregar contatos.', variant: 'destructive' });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleSubmit = async () => {
+    try {
+      const { error } = await supabase.from('contacts').insert([{ ...formData }]);
+      if (error) throw error;
+      toast({ title: 'Sucesso', description: 'Contato criado com sucesso.' });
+      setIsDialogOpen(false);
+      setFormData({ type: 'Decisor', influence: 'Alta' });
+      fetchContacts();
+    } catch (error) {
+      console.error(error);
+      toast({ title: 'Erro', description: 'Erro ao criar contato.', variant: 'destructive' });
     }
   };
 
@@ -54,50 +72,50 @@ export default function Contacts() {
             <div className="grid grid-cols-2 gap-4 py-4">
               <div className="space-y-2 col-span-2">
                 <label className="text-sm font-medium">Nome *</label>
-                <Input placeholder="Nome completo" />
+                <Input placeholder="Nome completo" value={formData.name || ''} onChange={e => setFormData({...formData, name: e.target.value})} />
               </div>
               <div className="space-y-2">
                 <label className="text-sm font-medium">Empresa (Cliente)</label>
-                <Input placeholder="Buscar empresa..." />
+                <Input placeholder="Buscar empresa..." value={formData.company || ''} onChange={e => setFormData({...formData, company: e.target.value})} />
               </div>
               <div className="space-y-2">
                 <label className="text-sm font-medium">Cargo</label>
-                <Input placeholder="Cargo" />
+                <Input placeholder="Cargo" value={formData.role || ''} onChange={e => setFormData({...formData, role: e.target.value})} />
               </div>
               <div className="space-y-2">
                 <label className="text-sm font-medium">Email</label>
-                <Input placeholder="email@exemplo.com" type="email" />
+                <Input placeholder="email@exemplo.com" type="email" value={formData.email || ''} onChange={e => setFormData({...formData, email: e.target.value})} />
               </div>
               <div className="space-y-2">
                 <label className="text-sm font-medium">Telefone</label>
-                <Input placeholder="(00) 00000-0000" />
+                <Input placeholder="(00) 00000-0000" value={formData.phone || ''} onChange={e => setFormData({...formData, phone: e.target.value})} />
               </div>
               <div className="space-y-2">
                 <label className="text-sm font-medium">Tipo de Contato</label>
-                <select className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm">
-                  <option value="decisor">Decisor</option>
-                  <option value="influenciador">Influenciador</option>
-                  <option value="tecnico">Técnico</option>
-                  <option value="financeiro">Financeiro</option>
-                  <option value="outro">Outro</option>
+                <select className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm" value={formData.type || 'Decisor'} onChange={e => setFormData({...formData, type: e.target.value})}>
+                  <option value="Decisor">Decisor</option>
+                  <option value="Influenciador">Influenciador</option>
+                  <option value="Técnico">Técnico</option>
+                  <option value="Financeiro">Financeiro</option>
+                  <option value="Outro">Outro</option>
                 </select>
               </div>
               <div className="space-y-2">
                 <label className="text-sm font-medium">Influência na Decisão</label>
-                <select className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm">
-                  <option value="alta">Alta</option>
-                  <option value="media">Média</option>
-                  <option value="baixa">Baixa</option>
+                <select className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm" value={formData.influence || 'Alta'} onChange={e => setFormData({...formData, influence: e.target.value})}>
+                  <option value="Alta">Alta</option>
+                  <option value="Média">Média</option>
+                  <option value="Baixa">Baixa</option>
                 </select>
               </div>
               <div className="space-y-2 col-span-2">
                 <label className="text-sm font-medium">Observações</label>
-                <textarea className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm" placeholder="Observações adicionais..." />
+                <textarea className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm" placeholder="Observações adicionais..." value={formData.notes || ''} onChange={e => setFormData({...formData, notes: e.target.value})} />
               </div>
             </div>
             <div className="flex justify-end gap-2">
               <Button variant="outline" onClick={() => setIsDialogOpen(false)}>Cancelar</Button>
-              <Button onClick={() => setIsDialogOpen(false)}>Salvar</Button>
+              <Button onClick={handleSubmit}>Salvar</Button>
             </div>
           </DialogContent>
         </Dialog>

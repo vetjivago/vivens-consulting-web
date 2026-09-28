@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Search, Plus, List, LayoutGrid, AlertCircle, Clock } from 'lucide-react';
 import { format, differenceInDays } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { useToast } from '@/hooks/use-toast';
 
 interface Opportunity {
   id: string;
@@ -45,6 +46,7 @@ const formatCurrency = (value: number) => {
 };
 
 export default function Opportunities() {
+  const { toast } = useToast();
   const [opportunities, setOpportunities] = useState<Opportunity[]>([]);
   const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState<'list' | 'kanban'>('list');
@@ -89,9 +91,11 @@ export default function Opportunities() {
       
       setIsDialogOpen(false);
       setFormData({ etapa: 'lead_identificado', valor_estimado: 0, probabilidade: 10 });
+      toast({ title: 'Sucesso', description: 'Oportunidade criada com sucesso.' });
       fetchOpportunities();
     } catch (error) {
       console.error('Erro ao criar oportunidade:', error);
+      toast({ title: 'Erro', description: 'Erro ao criar oportunidade.', variant: 'destructive' });
     }
   };
 
@@ -99,9 +103,11 @@ export default function Opportunities() {
     try {
       const { error } = await supabase.from('opportunities').update({ etapa: newStage }).eq('id', id);
       if (error) throw error;
+      toast({ title: 'Sucesso', description: 'Etapa atualizada.' });
       fetchOpportunities();
     } catch (error) {
       console.error('Erro ao mover oportunidade:', error);
+      toast({ title: 'Erro', description: 'Erro ao mover oportunidade.', variant: 'destructive' });
     }
   };
 

@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/dialog';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { useToast } from '@/components/ui/use-toast';
 
 interface Proposal {
   id: string;
@@ -28,7 +29,7 @@ interface Proposal {
   responsavel: string;
 }
 
-const statusColors = {
+const statusColors: any = {
   rascunho: 'bg-gray-100 text-gray-800',
   revisao_interna: 'bg-blue-100 text-blue-800',
   aguardando_aprovacao: 'bg-amber-100 text-amber-800',
@@ -50,6 +51,7 @@ export default function Proposals() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [isNewDialogOpen, setIsNewDialogOpen] = useState(false);
+  const { toast } = useToast();
 
   // New Proposal Form State
   const [newProposal, setNewProposal] = useState({
@@ -70,16 +72,57 @@ export default function Proposals() {
       const { data, error } = await supabase.from('proposals').select('*');
       if (error) throw error;
       setProposals(data || []);
-    } catch (error) {
-      console.error('Error fetching proposals:', error);
+    } catch (error: any) {
+      toast({
+        title: "Erro ao carregar propostas",
+        description: error.message,
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
     }
   };
 
+  const handleSaveProposal = async () => {
+    try {
+      const { data, error } = await supabase.from('proposals').insert([{
+        numero: newProposal.numero,
+        cliente: newProposal.cliente,
+        oportunidade: newProposal.oportunidade,
+        responsavel: newProposal.responsavel,
+        valor: newProposal.valor,
+        validade: newProposal.validade ? new Date(newProposal.validade).toISOString() : null,
+        data: new Date().toISOString(),
+        status: 'rascunho',
+        versao: 1
+      }]).select();
+
+      if (error) throw error;
+
+      toast({
+        title: "Sucesso",
+        description: "Proposta criada com sucesso",
+      });
+      setIsNewDialogOpen(false);
+      fetchProposals();
+      
+      setNewProposal({
+        numero: '', cliente: '', oportunidade: '', responsavel: '', 
+        escopo: '', entregaveis: '', prazo: '', valor: 0, 
+        impostos: 0, custos: 0, condicoes_pagamento: '', validade: ''
+      });
+    } catch (error: any) {
+      toast({
+        title: "Erro ao criar proposta",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
   const filteredProposals = proposals.filter(p => 
-    p.numero.toLowerCase().includes(search.toLowerCase()) || 
-    p.cliente.toLowerCase().includes(search.toLowerCase())
+    p.numero?.toLowerCase().includes(search.toLowerCase()) || 
+    p.cliente?.toLowerCase().includes(search.toLowerCase())
   );
 
   return (
@@ -134,7 +177,7 @@ export default function Proposals() {
             </div>
             <div className="flex justify-end space-x-2">
               <Button variant="outline" onClick={() => setIsNewDialogOpen(false)}>Cancelar</Button>
-              <Button onClick={() => {}}>Salvar Proposta</Button>
+              <Button onClick={handleSaveProposal}>Salvar Proposta</Button>
             </div>
           </DialogContent>
         </Dialog>
@@ -185,14 +228,14 @@ export default function Proposals() {
                   <TableCell>{proposal.cliente}</TableCell>
                   <TableCell>{proposal.oportunidade}</TableCell>
                   <TableCell>v{proposal.versao}</TableCell>
-                  <TableCell>{formatCurrency(proposal.valor)}</TableCell>
+                  <TableCell>{formatCurrency(proposal.valor || 0)}</TableCell>
                   <TableCell>
-                    <Badge variant="secondary" className={statusColors[proposal.status]}>
-                      {proposal.status.replace('_', ' ').toUpperCase()}
+                    <Badge variant="secondary" className={proposal.status && statusColors[proposal.status] ? statusColors[proposal.status] : ''}>
+                      {proposal.status ? proposal.status.replace('_', ' ').toUpperCase() : ''}
                     </Badge>
                   </TableCell>
-                  <TableCell>{format(new Date(proposal.data), 'dd/MM/yyyy')}</TableCell>
-                  <TableCell>{format(new Date(proposal.validade), 'dd/MM/yyyy')}</TableCell>
+                  <TableCell>{proposal.data ? format(new Date(proposal.data), 'dd/MM/yyyy') : ''}</TableCell>
+                  <TableCell>{proposal.validade ? format(new Date(proposal.validade), 'dd/MM/yyyy') : ''}</TableCell>
                 </TableRow>
               ))
             )}
